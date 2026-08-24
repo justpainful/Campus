@@ -4,6 +4,8 @@ using Campus.Desktop.ViewModels;
 using Campus.Domain;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Windows.ApplicationModel.DataTransfer;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 
@@ -46,8 +48,17 @@ public sealed partial class CollectionPage : Page
         EmptyTitle.Text = _definition.EmptyTitle;
         EmptyMessage.Text = _definition.EmptyMessage;
 
+        // A list nothing is created in should not offer a button that creates nothing.
+        NewButton.Visibility = _definition.CanCreate ? Visibility.Visible : Visibility.Collapsed;
+        BuildCommands();
+
         Segments.Segments = _definition.Segments.Select(s => s.Name).ToList();
         Segments.SelectedIndex = 0;
+
+        // A single segment is not a choice, so it is not drawn as one.
+        Segments.Visibility = _definition.Segments.Count > 1
+            ? Visibility.Visible
+            : Visibility.Collapsed;
 
         await LoadSubjectsAsync();
         await ReloadAsync();
@@ -128,6 +139,57 @@ public sealed partial class CollectionPage : Page
         {
             // Superseded by a newer load; the newer one will render.
         }
+    }
+
+    /// <summary>
+    /// Builds the buttons for actions that belong to the whole list. Destructive ones ask first,
+    /// and say what they are about to destroy.
+    /// </summary>
+    private void BuildCommands()
+    {
+        ListCommands.Children.Clear();
+
+        foreach (var command in _definition.Commands)
+        {
+            var button = new Button
+            {
+                Style = (Style)Application.Current.Resources[
+                    command.IsDestructive ? "Button.Destructive" : "Button.Secondary"],
+                Content = command.Label,
+                MinWidth = 0,
+            };
+
+            button.Click += async (_, _) => await RunAsync(command);
+            ListCommands.Children.Add(button);
+        }
+    }
+
+    private async Task RunAsync(CollectionCommand command)
+    {
+        if (!_workspace.IsUnlocked) return;
+
+        if (command.ConfirmTitle is { } title && !await ObjectCommands.ConfirmAsync(
+            XamlRoot, title, command.ConfirmMessage ?? "", command.Label)) return;
+
+        if (command.Label == "Empty trash")
+        {
+            // Emptying returns the content hashes nothing references any more; those are the
+            // only ones the vault may forget.
+            var orphaned = await _workspace.Objects.EmptyTrashAsync();
+            var freed = 0;
+
+            foreach (var hash in orphaned)
+            {
+                try { if (_workspace.Vault.Objects.Delete(hash)) freed++; }
+                catch (IOException) { /* left for the next vacuum */ }
+            }
+
+            Notifications.Show(
+                freed > 0 ? $"Trash emptied. {freed} file{(freed == 1 ? "" : "s")} removed from the vault."
+                          : "Trash emptied.");
+        }
+
+        await ReloadAsync();
     }
 
     private void UpdateEmptyState()
@@ -251,7 +313,75 @@ public sealed partial class CollectionPage : Page
     private void OnItemClick(object sender, ItemClickEventArgs e)
     {
         if (e.ClickedItem is not ObjectItem item || !_workspace.IsUnlocked) return;
-        Frame?.Navigate(typeof(ObjectDetailPage), item.Id);
+
+        // The shell decides which page suits the thing being opened, so a file opens in a viewer
+        // and a task opens in its detail page without this list having to know the difference.
+        App.GetService<ShellRouter>().Open(item.Id);
+    }
+
+    /// <summary>
+    /// Right-clicking a row offers the same verbs it would be offered anywhere else.
+    /// </summary>
+    private void OnItemRightTapped(object sender, RightTappedRoutedEventArgs e)
+    {
+        if (!_workspace.IsUnlocked) return;
+        if ((e.OriginalSource as FrameworkElement)?.DataContext is not ObjectItem item) return;
+
+        var menu = ObjectCommands.Build(item.Model, XamlRoot, ReloadAsync);
+        menu.ShowAt(Items, e.GetPosition(Items));
+        e.Handled = true;
+    }
+
+    // ------------------------------------------------------------------ drag and drop
+
+    private void OnDragOver(object sender, DragEventArgs e)
+    {
+        if (!_workspace.IsUnlocked || !e.DataView.Contains(StandardDataFormats.StorageItems)) return;
+
+        e.AcceptedOperation = DataPackageOperation.Copy;
+        e.DragUIOverride.Caption = $"Add to {_definition.Title}";
+        e.DragUIOverride.IsGlyphVisible = false;
+        DropHint.Visibility = Visibility.Visible;
+        e.Handled = true;
+    }
+
+    private void OnDragLeave(object sender, DragEventArgs e) =>
+        DropHint.Visibility = Visibility.Collapsed;
+
+    /// <summary>
+    /// Files dropped on a list are imported into it, under whatever subject the workspace is
+    /// currently narrowed to — dropping onto Physics should not then require saying "Physics".
+    /// </summary>
+    private async void OnDrop(object sender, DragEventArgs e)
+    {
+        DropHint.Visibility = Visibility.Collapsed;
+        if (!_workspace.IsUnlocked || !e.DataView.Contains(StandardDataFormats.StorageItems)) return;
+
+        var deferral = e.GetDeferral();
+        try
+        {
+            var items = await e.DataView.GetStorageItemsAsync();
+            var paths = items.OfType<Windows.Storage.StorageFile>().Select(f => f.Path).ToList();
+            if (paths.Count == 0) return;
+
+            var results = await App.GetService<ImportService>()
+                .ImportAsync(paths, _navigation.SubjectId);
+
+            var added = results.Count(r => r.Succeeded);
+            var failed = results.Count - added;
+
+            Notifications.Show(
+                failed == 0
+                    ? $"Added {added} file{(added == 1 ? "" : "s")}."
+                    : $"Added {added}, could not read {failed}.",
+                failed == 0 ? NoticeKind.Success : NoticeKind.Warning);
+
+            await ReloadAsync();
+        }
+        finally
+        {
+            deferral.Complete();
+        }
     }
 
     // -------------------------------------------------- template helper functions

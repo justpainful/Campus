@@ -1,0 +1,104 @@
+<Page
+    x:Class="Campus.Desktop.Views.FilesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Campus.Desktop.Design.Controls"
+    xmlns:icons="using:Campus.Desktop.Design.Icons"
+    Background="{ThemeResource Theme.Background.Primary}">
+
+    <!--
+        Everything stored in the vault, arranged the way a shelf is: by what it belongs to. The
+        grid is the default because a page of scanned handouts is far easier to recognise by sight
+        than by file name.
+    -->
+    <Grid AllowDrop="True" DragOver="OnDragOver" Drop="OnDrop" DragLeave="OnDragLeave">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Padding="28,20,28,12" ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Spacing="2" VerticalAlignment="Center">
+                <TextBlock Text="Files" Style="{StaticResource Text.LargeTitle}" />
+                <TextBlock x:Name="Subtitle" Style="{StaticResource Text.Footnote}" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBox x:Name="FilterBox" Style="{StaticResource Input.Search}"
+                         PlaceholderText="Filter" Width="200"
+                         TextChanged="OnFilterChanged"
+                         AutomationProperties.Name="Filter files" />
+
+                <Button x:Name="ViewToggle" Style="{StaticResource Button.Icon}"
+                        Click="OnToggleViewClick"
+                        AutomationProperties.Name="Switch between grid and list"
+                        ToolTipService.ToolTip="Switch between grid and list">
+                    <icons:CampusIcon x:Name="ViewGlyph" Symbol="view.list"
+                                      IconSize="{StaticResource Theme.Icon.L}"
+                                      Foreground="{ThemeResource Theme.Label.Secondary}" />
+                </Button>
+
+                <Button Style="{StaticResource Button.Primary}" Click="OnImportClick" MinWidth="0">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <icons:CampusIcon Symbol="import" IconSize="{StaticResource Theme.Icon.M}"
+                                          Foreground="{ThemeResource Theme.Label.OnAccent}" />
+                        <TextBlock Text="Add files" Foreground="{ThemeResource Theme.Label.OnAccent}"
+                                   FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <ScrollViewer Padding="28,0,28,40">
+                <StackPanel x:Name="Groups" Spacing="26" />
+            </ScrollViewer>
+
+            <StackPanel x:Name="EmptyState" Visibility="Collapsed" Spacing="12"
+                        HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="380">
+                <Border Width="64" Height="64" HorizontalAlignment="Center"
+                        CornerRadius="{StaticResource Theme.Radius.Surface}"
+                        Background="{ThemeResource Theme.Fill.Quaternary}">
+                    <icons:CampusIcon Symbol="files" IconSize="{StaticResource Theme.Icon.Display}"
+                                      Weight="Light" Foreground="{ThemeResource Theme.Label.Tertiary}" />
+                </Border>
+                <TextBlock x:Name="EmptyTitle" Text="No files yet" Style="{StaticResource Text.Title3}"
+                           HorizontalAlignment="Center" />
+                <TextBlock x:Name="EmptyMessage" Style="{StaticResource Text.Callout}"
+                           HorizontalAlignment="Center" TextAlignment="Center"
+                           Text="Drop anything here — a scan, a slide deck, a recording. It is encrypted on the way in and searchable once it lands." />
+            </StackPanel>
+
+            <Border x:Name="DropHint" Visibility="Collapsed"
+                    Margin="16" CornerRadius="{StaticResource Theme.Radius.Surface}"
+                    Background="{ThemeResource Theme.Accent.Subtle}"
+                    BorderBrush="{ThemeResource Theme.Accent.Primary}"
+                    BorderThickness="2" IsHitTestVisible="False">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                    <icons:CampusIcon Symbol="import" IconSize="{StaticResource Theme.Icon.Display}"
+                                      Weight="Light" Foreground="{ThemeResource Theme.Accent.Primary}"
+                                      HorizontalAlignment="Center" />
+                    <TextBlock Text="Drop to add to the vault" Style="{StaticResource Text.Headline}"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="Progress" Visibility="Collapsed"
+                    HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,28"
+                    Background="{ThemeResource Theme.Surface.Elevated}"
+                    BorderBrush="{ThemeResource Theme.Separator.Standard}" BorderThickness="1"
+                    CornerRadius="{StaticResource Theme.Radius.Card}" Padding="16,12,16,12">
+                <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                    <ProgressRing IsActive="True" Width="20" Height="20" />
+                    <TextBlock x:Name="ProgressText" Style="{StaticResource Text.Callout}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Page>

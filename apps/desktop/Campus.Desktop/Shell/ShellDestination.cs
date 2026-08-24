@@ -40,10 +40,12 @@ public static class ShellDestinations
     public const string Inbox = "inbox";
     public const string Subjects = "subjects";
     public const string Library = "library";
+    public const string Files = "files";
     public const string Notes = "notes";
     public const string Assignments = "assignments";
     public const string Tasks = "tasks";
     public const string Requirements = "requirements";
+    public const string Goals = "goals";
     public const string Planner = "planner";
     public const string PrintCenter = "print";
     public const string Links = "links";
@@ -51,6 +53,8 @@ public static class ShellDestinations
     public const string Search = "search";
     public const string Sync = "sync";
     public const string Extensions = "extensions";
+    public const string Archive = "archive";
+    public const string Trash = "trash";
     public const string Profile = "profile";
     public const string Settings = "settings";
 
@@ -60,16 +64,20 @@ public static class ShellDestinations
         new() { Id = Inbox, Title = "Inbox", Symbol = CampusSymbols.Inbox, Shortcut = "Ctrl+2" },
         new() { Id = Subjects, Title = "Subjects", Symbol = CampusSymbols.Subjects, Shortcut = "Ctrl+3" },
         new() { Id = Library, Title = "Library", Symbol = CampusSymbols.Library, Shortcut = "Ctrl+4" },
+        new() { Id = Files, Title = "Files", Symbol = CampusSymbols.Files },
         new() { Id = Notes, Title = "Notes", Symbol = CampusSymbols.Notes, Shortcut = "Ctrl+5" },
         new() { Id = Assignments, Title = "Assignments", Symbol = CampusSymbols.Assignments, Shortcut = "Ctrl+6" },
         new() { Id = Tasks, Title = "Tasks", Symbol = CampusSymbols.Tasks, Shortcut = "Ctrl+7" },
         new() { Id = Requirements, Title = "Requirements", Symbol = CampusSymbols.Requirements, Shortcut = "Ctrl+8" },
+        new() { Id = Goals, Title = "Goals", Symbol = CampusSymbols.Goals },
         new() { Id = Planner, Title = "Planner", Symbol = CampusSymbols.Planner, Shortcut = "Ctrl+9" },
         new() { Id = PrintCenter, Title = "Print Center", Symbol = CampusSymbols.PrintCenter },
         new() { Id = Links, Title = "Links", Symbol = CampusSymbols.Links },
         new() { Id = Boards, Title = "Boards", Symbol = CampusSymbols.Boards },
         new() { Id = Search, Title = "Search", Symbol = CampusSymbols.Search, Shortcut = "Ctrl+Shift+F" },
 
+        new() { Id = Archive, Title = "Archive", Symbol = CampusSymbols.Archive, Placement = DestinationPlacement.Bottom },
+        new() { Id = Trash, Title = "Trash", Symbol = CampusSymbols.Trash, Placement = DestinationPlacement.Bottom },
         new() { Id = Sync, Title = "Sync", Symbol = CampusSymbols.Sync, Placement = DestinationPlacement.Bottom },
         new() { Id = Extensions, Title = "Extensions", Symbol = CampusSymbols.Extensions, Placement = DestinationPlacement.Bottom },
         new() { Id = Profile, Title = "Profile", Symbol = CampusSymbols.Profile, Placement = DestinationPlacement.Bottom },

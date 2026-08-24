@@ -8,6 +8,17 @@ namespace Campus.Desktop.ViewModels;
 public sealed record CollectionSegment(string Name, Func<CampusQuery> BuildQuery);
 
 /// <summary>
+/// An action that belongs to a whole list rather than to one row — emptying the trash, clearing
+/// an archive. Defined beside the list it belongs to so the page stays free of special cases.
+/// </summary>
+public sealed record CollectionCommand(
+    string Label,
+    string Symbol,
+    bool IsDestructive,
+    string? ConfirmTitle,
+    string? ConfirmMessage);
+
+/// <summary>
 /// Everything a list destination needs: what it is called, how its segments are queried, what to
 /// say when it is empty, and what creating something here means.
 /// </summary>
@@ -18,7 +29,14 @@ public sealed record CollectionDefinition(
     IReadOnlyList<CollectionSegment> Segments,
     string EmptyTitle,
     string EmptyMessage,
-    string NewLabel);
+    string NewLabel)
+{
+    /// <summary>Actions that apply to the list as a whole. Usually none.</summary>
+    public IReadOnlyList<CollectionCommand> Commands { get; init; } = [];
+
+    /// <summary>False when this list is not somewhere new things are made.</summary>
+    public bool CanCreate => CreateKind != ObjectKind.Unknown && NewLabel.Length > 0;
+}
 
 /// <summary>
 /// The list destinations, defined in one place. Each is a query rather than a folder, which is
@@ -37,6 +55,8 @@ public static class CollectionCatalog
         ShellDestinations.Library => Library(),
         ShellDestinations.Links => Links(),
         ShellDestinations.PrintCenter => PrintCenter(),
+        ShellDestinations.Archive => Archive(),
+        ShellDestinations.Trash => Trash(),
         _ => null,
     };
 
@@ -221,4 +241,66 @@ public static class CollectionCatalog
         "Nothing waiting to print",
         "Drop files here and Campus keeps the queue, the page counts and what you already printed.",
         "Add to queue");
+
+    /// <summary>
+    /// Things put away on purpose. Archived is not deleted and not hidden — it is finished, and
+    /// still findable, which is what makes it safe to archive a whole term.
+    /// </summary>
+    public static CollectionDefinition Archive() => new(
+        "Archive", CampusSymbols.Archive, ObjectKind.Unknown,
+        [
+            new("Everything", () => new CampusQuery
+            {
+                IsArchived = true,
+                Sort = SortField.UpdatedAt,
+            }),
+            new("Files", () => new CampusQuery
+            {
+                Kinds = { ObjectKind.File },
+                IsArchived = true,
+                Sort = SortField.UpdatedAt,
+            }),
+            new("Notes", () => new CampusQuery
+            {
+                Kinds = { ObjectKind.Note, ObjectKind.Lesson },
+                IsArchived = true,
+                Sort = SortField.UpdatedAt,
+            }),
+            new("Finished work", () => new CampusQuery
+            {
+                Kinds = { ObjectKind.Assignment, ObjectKind.Task, ObjectKind.Exam },
+                IsArchived = true,
+                Sort = SortField.UpdatedAt,
+            }),
+        ],
+        "The archive is empty",
+        "Last term's work belongs here: out of the way, still searchable, not deleted.",
+        "");
+
+    /// <summary>
+    /// The trash. Deliberately its own view rather than a filter on everything else, because
+    /// something in the trash should never turn up in an ordinary list by accident.
+    /// </summary>
+    public static CollectionDefinition Trash() => new(
+        "Trash", CampusSymbols.Trash, ObjectKind.Unknown,
+        [
+            new("Everything", () => new CampusQuery
+            {
+                OnlyTrashed = true,
+                Sort = SortField.UpdatedAt,
+            }),
+        ],
+        "The trash is empty",
+        "Anything you delete waits here until you empty it, so a wrong click is not the end of it.",
+        "")
+    {
+        Commands =
+        [
+            new CollectionCommand(
+                "Empty trash", CampusSymbols.Delete, IsDestructive: true,
+                "Empty the trash?",
+                "Everything in the trash will be gone, and the files behind it will be removed "
+                + "from the vault. This cannot be undone."),
+        ],
+    };
 }

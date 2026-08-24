@@ -79,7 +79,7 @@
         </DataTemplate>
     </Page.Resources>
 
-    <Grid>
+    <Grid AllowDrop="True" DragOver="OnDragOver" Drop="OnDrop" DragLeave="OnDragLeave">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -113,6 +113,7 @@
                     Width="200"
                     TextChanged="OnFilterChanged"
                     AutomationProperties.Name="Filter this list" />
+                <StackPanel x:Name="ListCommands" Orientation="Horizontal" Spacing="8" />
                 <Button
                     x:Name="NewButton"
                     Style="{StaticResource Button.Primary}"
@@ -142,6 +143,7 @@
                 SelectionMode="Extended"
                 IsItemClickEnabled="True"
                 ItemClick="OnItemClick"
+                RightTapped="OnItemRightTapped"
                 ItemTemplate="{StaticResource ObjectRowTemplate}"
                 AutomationProperties.Name="Items">
                 <ListView.ItemContainerStyle>
@@ -178,6 +180,26 @@
                 <TextBlock x:Name="EmptyMessage" Style="{StaticResource Text.Callout}"
                            HorizontalAlignment="Center" TextAlignment="Center" />
             </StackPanel>
+
+            <!--
+                Shown only while something is being dragged over the list, so the invitation to
+                drop appears exactly when it is true and never as permanent decoration.
+            -->
+            <Border x:Name="DropHint" Visibility="Collapsed"
+                    Margin="16" CornerRadius="{StaticResource Theme.Radius.Surface}"
+                    Background="{ThemeResource Theme.Accent.Subtle}"
+                    BorderBrush="{ThemeResource Theme.Accent.Primary}"
+                    BorderThickness="2" IsHitTestVisible="False">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                    <icons:CampusIcon Symbol="import" IconSize="{StaticResource Theme.Icon.Display}"
+                                      Weight="Light"
+                                      Foreground="{ThemeResource Theme.Accent.Primary}"
+                                      HorizontalAlignment="Center" />
+                    <TextBlock Text="Drop to add to this list"
+                               Style="{StaticResource Text.Headline}"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
         </Grid>
     </Grid>
 </Page>

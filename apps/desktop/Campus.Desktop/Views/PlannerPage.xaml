@@ -1,0 +1,57 @@
+<Page
+    x:Class="Campus.Desktop.Views.PlannerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Campus.Desktop.Design.Controls"
+    xmlns:icons="using:Campus.Desktop.Design.Icons"
+    Background="{ThemeResource Theme.Background.Primary}">
+
+    <!--
+        The week, as a week. Timetabled lessons and the things due on each day sit in the same
+        column, because on a Tuesday morning those are the same question: what is happening today
+        and what do I have to hand in.
+    -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Padding="28,20,28,12" ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Spacing="2" VerticalAlignment="Center">
+                <TextBlock Text="Planner" Style="{StaticResource Text.LargeTitle}" />
+                <TextBlock x:Name="RangeText" Style="{StaticResource Text.Footnote}" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                <Button Style="{StaticResource Button.Icon}" Click="OnPreviousClick"
+                        AutomationProperties.Name="Previous week" ToolTipService.ToolTip="Previous week">
+                    <icons:CampusIcon Symbol="chevron.left" IconSize="{StaticResource Theme.Icon.L}"
+                                      Foreground="{ThemeResource Theme.Label.Secondary}" />
+                </Button>
+                <Button Style="{StaticResource Button.Secondary}" Click="OnTodayClick"
+                        Content="Today" MinWidth="0" />
+                <Button Style="{StaticResource Button.Icon}" Click="OnNextClick"
+                        AutomationProperties.Name="Next week" ToolTipService.ToolTip="Next week">
+                    <icons:CampusIcon Symbol="chevron.right" IconSize="{StaticResource Theme.Icon.L}"
+                                      Foreground="{ThemeResource Theme.Label.Secondary}" />
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <controls:SegmentedControl x:Name="Segments" Grid.Row="1"
+                                   Margin="28,0,28,12" HorizontalAlignment="Left"
+                                   SelectionChanged="OnSegmentChanged" />
+
+        <ScrollViewer Grid.Row="2" Padding="28,0,28,32"
+                      HorizontalScrollMode="Auto" HorizontalScrollBarVisibility="Auto">
+            <Grid x:Name="Surface" />
+        </ScrollViewer>
+    </Grid>
+</Page>

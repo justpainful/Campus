@@ -26,8 +26,11 @@ public static class QueryCompiler
             return name;
         }
 
-        // Trashed objects are hidden everywhere except the Trash view itself.
-        where.Add(query.IncludeTrashed ? "1 = 1" : "o.deleted_at IS NULL");
+        // Trashed objects are hidden everywhere except the Trash view itself, which wants only
+        // them — "include the trash" and "show me the trash" are different questions.
+        where.Add(query.OnlyTrashed ? "o.deleted_at IS NOT NULL"
+            : query.IncludeTrashed ? "1 = 1"
+            : "o.deleted_at IS NULL");
 
         if (query.Kinds.Count > 0)
             where.Add($"o.kind IN ({string.Join(", ", query.Kinds.Select(k => Bind((int)k)))})");

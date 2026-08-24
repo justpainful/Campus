@@ -1,0 +1,153 @@
+<Page
+    x:Class="Campus.Desktop.Views.SubjectPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Campus.Desktop.Design.Controls"
+    xmlns:icons="using:Campus.Desktop.Design.Icons"
+    xmlns:vm="using:Campus.Desktop.ViewModels"
+    xmlns:local="using:Campus.Desktop.Views"
+    Background="{ThemeResource Theme.Background.Primary}">
+
+    <Page.Resources>
+        <DataTemplate x:Key="SubjectRowTemplate" x:DataType="vm:ObjectItem">
+            <Grid Padding="4,0,4,0" ColumnSpacing="12" MinHeight="48">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <icons:CampusIcon
+                    Symbol="{x:Bind Symbol, Mode=OneWay}"
+                    IconSize="{StaticResource Theme.Icon.L}"
+                    VerticalAlignment="Center"
+                    Foreground="{ThemeResource Theme.Label.Secondary}" />
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                    <TextBlock Text="{x:Bind Title, Mode=OneWay}"
+                               FontFamily="{StaticResource Theme.Font.Text}"
+                               FontSize="{StaticResource Theme.Text.Body}"
+                               Foreground="{ThemeResource Theme.Label.Primary}"
+                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+                    <TextBlock Text="{x:Bind Subtitle, Mode=OneWay}"
+                               Style="{StaticResource Text.Footnote}"
+                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"
+                               Visibility="{x:Bind local:CollectionPage.TextVisibility(Subtitle), Mode=OneWay}" />
+                </StackPanel>
+
+                <TextBlock Grid.Column="2"
+                           Text="{x:Bind DueText, Mode=OneWay}"
+                           FontFamily="{StaticResource Theme.Font.Small}"
+                           FontSize="{StaticResource Theme.Text.Footnote}"
+                           Foreground="{x:Bind local:CollectionPage.RoleBrush(DueRole), Mode=OneWay}"
+                           VerticalAlignment="Center"
+                           Visibility="{x:Bind local:CollectionPage.TextVisibility(DueText), Mode=OneWay}" />
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid AllowDrop="True" DragOver="OnDragOver" Drop="OnDrop" DragLeave="OnDragLeave">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header. The accent identifies the subject; it never colours an action. -->
+        <Grid Padding="28,18,28,14" ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button Style="{StaticResource Button.Icon}" Click="OnBackClick"
+                    VerticalAlignment="Center" Margin="0,0,4,0"
+                    AutomationProperties.Name="Back" ToolTipService.ToolTip="Back">
+                <icons:CampusIcon Symbol="chevron.left" IconSize="{StaticResource Theme.Icon.L}"
+                                  Foreground="{ThemeResource Theme.Label.Secondary}" />
+            </Button>
+
+            <Border Grid.Column="1" x:Name="AccentBlock" Width="44" Height="44"
+                    VerticalAlignment="Center"
+                    CornerRadius="{StaticResource Theme.Radius.M}">
+                <icons:CampusIcon x:Name="SubjectGlyph" Symbol="subjects" IconSize="24"
+                                  Foreground="{ThemeResource Theme.Label.OnAccent}" />
+            </Border>
+
+            <StackPanel Grid.Column="2" Spacing="2" VerticalAlignment="Center">
+                <TextBlock x:Name="TitleText" Style="{StaticResource Text.Title1}"
+                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+                <TextBlock x:Name="DetailText" Style="{StaticResource Text.Footnote}" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Button Style="{StaticResource Button.Secondary}" Click="OnEditClick"
+                        Content="Edit" MinWidth="0" />
+                <Button x:Name="AddButton" Style="{StaticResource Button.Primary}"
+                        Click="OnAddClick" MinWidth="0">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <icons:CampusIcon Symbol="add" IconSize="{StaticResource Theme.Icon.M}"
+                                          Foreground="{ThemeResource Theme.Label.OnAccent}" />
+                        <TextBlock x:Name="AddLabel" Text="Add"
+                                   Foreground="{ThemeResource Theme.Label.OnAccent}"
+                                   FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <controls:SegmentedControl x:Name="Segments" Grid.Row="1"
+                                   Margin="28,0,28,12" HorizontalAlignment="Left"
+                                   SelectionChanged="OnSegmentChanged" />
+
+        <Grid Grid.Row="2">
+            <ListView x:Name="Items" Padding="20,0,20,24"
+                      SelectionMode="None" IsItemClickEnabled="True"
+                      ItemClick="OnItemClick" RightTapped="OnItemRightTapped"
+                      ItemTemplate="{StaticResource SubjectRowTemplate}"
+                      AutomationProperties.Name="Items">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Padding" Value="8,0,8,0" />
+                        <Setter Property="MinHeight" Value="48" />
+                        <Setter Property="CornerRadius" Value="{StaticResource Theme.Radius.M}" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+
+            <!-- The timetable segment builds its own rows, so it gets its own surface. -->
+            <ScrollViewer x:Name="ScheduleSurface" Visibility="Collapsed" Padding="28,0,28,32">
+                <StackPanel x:Name="ScheduleList" Spacing="10" MaxWidth="640"
+                            HorizontalAlignment="Left" />
+            </ScrollViewer>
+
+            <StackPanel x:Name="EmptyState" Visibility="Collapsed" Spacing="10"
+                        HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="360">
+                <icons:CampusIcon x:Name="EmptyGlyph" Symbol="subjects"
+                                  IconSize="{StaticResource Theme.Icon.Display}" Weight="Light"
+                                  Foreground="{ThemeResource Theme.Label.Tertiary}"
+                                  HorizontalAlignment="Center" />
+                <TextBlock x:Name="EmptyText" Style="{StaticResource Text.Callout}"
+                           HorizontalAlignment="Center" TextAlignment="Center" />
+            </StackPanel>
+
+            <Border x:Name="DropHint" Visibility="Collapsed"
+                    Margin="16" CornerRadius="{StaticResource Theme.Radius.Surface}"
+                    Background="{ThemeResource Theme.Accent.Subtle}"
+                    BorderBrush="{ThemeResource Theme.Accent.Primary}"
+                    BorderThickness="2" IsHitTestVisible="False">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                    <icons:CampusIcon Symbol="import" IconSize="{StaticResource Theme.Icon.Display}"
+                                      Weight="Light"
+                                      Foreground="{ThemeResource Theme.Accent.Primary}"
+                                      HorizontalAlignment="Center" />
+                    <TextBlock x:Name="DropText" Style="{StaticResource Text.Headline}"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Page>

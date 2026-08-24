@@ -19,6 +19,9 @@ public sealed class CampusQuery
     public bool? IsArchived { get; set; }
     public bool IncludeTrashed { get; set; }
 
+    /// <summary>Restricts the result to trashed objects, which is what the Trash view wants.</summary>
+    public bool OnlyTrashed { get; set; }
+
     public DateRange? Due { get; set; }
     public DateRange? Created { get; set; }
     public DateRange? Updated { get; set; }
@@ -47,6 +50,7 @@ public sealed class CampusQuery
         IsPinned = IsPinned,
         IsArchived = IsArchived,
         IncludeTrashed = IncludeTrashed,
+        OnlyTrashed = OnlyTrashed,
         Due = Due,
         Created = Created,
         Updated = Updated,

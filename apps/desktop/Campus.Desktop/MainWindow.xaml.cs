@@ -238,6 +238,18 @@ public sealed partial class MainWindow : Window
             case ShellDestinations.Home:
                 ContentFrame.Navigate(typeof(HomePage));
                 break;
+            case ShellDestinations.Subjects:
+                ContentFrame.Navigate(typeof(SubjectsPage));
+                break;
+            case ShellDestinations.Planner:
+                ContentFrame.Navigate(typeof(PlannerPage));
+                break;
+            case ShellDestinations.Files:
+                ContentFrame.Navigate(typeof(FilesPage));
+                break;
+            case ShellDestinations.Goals:
+                ContentFrame.Navigate(typeof(GoalsPage));
+                break;
             default:
                 // Most destinations are the same page over a different query.
                 if (CollectionCatalog.For(id) is { } collection)

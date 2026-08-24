@@ -4,30 +4,6 @@ using Microsoft.Data.Sqlite;
 namespace Campus.Storage;
 
 /// <summary>
-/// A recurring class: which subject, which day, from when to when.
-/// </summary>
-public sealed class ScheduleSlot
-{
-    public CampusId Id { get; init; } = CampusId.New();
-    public CampusId SubjectId { get; set; }
-
-    /// <summary>Day of the week, using <see cref="DayOfWeek"/>'s numbering.</summary>
-    public DayOfWeek Day { get; set; }
-
-    /// <summary>Minutes past midnight. Stored as minutes so no time zone can move a lesson.</summary>
-    public int StartMinutes { get; set; }
-    public int EndMinutes { get; set; }
-
-    public string? Room { get; set; }
-    public TermKind? Term { get; set; }
-    public int? AcademicYear { get; set; }
-
-    public TimeSpan Start => TimeSpan.FromMinutes(StartMinutes);
-    public TimeSpan End => TimeSpan.FromMinutes(EndMinutes);
-    public int DurationMinutes => Math.Max(0, EndMinutes - StartMinutes);
-}
-
-/// <summary>
 /// The weekly timetable.
 ///
 /// Slots are separate from events because they are not events: a class at 08:15 on Sundays is one
@@ -82,8 +58,9 @@ public sealed class ScheduleRepository(CampusDatabase database)
         command.Parameters.AddWithValue("@id", slot.Id.Value);
         command.Parameters.AddWithValue("@subject", slot.SubjectId.Value);
         command.Parameters.AddWithValue("@day", (int)slot.Day);
-        command.Parameters.AddWithValue("@start", slot.StartMinutes);
-        command.Parameters.AddWithValue("@end", slot.EndMinutes);
+        // Stored as minutes past midnight so no time zone or daylight change can move a lesson.
+        command.Parameters.AddWithValue("@start", Minutes(slot.Start));
+        command.Parameters.AddWithValue("@end", Minutes(slot.End));
         command.Parameters.AddWithValue("@room", (object?)slot.Room ?? DBNull.Value);
         command.Parameters.AddWithValue("@term", slot.Term is { } t ? (int)t : DBNull.Value);
         command.Parameters.AddWithValue("@year", (object?)slot.AcademicYear ?? DBNull.Value);
@@ -115,8 +92,8 @@ public sealed class ScheduleRepository(CampusDatabase database)
                 Id = CampusId.Parse(reader.GetString(reader.GetOrdinal("id"))),
                 SubjectId = CampusId.Parse(reader.GetString(reader.GetOrdinal("subject_id"))),
                 Day = (DayOfWeek)reader.GetInt32(reader.GetOrdinal("day")),
-                StartMinutes = reader.GetInt32(reader.GetOrdinal("start_minutes")),
-                EndMinutes = reader.GetInt32(reader.GetOrdinal("end_minutes")),
+                Start = FromMinutes(reader.GetInt32(reader.GetOrdinal("start_minutes"))),
+                End = FromMinutes(reader.GetInt32(reader.GetOrdinal("end_minutes"))),
                 Room = reader.IsDBNull(roomIndex) ? null : reader.GetString(roomIndex),
                 Term = reader.IsDBNull(termIndex) ? null : (TermKind)reader.GetInt32(termIndex),
                 AcademicYear = reader.IsDBNull(yearIndex) ? null : reader.GetInt32(yearIndex),
@@ -125,4 +102,19 @@ public sealed class ScheduleRepository(CampusDatabase database)
 
         return slots;
     }
+
+    private static int Minutes(TimeOnly time) => time.Hour * 60 + time.Minute;
+
+    private static TimeOnly FromMinutes(int minutes)
+        => new(Math.Clamp(minutes / 60, 0, 23), Math.Clamp(minutes % 60, 0, 59));
+}
+
+/// <summary>Small conveniences the timetable views want and the model does not need to carry.</summary>
+public static class ScheduleSlotExtensions
+{
+    public static int StartMinutes(this ScheduleSlot slot) => slot.Start.Hour * 60 + slot.Start.Minute;
+    public static int EndMinutes(this ScheduleSlot slot) => slot.End.Hour * 60 + slot.End.Minute;
+
+    public static int DurationMinutes(this ScheduleSlot slot)
+        => Math.Max(0, slot.EndMinutes() - slot.StartMinutes());
 }
