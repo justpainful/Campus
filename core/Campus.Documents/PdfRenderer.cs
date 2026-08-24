@@ -15,10 +15,16 @@ public static class PdfRenderer
         try
         {
             pdf.Position = 0;
-            return PDFtoImage.Conversion.GetPageCount(pdf);
+
+            // leaveOpen is false by default, which closes the caller's stream. A viewer counts,
+            // measures and then renders from one stream, so closing it after the first call would
+            // break every page after the first.
+            return PDFtoImage.Conversion.GetPageCount(pdf, leaveOpen: true);
         }
-        catch (Exception ex) when (ex is IOException or InvalidOperationException or FormatException)
+        catch (Exception)
         {
+            // Broad on purpose: a document that cannot be counted has zero readable pages, and
+            // saying so is always better than taking the application down with it.
             return 0;
         }
     }
@@ -34,12 +40,11 @@ public static class PdfRenderer
             pdf.Position = 0;
             using var output = new MemoryStream();
             PDFtoImage.Conversion.SavePng(
-                output, pdf, page: pageIndex,
+                output, pdf, page: pageIndex, leaveOpen: true,
                 options: new PDFtoImage.RenderOptions(Width: width));
             return output.ToArray();
         }
-        catch (Exception ex) when (ex is IOException or InvalidOperationException
-                                      or FormatException or ArgumentOutOfRangeException)
+        catch (Exception)
         {
             return null;
         }
@@ -51,11 +56,10 @@ public static class PdfRenderer
         try
         {
             pdf.Position = 0;
-            var size = PDFtoImage.Conversion.GetPageSize(pdf, pageIndex);
+            var size = PDFtoImage.Conversion.GetPageSize(pdf, pageIndex, leaveOpen: true);
             return (size.Width, size.Height);
         }
-        catch (Exception ex) when (ex is IOException or InvalidOperationException
-                                      or FormatException or ArgumentOutOfRangeException)
+        catch (Exception)
         {
             return null;
         }

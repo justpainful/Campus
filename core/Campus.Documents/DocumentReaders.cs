@@ -42,12 +42,12 @@ public static class DocumentReaders
     private static void ReadPdf(FileFacts facts, string path)
     {
         using var stream = File.OpenRead(path);
-        facts.PageCount = PDFtoImage.Conversion.GetPageCount(stream);
+        facts.PageCount = PDFtoImage.Conversion.GetPageCount(stream, leaveOpen: true);
 
         if (facts.PageCount is > 0)
         {
             stream.Position = 0;
-            var size = PDFtoImage.Conversion.GetPageSize(stream, 0);
+            var size = PDFtoImage.Conversion.GetPageSize(stream, 0, leaveOpen: true);
             facts.PixelWidth = (int)size.Width;
             facts.PixelHeight = (int)size.Height;
         }

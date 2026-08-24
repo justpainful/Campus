@@ -144,6 +144,10 @@ public sealed partial class MainWindow : Window
                 case "focus": ToggleFocusMode(); break;
                 case "emoji": _ = ShowEmojiSheetAsync(); break;
                 case "detail": _ = OpenFirstObjectAsync(); break;
+                case "pdf": _ = OpenFirstFileAsync(ObjectKind.File, MediaKind.Pdf); break;
+                case "markdown": _ = OpenFirstFileAsync(ObjectKind.File, MediaKind.Markdown); break;
+                case "viewer": _ = OpenFirstFileAsync(ObjectKind.File); break;
+                case "thread": _ = OpenFirstFileAsync(ObjectKind.Thread); break;
             }
         });
     }
@@ -164,6 +168,21 @@ public sealed partial class MainWindow : Window
         })).FirstOrDefault();
 
         if (first is not null) ContentFrame.Navigate(typeof(ObjectDetailPage), first.Id);
+    }
+#endif
+
+#if DEBUG
+    /// <summary>Opens the first object of a kind, for development screenshots.</summary>
+    private async Task OpenFirstFileAsync(ObjectKind kind, MediaKind? media = null)
+    {
+        if (!_workspace.IsUnlocked) return;
+
+        var query = new CampusQuery { Kinds = { kind }, Sort = SortField.UpdatedAt, Limit = 1 };
+        if (media is { } value) query.Media.Add(value);
+
+        var first = (await _workspace.Objects.QueryAsync(query)).FirstOrDefault();
+
+        if (first is not null) _router.Open(first.Id);
     }
 #endif
 

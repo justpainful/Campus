@@ -85,7 +85,12 @@ internal static class ViewerChrome
 
         var button = new Button
         {
-            Style = (Style)Application.Current.Resources["Button.Icon"],
+            // Not Button.Icon: that style is a fixed square, and a menu button carries a word as
+            // well as a glyph. A label clipped to two letters is worse than no label.
+            Style = (Style)Application.Current.Resources["Button.Plain"],
+            Height = (double)Application.Current.Resources["Theme.Size.ControlHeight"],
+            Padding = new Thickness(8, 0, 10, 0),
+            MinWidth = 0,
             Content = content,
             Flyout = flyout,
         };

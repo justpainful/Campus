@@ -158,6 +158,9 @@ public sealed partial class PlannerPage : Page
             Background = isToday ? Brush(ThemeTokens.Fill.Quaternary) : null,
             CornerRadius = (CornerRadius)Application.Current.Resources["Theme.Radius.Card"],
             Padding = new Thickness(8, 10, 8, 14),
+            // Hugging its content rather than stretching: a tint down the whole page reads as a
+            // selected region, not as "you are here".
+            VerticalAlignment = VerticalAlignment.Top,
             Child = column,
         };
     }

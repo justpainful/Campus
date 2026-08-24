@@ -43,10 +43,11 @@ public static class PdfText
             var result = text.ToString().Trim();
             return result.Length == 0 ? null : result;
         }
-        catch (Exception ex) when (ex is IOException or InvalidOperationException
-                                      or NotSupportedException or ArgumentException)
+        catch (Exception)
         {
-            // Encrypted, malformed, or a scan. The file is still stored and still openable.
+            // Encrypted, malformed, or a scan. Caught broadly on purpose: this reads the least
+            // trustworthy input Campus handles, and the honest answer for a file whose text
+            // cannot be read is no text — never a crash.
             return null;
         }
     }
@@ -64,8 +65,7 @@ public static class PdfText
             // PdfPig numbers pages from one; everything else in Campus counts from zero.
             return document.GetPage(pageIndex + 1).Text;
         }
-        catch (Exception ex) when (ex is IOException or InvalidOperationException
-                                      or NotSupportedException or ArgumentException)
+        catch (Exception)
         {
             return null;
         }
@@ -89,10 +89,7 @@ public static class PdfText
             var index = 0;
             foreach (var page in document.GetPages())
             {
-                // Words rather than raw text: PDFs frequently have no spaces between glyphs, and
-                // joining the extracted words is what makes a phrase findable at all.
-                var words = NearestNeighbourWordExtractor.Instance.GetWords(page.Letters);
-                var text = string.Join(' ', words.Select(w => w.Text));
+                var text = Haystack(page, phrase);
 
                 var at = text.IndexOf(phrase, StringComparison.OrdinalIgnoreCase);
                 while (at >= 0 && matches.Count < limit)
@@ -109,13 +106,32 @@ public static class PdfText
                 if (matches.Count >= limit) break;
             }
         }
-        catch (Exception ex) when (ex is IOException or InvalidOperationException
-                                      or NotSupportedException or ArgumentException)
+        catch (Exception)
         {
             // Whatever was found before the failure is still worth returning.
         }
 
         return matches;
+    }
+
+    /// <summary>
+    /// The text of a page, in whichever form the phrase can be found in.
+    ///
+    /// Two forms are needed because PDFs disagree about spaces. Some write real space characters,
+    /// and their raw text reads properly; others position every glyph individually, and their raw
+    /// text is one long word until the letters are grouped. Trying the raw text first keeps
+    /// reading order intact for the documents that have it, and falling back to grouped words
+    /// finds the phrase in the ones that do not.
+    /// </summary>
+    private static string Haystack(UglyToad.PdfPig.Content.Page page, string phrase)
+    {
+        var raw = page.Text;
+        if (raw.Contains(phrase, StringComparison.OrdinalIgnoreCase)) return raw;
+
+        var words = NearestNeighbourWordExtractor.Instance.GetWords(page.Letters);
+        var joined = string.Join(' ', words.Select(w => w.Text));
+
+        return joined.Contains(phrase, StringComparison.OrdinalIgnoreCase) ? joined : raw;
     }
 
     /// <summary>
@@ -135,8 +151,7 @@ public static class PdfText
             foreach (var node in bookmarks.Roots) Walk(node, 0, entries);
             return entries;
         }
-        catch (Exception ex) when (ex is IOException or InvalidOperationException
-                                      or NotSupportedException or ArgumentException)
+        catch (Exception)
         {
             return [];
         }

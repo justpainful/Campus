@@ -249,6 +249,111 @@ public static class DeveloperWorkspace
             Payload = new InboxPayload(),
         });
 
+        // ---- a board with a thread and an answer, because a forum with nothing in it shows
+        // nothing about whether a forum works.
+        var board = new CampusObject
+        {
+            Kind = ObjectKind.Board,
+            Title = "Physics questions",
+            SubjectId = Subject("Physics"),
+            Payload = new BoardPayload { Description = "Things worth writing down once" },
+        };
+        await Add(board);
+
+        var thread = new CampusObject
+        {
+            Kind = ObjectKind.Thread,
+            Title = "Why does the sign flip when the charge is negative?",
+            ParentId = board.Id,
+            SubjectId = Subject("Physics"),
+            Status = ObjectStatus.InProgress,
+            Payload = new ThreadPayload
+            {
+                Body = "The force comes out the other way and I keep losing the minus sign "
+                     + "halfway through. Where exactly does it come from?",
+                MessageCount = 1,
+                LastActivityAt = DateTimeOffset.UtcNow,
+            },
+        };
+        await Add(thread);
+
+        await Add(new CampusObject
+        {
+            Kind = ObjectKind.Note,
+            Title = "It is in the definition of the field",
+            ParentId = thread.Id,
+            SubjectId = Subject("Physics"),
+            Payload = new NotePayload
+            {
+                Body = "**E** is defined as force per unit *positive* charge.\n\n"
+                     + "So for a negative charge the force is opposite to **E** — the minus sign "
+                     + "is in `q`, not in the field.\n\n"
+                     + "- Positive charge: force along the field\n"
+                     + "- Negative charge: force against it\n",
+            },
+        });
+
+        // ---- goals, which are the slow things
+        await Add(new CampusObject
+        {
+            Kind = ObjectKind.Goal,
+            Title = "Finish the physics textbook before the exam",
+            SubjectId = Subject("Physics"),
+            Status = ObjectStatus.InProgress,
+            Payload = new GoalPayload
+            {
+                Detail = "Two chapters a week is enough",
+                TargetDate = Day(30),
+                Progress = 0.4,
+                Steps =
+                {
+                    new ChecklistItem { Text = "Chapter 1 — motion", Done = true, SortOrder = 0 },
+                    new ChecklistItem { Text = "Chapter 2 — forces", Done = true, SortOrder = 1 },
+                    new ChecklistItem { Text = "Chapter 3 — energy", SortOrder = 2 },
+                    new ChecklistItem { Text = "Chapter 4 — fields", SortOrder = 3 },
+                    new ChecklistItem { Text = "Past papers", SortOrder = 4 },
+                },
+            },
+        });
+
+        await Add(new CampusObject
+        {
+            Kind = ObjectKind.Goal,
+            Title = "Stop leaving revision to the night before",
+            Status = ObjectStatus.InProgress,
+            Payload = new GoalPayload { Detail = "One hour a day, whatever else happens", Progress = 0.2 },
+        });
+
+        // ---- a timetable, so the planner has lessons as well as deadlines
+        var timetable = new (string Subject, DayOfWeek Day, int Hour, int Minute, string Room)[]
+        {
+            ("Mathematics", DayOfWeek.Sunday, 8, 0, "B2"),
+            ("English", DayOfWeek.Sunday, 9, 0, "A1"),
+            ("Physics", DayOfWeek.Monday, 8, 0, "Lab 1"),
+            ("Chemistry", DayOfWeek.Monday, 10, 0, "Lab 2"),
+            ("Biology", DayOfWeek.Tuesday, 8, 0, "Lab 3"),
+            ("Mathematics", DayOfWeek.Tuesday, 11, 0, "B2"),
+            ("English", DayOfWeek.Wednesday, 8, 0, "A1"),
+            ("Physics", DayOfWeek.Wednesday, 9, 0, "Lab 1"),
+            ("Environmental Science", DayOfWeek.Thursday, 8, 0, "A4"),
+            ("Chemistry", DayOfWeek.Thursday, 10, 0, "Lab 2"),
+        };
+
+        foreach (var slot in timetable)
+        {
+            await workspace.Schedule.SaveAsync(new ScheduleSlot
+            {
+                SubjectId = Subject(slot.Subject),
+                Day = slot.Day,
+                Start = new TimeOnly(slot.Hour, slot.Minute),
+                End = new TimeOnly(slot.Hour, slot.Minute).AddMinutes(45),
+                Room = slot.Room,
+                AcademicYear = DateTimeOffset.Now.Year,
+            }, ct).ConfigureAwait(false);
+        }
+
+        await ImportSampleFilesAsync(workspace, Subject, ct).ConfigureAwait(false);
+
         await Add(new CampusObject
         {
             Kind = ObjectKind.Exam,
@@ -258,6 +363,83 @@ public static class DeveloperWorkspace
             Payload = new ExamPayload { ScheduledAt = Day(8, 8), Scope = "Chapters 1 to 4", MaxScore = 40 },
         });
     }
+
+    /// <summary>
+    /// Puts real files through the real import pipeline — identify, hash, encrypt, extract text,
+    /// thumbnail, index. A sample workspace whose files were faked would prove nothing about the
+    /// part of Campus most likely to be broken.
+    /// </summary>
+    private static async Task ImportSampleFilesAsync(
+        WorkspaceService workspace, Func<string, CampusId> subject, CancellationToken ct)
+    {
+        var staging = Path.Combine(Path.GetTempPath(), "campus-sample-files");
+        Directory.CreateDirectory(staging);
+
+        var pdf = Path.Combine(staging, "Physics — fields and forces.pdf");
+        await File.WriteAllBytesAsync(pdf, SamplePdf.Create(
+            "Fields and forces",
+            [
+                "The electric field E at a point is defined as the force per unit positive charge "
+                + "placed at that point. It is a vector, and it points away from positive charge "
+                + "and towards negative charge.",
+
+                "A charge q placed in a field E experiences a force F = qE. When q is negative the "
+                + "force is opposite to the field, which is where the sign that everyone loses "
+                + "actually comes from.",
+
+                "Work done moving a charge between two points does not depend on the path taken. "
+                + "That is what makes potential a useful idea at all.",
+            ]), ct).ConfigureAwait(false);
+
+        var notes = Path.Combine(staging, "Chemistry — bonding.md");
+        await File.WriteAllTextAsync(notes, """
+            # Bonding
+
+            Two ways atoms end up sharing the electrons they need.
+
+            ## Ionic
+
+            One atom **gives** an electron to another. Metals and non-metals.
+
+            - Sodium gives, chlorine takes
+            - The result is two ions that attract each other
+
+            ## Covalent
+
+            Both atoms **share** a pair. Non-metals with non-metals.
+
+            > A double bond is two shared pairs, not one stronger pair.
+
+            | Bond     | Electrons | Between            |
+            |----------|-----------|--------------------|
+            | Ionic    | Given     | Metal + non-metal  |
+            | Covalent | Shared    | Non-metal + non-metal |
+
+            - [x] Chapter read
+            - [ ] Questions 1 to 12
+            """, ct).ConfigureAwait(false);
+
+        var vocabulary = Path.Combine(staging, "English — Connect vocabulary.txt");
+        await File.WriteAllTextAsync(vocabulary, string.Join(Environment.NewLine,
+        [
+            "Unit 4 vocabulary",
+            "",
+            "acquire      to get something, often over time",
+            "consequence  what follows from something else",
+            "deliberate   done on purpose",
+            "essential    cannot be done without",
+            "gradual      happening slowly, in stages",
+            "reluctant    unwilling, but doing it anyway",
+            "sufficient   enough",
+        ]), ct).ConfigureAwait(false);
+
+        var import = App.GetService<ImportService>();
+
+        await import.ImportAsync([pdf], subject("Physics"), ["textbook"], ct).ConfigureAwait(false);
+        await import.ImportAsync([notes], subject("Chemistry"), ["notes"], ct).ConfigureAwait(false);
+        await import.ImportAsync([vocabulary], subject("English"), ["vocabulary"], ct).ConfigureAwait(false);
+    }
+
 #else
     public const string Argument = "--dev-workspace";
     public static bool Requested => false;

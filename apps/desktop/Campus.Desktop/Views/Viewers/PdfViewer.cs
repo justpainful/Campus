@@ -29,7 +29,17 @@ namespace Campus.Desktop.Views.Viewers;
 public sealed class PdfViewer : Grid, IContentViewer
 {
     private const double BaseWidth = 900;
-    private static readonly SemaphoreSlim RenderGate = new(1, 1);
+
+    /// <summary>
+    /// One reader at a time on the document's stream.
+    ///
+    /// A viewer counts pages, measures them, renders several of them as they scroll into view,
+    /// reads the outline and searches the text — and all of it comes from one seekable stream over
+    /// one encrypted file. Every one of those operations seeks to the beginning first, so two of
+    /// them running at once do not merely queue: they move the position under each other, and the
+    /// second one finds a document that appears to start in the middle.
+    /// </summary>
+    private readonly SemaphoreSlim _stream = new(1, 1);
 
     private readonly WorkspaceService _workspace = App.GetService<WorkspaceService>();
 
@@ -86,7 +96,9 @@ public sealed class PdfViewer : Grid, IContentViewer
         var style = new Style(typeof(ListViewItem));
         style.Setters.Add(new Setter(Control.PaddingProperty, new Thickness(0)));
         style.Setters.Add(new Setter(FrameworkElement.MarginProperty, new Thickness(0)));
-        style.Setters.Add(new Setter(Control.BackgroundProperty, null));
+        // A Setter refuses a null value, so "no background" has to be said with a brush.
+        style.Setters.Add(new Setter(Control.BackgroundProperty,
+            new SolidColorBrush(Microsoft.UI.Colors.Transparent)));
         style.Setters.Add(new Setter(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center));
         return style;
     }
@@ -158,7 +170,7 @@ public sealed class PdfViewer : Grid, IContentViewer
 
         try
         {
-            var count = await Task.Run(() => PdfRenderer.PageCount(content));
+            var count = await ReadAsync(() => PdfRenderer.PageCount(content));
             if (count == 0)
             {
                 Notifications.Show("This PDF could not be read.", NoticeKind.Error);
@@ -167,7 +179,7 @@ public sealed class PdfViewer : Grid, IContentViewer
 
             // Page shapes are read up front so every page can be laid out before any of them has
             // been rendered. Otherwise the scroll position moves under the reader.
-            var ratios = await Task.Run(() =>
+            var ratios = await ReadAsync(() =>
             {
                 var values = new double[count];
                 for (var i = 0; i < count; i++)
@@ -181,7 +193,7 @@ public sealed class PdfViewer : Grid, IContentViewer
             _pages.Clear();
             for (var i = 0; i < count; i++) _pages.Add(BuildPage(i, ratios[i]));
 
-            _outlineEntries = await Task.Run(() => PdfText.Outline(content));
+            _outlineEntries = await ReadAsync(() => PdfText.Outline(content));
             BuildOutline();
             BuildThumbnails(count);
 
@@ -246,24 +258,27 @@ public sealed class PdfViewer : Grid, IContentViewer
         }
 
         var width = (int)Math.Clamp(BaseWidth * _zoom * 1.5, 400, 2400);
-        byte[]? png;
 
-        await RenderGate.WaitAsync();
-        try
-        {
-            // PDFium is not reentrant over one stream, so renders are serialised.
-            png = await Task.Run(() => PdfRenderer.RenderPage(_content, page.PageIndex, width));
-        }
-        finally
-        {
-            RenderGate.Release();
-        }
-
+        var png = await ReadAsync(() => PdfRenderer.RenderPage(_content, page.PageIndex, width));
         if (png is null) return;
 
         var image = await DecodeAsync(png);
         _rendered[page.PageIndex] = image;
         page.SetImage(image);
+    }
+
+    /// <summary>Runs one read of the document, off the UI thread and alone on the stream.</summary>
+    private async Task<T> ReadAsync<T>(Func<T> read)
+    {
+        await _stream.WaitAsync();
+        try
+        {
+            return await Task.Run(read);
+        }
+        finally
+        {
+            _stream.Release();
+        }
     }
 
     private static async Task<BitmapImage> DecodeAsync(byte[] png)
@@ -346,17 +361,7 @@ public sealed class PdfViewer : Grid, IContentViewer
             {
                 if (image.Source is not null || _content is null) return;
 
-                byte[]? png;
-                await RenderGate.WaitAsync();
-                try
-                {
-                    png = await Task.Run(() => PdfRenderer.RenderPage(_content, index, 160));
-                }
-                finally
-                {
-                    RenderGate.Release();
-                }
-
+                var png = await ReadAsync(() => PdfRenderer.RenderPage(_content, index, 160));
                 if (png is not null) image.Source = await DecodeAsync(png);
             };
 
@@ -378,7 +383,7 @@ public sealed class PdfViewer : Grid, IContentViewer
             Margin = new Thickness(10, 4, 10, 4),
         });
 
-        _matches = await Task.Run(() => PdfText.Search(_content, phrase));
+        _matches = await ReadAsync(() => PdfText.Search(_content, phrase));
         _searchResults.Items.Clear();
 
         if (_matches.Count == 0)

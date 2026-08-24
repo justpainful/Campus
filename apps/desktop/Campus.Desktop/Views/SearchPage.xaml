@@ -29,7 +29,7 @@
 
                 <TextBox x:Name="QueryBox" Style="{StaticResource Input.Search}"
                          PlaceholderText="Search titles, notes and inside documents"
-                         MaxWidth="620" HorizontalAlignment="Left"
+                         MaxWidth="620" HorizontalAlignment="Stretch"
                          TextChanged="OnQueryChanged"
                          AutomationProperties.Name="Search" />
 
