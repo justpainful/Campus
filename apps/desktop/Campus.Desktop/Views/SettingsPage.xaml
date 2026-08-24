@@ -267,6 +267,52 @@
                 </StackPanel>
             </controls:SettingsSection>
 
+            <controls:SettingsSection
+                Header="ON THIS PC"
+                Footer="Only the small background helper runs at sign-in, never the window. It holds no keys and cannot open your workspace — the most it does is catch a shortcut and watch one folder.">
+                <StackPanel>
+                    <controls:SettingsRow
+                        x:Name="StartupRow"
+                        Title="Run the helper at sign-in"
+                        Subtitle="Keeps Ctrl+Alt+N working when Campus is closed"
+                        Symbol="device.laptop"
+                        ShowSeparator="False">
+                        <ToggleSwitch x:Name="StartupToggle" OnContent="" OffContent=""
+                                      Toggled="OnStartupToggled"
+                                      AutomationProperties.Name="Run at sign-in" />
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow
+                        x:Name="DropFolderRow"
+                        Title="Drop folder"
+                        Subtitle="Anything put here lands in Campus"
+                        Symbol="folder">
+                        <Button Style="{StaticResource Button.Secondary}"
+                                Content="Open" Click="OnOpenDropFolderClick"
+                                AutomationProperties.Name="Open the drop folder" />
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow
+                        x:Name="FileTypeRow"
+                        Title="Open .campus files with Campus"
+                        Subtitle="Gives them the right icon in Explorer"
+                        Symbol="file">
+                        <Button x:Name="FileTypeButton" Style="{StaticResource Button.Secondary}"
+                                Content="Register" Click="OnRegisterFileTypeClick"
+                                AutomationProperties.Name="Register the .campus file type" />
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow
+                        Title="Shortcuts"
+                        Subtitle="On the desktop and in the Start menu"
+                        Symbol="add">
+                        <Button Style="{StaticResource Button.Secondary}"
+                                Content="Create" Click="OnCreateShortcutsClick"
+                                AutomationProperties.Name="Create shortcuts" />
+                    </controls:SettingsRow>
+                </StackPanel>
+            </controls:SettingsSection>
+
             <controls:SettingsSection Header="ABOUT">
                 <StackPanel>
                     <controls:SettingsRow Title="Campus" Subtitle="Personal Academic Workspace"

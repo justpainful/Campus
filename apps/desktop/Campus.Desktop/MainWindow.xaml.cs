@@ -564,6 +564,58 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// The service queues anything dropped while Campus was closed. This is where that queue is
+    /// picked up — once, on unlock, because before that there is nowhere to put the files.
+    /// </summary>
+    public async Task DrainPendingImportsAsync()
+    {
+        var queue = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "Campus", "pending-import.txt");
+
+        if (!File.Exists(queue) || !_workspace.IsUnlocked) return;
+
+        try
+        {
+            var paths = (await File.ReadAllLinesAsync(queue))
+                .Select(p => p.Trim())
+                .Where(p => p.Length > 0 && File.Exists(p))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            // The queue is cleared before the import rather than after: a file that fails to
+            // import should not be retried on every launch for ever.
+            File.Delete(queue);
+
+            if (paths.Count > 0) await ImportAsync(paths);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            Diagnostics.Log("pending-import", ex);
+        }
+    }
+
+    /// <summary>
+    /// Brings in files somebody put somewhere Campus watches — a drop folder, a share from the
+    /// phone, a second copy of Campus started by double-clicking a file.
+    /// </summary>
+    public async Task ImportAsync(IReadOnlyList<string> paths)
+    {
+        if (!_workspace.IsUnlocked || paths.Count == 0) return;
+
+        var results = await App.GetService<ImportService>().ImportAsync(paths);
+        var added = results.Count(r => r.Succeeded);
+
+        Notifications.Show(
+            added == paths.Count
+                ? $"Added {added} file{(added == 1 ? "" : "s")}."
+                : $"Added {added} of {paths.Count}.",
+            added == paths.Count ? NoticeKind.Success : NoticeKind.Warning);
+
+        Navigate(CurrentDestination);
+    }
+
     /// <summary>Takes a backup now, into the folder backups normally go to.</summary>
     public async Task BackUpNowAsync()
     {
@@ -626,6 +678,7 @@ public sealed partial class MainWindow : Window
             // rebuilt now that there is something to read.
             Navigate(CurrentDestination);
             _ = SidebarContent.RefreshAsync();
+            _ = DrainPendingImportsAsync();
         }
         else
         {

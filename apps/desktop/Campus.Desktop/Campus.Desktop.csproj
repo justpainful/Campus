@@ -54,6 +54,23 @@
     The indexer ships beside the app too. It is a separate program so that a malformed document
     cannot take the workspace down with it.
   -->
+  <!--
+    The background service ships beside the app. It is the only part of Campus allowed to be
+    running when Campus is not, and it holds no keys.
+  -->
+  <Target Name="CopyService" AfterTargets="Build">
+    <MSBuild Projects="$(MSBuildThisFileDirectory)..\..\host\Campus.Service\Campus.Service.csproj"
+             Targets="Build"
+             Properties="Configuration=$(Configuration)" />
+    <ItemGroup>
+      <ServiceOutput Include="$(MSBuildThisFileDirectory)..\..\host\Campus.Service\bin\$(Configuration)\net10.0-windows10.0.19041.0\win-x64\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ServiceOutput)"
+          DestinationFolder="$(OutDir)service\%(RecursiveDir)"
+          SkipUnchangedFiles="true"
+          Condition="'@(ServiceOutput)' != ''" />
+  </Target>
+
   <Target Name="CopyIndexer" AfterTargets="Build">
     <MSBuild Projects="$(MSBuildThisFileDirectory)..\..\host\Campus.Indexer\Campus.Indexer.csproj"
              Targets="Build"

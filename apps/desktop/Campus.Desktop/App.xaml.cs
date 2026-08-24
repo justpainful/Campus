@@ -52,6 +52,14 @@ public partial class App : Application
 
     private void Launch()
     {
+        // Two copies of one encrypted workspace would autosave over each other and disagree
+        // about what is unlocked, so the second one hands over its arguments and leaves.
+        if (!SingleInstance.Claim(Environment.GetCommandLineArgs()))
+        {
+            Exit();
+            return;
+        }
+
         Services = ConfigureServices();
 
         var theme = GetService<ThemeService>();
@@ -65,12 +73,61 @@ public partial class App : Application
 
         _window.Activate();
 
+        // Anything sent by a second copy of Campus, or by the background service, arrives here.
+        SingleInstance.MessageReceived += (_, arguments) =>
+            _window.DispatcherQueue.TryEnqueue(() => Handle(arguments));
+
+        // A backup, if one is due. Deliberately at startup rather than on a timer: a workspace
+        // that is not open cannot be backed up, and a process that wakes up to touch an encrypted
+        // vault is exactly what this app should not have.
+        _window.DispatcherQueue.TryEnqueue(async () =>
+        {
+            try
+            {
+                await GetService<BackupService>()
+                    .RunIfDueAsync(GetService<WorkspaceSettings>().Backup);
+            }
+            catch (Exception ex)
+            {
+                Diagnostics.Log("scheduled-backup", ex);
+            }
+        });
+
         // Started after the window exists so it can react to the unlock, and never blocked on:
         // waiting for it here would deadlock, because its continuations come back to this thread.
         if (DeveloperWorkspace.Requested)
         {
             _window.DispatcherQueue.TryEnqueue(async () =>
                 await DeveloperWorkspace.PrepareAsync(GetService<WorkspaceService>()));
+        }
+    }
+
+    /// <summary>
+    /// Carries out what another process asked for: open a destination, capture something, or
+    /// take in files that were dropped somewhere Campus watches.
+    /// </summary>
+    private void Handle(string[] arguments)
+    {
+        if (_window is not MainWindow window) return;
+
+        window.Activate();
+
+        for (var i = 0; i < arguments.Length; i++)
+        {
+            switch (arguments[i])
+            {
+                case "--open" or "-o" when i + 1 < arguments.Length:
+                    window.NavigateTo(arguments[++i]);
+                    break;
+
+                case "--capture":
+                    _ = window.QuickCaptureAsync();
+                    break;
+
+                case "--import" when i + 1 < arguments.Length:
+                    _ = window.ImportAsync(arguments[(i + 1)..]);
+                    return;
+            }
         }
     }
 

@@ -69,6 +69,11 @@ public sealed partial class SettingsPage : Page
 
         LoadEmojiPacks();
 
+        StartupToggle.IsOn = Platform.Windows.WindowsIntegration.RunsAtStartup();
+        FileTypeButton.Content = Platform.Windows.WindowsIntegration.IsFileTypeRegistered()
+            ? "Registered" : "Register";
+        DropFolderRow.Subtitle = DropFolder;
+
         VersionText.Text = typeof(SettingsPage).Assembly.GetName().Version?.ToString(3) ?? "0.1.0";
         VaultPathText.Text = _workspace.Paths.Root;
         _ = UpdateHelloRowAsync();
@@ -300,6 +305,94 @@ public sealed partial class SettingsPage : Page
         {
             Notifications.Show($"The restore failed: {ex.Message}", NoticeKind.Error);
         }
+    }
+
+    // ------------------------------------------------------------------ this PC
+
+    private static string DropFolder => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Campus", "drop");
+
+    private static string ServicePath => Path.Combine(
+        AppContext.BaseDirectory, "service", "Campus.Service.exe");
+
+    private void OnStartupToggled(object sender, RoutedEventArgs e)
+    {
+        if (_loading) return;
+
+        if (!File.Exists(ServicePath))
+        {
+            StartupToggle.IsOn = false;
+            StartupRow.Subtitle = "The helper is missing from this build.";
+            return;
+        }
+
+        if (Platform.Windows.WindowsIntegration.SetRunAtStartup(ServicePath, StartupToggle.IsOn))
+        {
+            StartupRow.Subtitle = StartupToggle.IsOn
+                ? "Running at sign-in. It holds no keys."
+                : "Keeps Ctrl+Alt+N working when Campus is closed";
+
+            // Turning it on should also start it now rather than at the next sign-in.
+            if (StartupToggle.IsOn) StartHelper();
+        }
+        else
+        {
+            StartupToggle.IsOn = !StartupToggle.IsOn;
+            StartupRow.Subtitle = "Windows would not let Campus change that.";
+        }
+    }
+
+    private static void StartHelper()
+    {
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = ServicePath,
+                Arguments = "--background",
+                UseShellExecute = true,
+            });
+        }
+        catch (Exception ex) when (ex is IOException or System.ComponentModel.Win32Exception)
+        {
+            // It will start at the next sign-in regardless.
+        }
+    }
+
+    private async void OnOpenDropFolderClick(object sender, RoutedEventArgs e)
+    {
+        Directory.CreateDirectory(DropFolder);
+        await Windows.System.Launcher.LaunchFolderPathAsync(DropFolder);
+    }
+
+    private void OnRegisterFileTypeClick(object sender, RoutedEventArgs e)
+    {
+        var app = Path.Combine(AppContext.BaseDirectory, "Campus.exe");
+        var icon = Path.Combine(AppContext.BaseDirectory, "Assets", "Campus.ico");
+
+        FileTypeRow.Subtitle = Platform.Windows.WindowsIntegration.RegisterFileType(app, icon)
+            ? "Registered for this user."
+            : "Windows would not let Campus register it.";
+
+        FileTypeButton.Content = Platform.Windows.WindowsIntegration.IsFileTypeRegistered()
+            ? "Registered" : "Register";
+    }
+
+    private void OnCreateShortcutsClick(object sender, RoutedEventArgs e)
+    {
+        var app = Path.Combine(AppContext.BaseDirectory, "Campus.exe");
+        var icon = Path.Combine(AppContext.BaseDirectory, "Assets", "Campus.ico");
+
+        var desktop = Platform.Windows.WindowsIntegration.CreateShortcut(
+            Platform.Windows.WindowsIntegration.DesktopShortcutPath, app, "Campus", icon);
+
+        var start = Platform.Windows.WindowsIntegration.CreateShortcut(
+            Platform.Windows.WindowsIntegration.StartMenuShortcutPath, app, "Campus", icon);
+
+        Notifications.Show(
+            desktop || start ? "Shortcuts created." : "The shortcuts could not be created.",
+            desktop || start ? NoticeKind.Success : NoticeKind.Error);
     }
 
     private void OnOpenGalleryClick(object sender, RoutedEventArgs e)

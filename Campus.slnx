@@ -5,6 +5,7 @@
   </Folder>
   <Folder Name="/apps/host/">
     <Project Path="apps/host/Campus.Indexer/Campus.Indexer.csproj" />
+    <Project Path="apps/host/Campus.Service/Campus.Service.csproj" />
     <Project Path="apps/host/Campus.PluginHost/Campus.PluginHost.csproj" />
   </Folder>
   <Folder Name="/core/">
