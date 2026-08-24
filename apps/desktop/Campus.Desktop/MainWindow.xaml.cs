@@ -250,6 +250,17 @@ public sealed partial class MainWindow : Window
             case ShellDestinations.Goals:
                 ContentFrame.Navigate(typeof(GoalsPage));
                 break;
+            case ShellDestinations.Boards:
+                ContentFrame.Navigate(typeof(BoardsPage));
+                break;
+            case ShellDestinations.Profile:
+                ContentFrame.Navigate(typeof(ProfilePage));
+                break;
+            case ShellDestinations.Search:
+                // The argument is a query the caller already has — from the palette, or from a
+                // saved search — so arriving here can land straight on results.
+                ContentFrame.Navigate(typeof(SearchPage), argument);
+                break;
             default:
                 // Most destinations are the same page over a different query.
                 if (CollectionCatalog.For(id) is { } collection)

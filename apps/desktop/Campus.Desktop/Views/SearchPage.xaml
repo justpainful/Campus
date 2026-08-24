@@ -1,0 +1,66 @@
+<Page
+    x:Class="Campus.Desktop.Views.SearchPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Campus.Desktop.Design.Controls"
+    xmlns:icons="using:Campus.Desktop.Design.Icons"
+    Background="{ThemeResource Theme.Background.Primary}">
+
+    <!--
+        Search across everything, including inside documents. The result shows the sentence that
+        matched rather than only the file's name, because "which of my forty PDFs mentions this"
+        is the question being asked.
+    -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Padding="28,20,28,12" Spacing="12">
+            <TextBlock Text="Search" Style="{StaticResource Text.LargeTitle}" />
+
+            <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="QueryBox" Style="{StaticResource Input.Search}"
+                         PlaceholderText="Search titles, notes and inside documents"
+                         MaxWidth="620" HorizontalAlignment="Left"
+                         TextChanged="OnQueryChanged"
+                         AutomationProperties.Name="Search" />
+
+                <Button Grid.Column="1" x:Name="SaveButton" Style="{StaticResource Button.Secondary}"
+                        Click="OnSaveClick" Content="Save this search" MinWidth="0"
+                        Visibility="Collapsed" />
+            </Grid>
+        </StackPanel>
+
+        <controls:SegmentedControl x:Name="Segments" Grid.Row="1"
+                                   Margin="28,0,28,12" HorizontalAlignment="Left"
+                                   SelectionChanged="OnSegmentChanged" />
+
+        <Grid Grid.Row="2">
+            <ScrollViewer Padding="28,0,28,40">
+                <StackPanel x:Name="Results" Spacing="6" MaxWidth="880"
+                            HorizontalAlignment="Left" />
+            </ScrollViewer>
+
+            <StackPanel x:Name="EmptyState" Spacing="12"
+                        HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="420">
+                <icons:CampusIcon x:Name="EmptyGlyph" Symbol="search"
+                                  IconSize="{StaticResource Theme.Icon.Display}" Weight="Light"
+                                  Foreground="{ThemeResource Theme.Label.Tertiary}"
+                                  HorizontalAlignment="Center" />
+                <TextBlock x:Name="EmptyTitle" Text="Search everything"
+                           Style="{StaticResource Text.Title3}" HorizontalAlignment="Center" />
+                <TextBlock x:Name="EmptyMessage" Style="{StaticResource Text.Callout}"
+                           HorizontalAlignment="Center" TextAlignment="Center"
+                           Text="Titles, notes, tags, and the text inside every PDF, document and slide deck you have imported." />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

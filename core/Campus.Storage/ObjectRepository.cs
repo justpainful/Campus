@@ -395,7 +395,8 @@ public sealed class ObjectRepository(CampusDatabase database, string deviceId)
             => value is null ? DBNull.Value : value.Value.ToUnixTimeMilliseconds();
     }
 
-    private static CampusObject Read(SqliteDataReader reader)
+    /// <summary>Reads one row of the objects table. Shared with the search repository.</summary>
+    internal static CampusObject Read(SqliteDataReader reader)
     {
         var kind = (ObjectKind)reader.GetInt32(reader.GetOrdinal("kind"));
         var entity = new CampusObject

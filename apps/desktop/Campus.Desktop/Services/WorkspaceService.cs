@@ -54,6 +54,7 @@ public sealed class WorkspaceService : IDisposable
     public ScheduleRepository Schedule => Required(_schedule);
     public SavedQueryRepository SavedQueries => Required(_savedQueries);
     public SettingsRepository Settings => Required(_settings);
+    public SearchRepository Search => Required(_search);
 
     private ObjectRepository? _objects;
     private AnnotationRepository? _annotations;
@@ -62,6 +63,7 @@ public sealed class WorkspaceService : IDisposable
     private ScheduleRepository? _schedule;
     private SavedQueryRepository? _savedQueries;
     private SettingsRepository? _settings;
+    private SearchRepository? _search;
 
     private static T Required<T>(T? repository) where T : class
         => repository ?? throw new InvalidOperationException("The workspace is locked.");
@@ -124,6 +126,7 @@ public sealed class WorkspaceService : IDisposable
         _schedule = null;
         _savedQueries = null;
         _settings = null;
+        _search = null;
 
         _database.CloseAsync().GetAwaiter().GetResult();
         _vault.Lock();
@@ -168,6 +171,7 @@ public sealed class WorkspaceService : IDisposable
         _schedule = new ScheduleRepository(_database);
         _savedQueries = new SavedQueryRepository(_database);
         _settings = new SettingsRepository(_database);
+        _search = new SearchRepository(_database);
     }
 
     private void RaiseUnlocked()
