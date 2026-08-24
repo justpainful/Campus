@@ -1,0 +1,229 @@
+<Page
+    x:Class="Campus.Desktop.Views.HomePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Campus.Desktop.Design.Controls"
+    xmlns:icons="using:Campus.Desktop.Design.Icons"
+    xmlns:vm="using:Campus.Desktop.ViewModels"
+    xmlns:local="using:Campus.Desktop.Views"
+    Background="{ThemeResource Theme.Background.Primary}">
+
+    <Page.Resources>
+        <!-- A compact row for the summary lists. Same shape everywhere on this page. -->
+        <DataTemplate x:Key="HomeRowTemplate" x:DataType="vm:ObjectItem">
+            <Grid ColumnSpacing="10" MinHeight="40" Padding="0,2,0,2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <icons:CampusIcon
+                    Grid.Column="0"
+                    Symbol="{x:Bind Symbol}"
+                    IconSize="{StaticResource Theme.Icon.L}"
+                    Foreground="{ThemeResource Theme.Label.Tertiary}"
+                    VerticalAlignment="Center" />
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock
+                        Text="{x:Bind Title}"
+                        FontFamily="{StaticResource Theme.Font.Text}"
+                        FontSize="{StaticResource Theme.Text.Callout}"
+                        Foreground="{ThemeResource Theme.Label.Primary}"
+                        TextTrimming="CharacterEllipsis"
+                        TextWrapping="NoWrap" />
+                    <TextBlock
+                        Text="{x:Bind Subtitle}"
+                        Style="{StaticResource Text.Caption}"
+                        TextTrimming="CharacterEllipsis"
+                        TextWrapping="NoWrap"
+                        Visibility="{x:Bind local:HomePage.TextVisibility(Subtitle)}" />
+                </StackPanel>
+
+                <TextBlock
+                    Grid.Column="2"
+                    Text="{x:Bind DueText}"
+                    FontFamily="{StaticResource Theme.Font.Small}"
+                    FontSize="{StaticResource Theme.Text.Caption1}"
+                    Foreground="{x:Bind local:HomePage.RoleBrush(DueRole)}"
+                    VerticalAlignment="Center" />
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
+    <ScrollViewer Padding="0,0,0,48">
+        <StackPanel MaxWidth="1000" Margin="32,24,32,0" HorizontalAlignment="Stretch" Spacing="28">
+
+            <!-- Greeting -->
+            <StackPanel Spacing="2">
+                <TextBlock x:Name="GreetingText" Style="{StaticResource Text.LargeTitle}" />
+                <TextBlock x:Name="DateText" Style="{StaticResource Text.Callout}" />
+            </StackPanel>
+
+            <!-- Today at a glance. Counts, not lists — the lists are underneath. -->
+            <StackPanel Spacing="10">
+                <TextBlock Text="TODAY" Style="{StaticResource Text.SectionHeader}" />
+                <controls:WrapPanel ItemSpacing="12" LineSpacing="12">
+                    <Button x:Name="DueTodayCard" Style="{StaticResource Button.Plain}"
+                            Padding="0" Click="OnTasksClick" AutomationProperties.Name="Due today">
+                        <Border Style="{StaticResource Surface.Card}" MinWidth="176">
+                            <StackPanel Spacing="6">
+                                <icons:CampusIcon Symbol="tasks" IconSize="{StaticResource Theme.Icon.XL}"
+                                                  HorizontalAlignment="Left"
+                                                  Foreground="{ThemeResource Theme.Label.Secondary}" />
+                                <TextBlock x:Name="DueTodayCount" Style="{StaticResource Text.Title1}"
+                                           HorizontalAlignment="Left" />
+                                <TextBlock Text="due today" Style="{StaticResource Text.Footnote}"
+                                           HorizontalAlignment="Left" />
+                            </StackPanel>
+                        </Border>
+                    </Button>
+
+                    <Button x:Name="OverdueCard" Style="{StaticResource Button.Plain}"
+                            Padding="0" Click="OnTasksClick" AutomationProperties.Name="Overdue">
+                        <Border Style="{StaticResource Surface.Card}" MinWidth="176">
+                            <StackPanel Spacing="6">
+                                <icons:CampusIcon Symbol="warning" IconSize="{StaticResource Theme.Icon.XL}"
+                                                  HorizontalAlignment="Left"
+                                                  Foreground="{ThemeResource Theme.Destructive.Primary}" />
+                                <TextBlock x:Name="OverdueCount" Style="{StaticResource Text.Title1}"
+                                           HorizontalAlignment="Left" />
+                                <TextBlock Text="overdue" Style="{StaticResource Text.Footnote}"
+                                           HorizontalAlignment="Left" />
+                            </StackPanel>
+                        </Border>
+                    </Button>
+
+                    <Button x:Name="RequirementsCard" Style="{StaticResource Button.Plain}"
+                            Padding="0" Click="OnRequirementsClick" AutomationProperties.Name="To prepare">
+                        <Border Style="{StaticResource Surface.Card}" MinWidth="176">
+                            <StackPanel Spacing="6">
+                                <icons:CampusIcon Symbol="requirements" IconSize="{StaticResource Theme.Icon.XL}"
+                                                  HorizontalAlignment="Left"
+                                                  Foreground="{ThemeResource Theme.Label.Secondary}" />
+                                <TextBlock x:Name="RequirementCount" Style="{StaticResource Text.Title1}"
+                                           HorizontalAlignment="Left" />
+                                <TextBlock Text="to prepare" Style="{StaticResource Text.Footnote}"
+                                           HorizontalAlignment="Left" />
+                            </StackPanel>
+                        </Border>
+                    </Button>
+
+                    <Button x:Name="PrintCard" Style="{StaticResource Button.Plain}"
+                            Padding="0" Click="OnPrintClick" AutomationProperties.Name="Waiting to print">
+                        <Border Style="{StaticResource Surface.Card}" MinWidth="176">
+                            <StackPanel Spacing="6">
+                                <icons:CampusIcon Symbol="print" IconSize="{StaticResource Theme.Icon.XL}"
+                                                  HorizontalAlignment="Left"
+                                                  Foreground="{ThemeResource Theme.Label.Secondary}" />
+                                <TextBlock x:Name="PrintCount" Style="{StaticResource Text.Title1}"
+                                           HorizontalAlignment="Left" />
+                                <TextBlock x:Name="PrintCaption" Text="waiting to print"
+                                           Style="{StaticResource Text.Footnote}"
+                                           HorizontalAlignment="Left" />
+                            </StackPanel>
+                        </Border>
+                    </Button>
+                </controls:WrapPanel>
+            </StackPanel>
+
+            <!-- Two columns of lists on wide windows, stacked when narrow. -->
+            <controls:WrapPanel ItemSpacing="20" LineSpacing="20">
+                <StackPanel x:Name="UpcomingColumn" Width="480" Spacing="10">
+                    <Grid>
+                        <TextBlock Text="UPCOMING" Style="{StaticResource Text.SectionHeader}"
+                                   VerticalAlignment="Center" />
+                        <HyperlinkButton Content="Assignments" Click="OnAssignmentsClick"
+                                         HorizontalAlignment="Right" Padding="6,0,6,0"
+                                         Foreground="{ThemeResource Theme.Accent.Primary}" />
+                    </Grid>
+                    <Border Style="{StaticResource Surface.Card}" Padding="14">
+                        <StackPanel>
+                            <ItemsControl x:Name="UpcomingList"
+                                          ItemTemplate="{StaticResource HomeRowTemplate}" />
+                            <TextBlock x:Name="UpcomingEmpty" Style="{StaticResource Text.Footnote}"
+                                       Text="Nothing due in the next two weeks."
+                                       Visibility="Collapsed" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel x:Name="InboxColumn" Width="480" Spacing="10">
+                    <Grid>
+                        <TextBlock Text="INBOX" Style="{StaticResource Text.SectionHeader}"
+                                   VerticalAlignment="Center" />
+                        <HyperlinkButton Content="Open inbox" Click="OnInboxClick"
+                                         HorizontalAlignment="Right" Padding="6,0,6,0"
+                                         Foreground="{ThemeResource Theme.Accent.Primary}" />
+                    </Grid>
+                    <Border Style="{StaticResource Surface.Card}" Padding="14">
+                        <StackPanel>
+                            <ItemsControl x:Name="InboxList"
+                                          ItemTemplate="{StaticResource HomeRowTemplate}" />
+                            <TextBlock x:Name="InboxEmpty" Style="{StaticResource Text.Footnote}"
+                                       Text="Inbox is clear."
+                                       Visibility="Collapsed" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </controls:WrapPanel>
+
+            <!-- Continue where you left off -->
+            <StackPanel Spacing="10">
+                <TextBlock Text="CONTINUE" Style="{StaticResource Text.SectionHeader}" />
+                <Border Style="{StaticResource Surface.Card}" Padding="14">
+                    <StackPanel>
+                        <ItemsControl x:Name="ContinueList" ItemTemplate="{StaticResource HomeRowTemplate}" />
+                        <TextBlock x:Name="ContinueEmpty" Style="{StaticResource Text.Footnote}"
+                                   Text="Nothing opened yet. Anything you read shows up here."
+                                   Visibility="Collapsed" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- Quick capture -->
+            <StackPanel Spacing="10">
+                <TextBlock Text="QUICK CAPTURE" Style="{StaticResource Text.SectionHeader}" />
+                <controls:WrapPanel ItemSpacing="8" LineSpacing="8">
+                    <Button Style="{StaticResource Button.Secondary}" Click="OnCaptureClick" Tag="Note"
+                            MinWidth="0">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <icons:CampusIcon Symbol="notes" IconSize="{StaticResource Theme.Icon.M}" />
+                            <TextBlock Text="Note" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource Button.Secondary}" Click="OnCaptureClick" Tag="Task"
+                            MinWidth="0">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <icons:CampusIcon Symbol="tasks" IconSize="{StaticResource Theme.Icon.M}" />
+                            <TextBlock Text="Task" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource Button.Secondary}" Click="OnCaptureClick" Tag="Assignment"
+                            MinWidth="0">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <icons:CampusIcon Symbol="assignments" IconSize="{StaticResource Theme.Icon.M}" />
+                            <TextBlock Text="Assignment" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource Button.Secondary}" Click="OnCaptureClick" Tag="Requirement"
+                            MinWidth="0">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <icons:CampusIcon Symbol="requirements" IconSize="{StaticResource Theme.Icon.M}" />
+                            <TextBlock Text="Requirement" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource Button.Secondary}" Click="OnCaptureClick" Tag="Link"
+                            MinWidth="0">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <icons:CampusIcon Symbol="link" IconSize="{StaticResource Theme.Icon.M}" />
+                            <TextBlock Text="Link" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </controls:WrapPanel>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

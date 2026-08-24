@@ -18,7 +18,12 @@ public sealed partial class MainWindow : Window
     private readonly ThemeService _theme;
     private readonly WorkspaceService _workspace;
     private double _sidebarWidth = 280;
+    private CommandRegistry _commands = new();
+    private bool _sidebarVisible = true;
+    private bool _focusMode;
     private double _inspectorWidth = 300;
+    private bool _sidebarWasVisible = true;
+    private bool _inspectorWasVisible;
 
     public MainWindow(string? startDestination = null)
     {
@@ -63,8 +68,16 @@ public sealed partial class MainWindow : Window
         RootLayout.KeyDown += (_, _) => _workspace.NoteActivity();
         _workspace.StartAutoLock(DispatcherQueue);
 
+        _commands = CommandRegistry.CreateDefault(this, _workspace);
+        Palette.Initialise(_commands, _workspace);
+
         ApplyLockState(_workspace.IsUnlocked);
         UpdateStatusBar();
+
+#if DEBUG
+        // Lets a screenshot capture transient surfaces that normally need a keystroke.
+        ShowDebugSurface();
+#endif
     }
 
     private void KeepClearOfCaptionButtons()
@@ -77,7 +90,32 @@ public sealed partial class MainWindow : Window
     /// <summary>The destination currently showing in the workspace.</summary>
     public string CurrentDestination { get; private set; } = ShellDestinations.Home;
 
+#if DEBUG
+    /// <summary>Opens a transient surface named by --dev-show, for development screenshots.</summary>
+    private void ShowDebugSurface()
+    {
+        var args = Environment.GetCommandLineArgs();
+        var index = Array.FindIndex(args, a => a == "--dev-show");
+        if (index < 0 || index + 1 >= args.Length) return;
+
+        var surface = args[index + 1];
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            switch (surface)
+            {
+                case "palette": Palette.Show(PaletteMode.Commands); break;
+                case "search": Palette.Show(PaletteMode.Search); break;
+                case "inspector": SetInspectorVisible(true); break;
+                case "focus": ToggleFocusMode(); break;
+            }
+        });
+    }
+#endif
+
     private void OnDestinationInvoked(object? sender, string id) => Navigate(id);
+
+    /// <summary>Moves the shell to a destination. Used by pages whose counts link to a list.</summary>
+    public void NavigateTo(string destinationId) => Navigate(destinationId);
 
     private void Navigate(string id)
     {
@@ -102,6 +140,9 @@ public sealed partial class MainWindow : Window
                 // the gallery's back button has somewhere to go.
                 ContentFrame.Navigate(typeof(SettingsPage));
                 break;
+            case ShellDestinations.Home:
+                ContentFrame.Navigate(typeof(HomePage));
+                break;
             default:
                 // Most destinations are the same page over a different query.
                 if (CollectionCatalog.For(id) is { } collection)
@@ -120,7 +161,35 @@ public sealed partial class MainWindow : Window
         var shift = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift)
             .HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down);
 
+        if (e.Key == VirtualKey.Escape && Palette.IsOpen)
+        {
+            Palette.Hide();
+            e.Handled = true;
+            return;
+        }
+
         if (!ctrl) return;
+
+        if (shift && e.Key == VirtualKey.P)
+        {
+            Palette.Show(PaletteMode.Commands);
+            e.Handled = true;
+            return;
+        }
+
+        if (!shift && e.Key == VirtualKey.P)
+        {
+            Palette.Show(PaletteMode.Search);
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == VirtualKey.B)
+        {
+            ToggleSidebar();
+            e.Handled = true;
+            return;
+        }
 
         // Ctrl+1..9 jump straight to the first nine destinations, the way the rail's tooltips say.
         if (e.Key is >= VirtualKey.Number1 and <= VirtualKey.Number9)
@@ -139,17 +208,76 @@ public sealed partial class MainWindow : Window
         {
             LockWorkspace();
             e.Handled = true;
+            return;
+        }
+
+        var alt = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Menu)
+            .HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down);
+        if (alt && e.Key == VirtualKey.N)
+        {
+            _ = CaptureAsync();
+            e.Handled = true;
         }
     }
 
     private void OnCommandPaletteClick(object sender, RoutedEventArgs e)
+        => Palette.Show(PaletteMode.Commands);
+
+    /// <summary>Opens the quick capture sheet. Exposed so the palette can reach it too.</summary>
+    public Task QuickCaptureAsync(ObjectKind kind = ObjectKind.InboxItem) => CaptureAsync(kind);
+
+    /// <summary>Shows or hides the sidebar. The workspace takes the space it leaves.</summary>
+    public void ToggleSidebar()
     {
-        // The palette lands with the command registry; the button is present so the shortcut
-        // and the affordance ship together rather than one before the other.
+        _sidebarVisible = !_sidebarVisible;
+        Sidebar.Visibility = _sidebarVisible ? Visibility.Visible : Visibility.Collapsed;
+        SidebarGrip.Visibility = Sidebar.Visibility;
+        SidebarColumn.Width = new GridLength(_sidebarVisible ? _sidebarWidth : 0);
     }
 
-    private void OnQuickCaptureClick(object sender, RoutedEventArgs e)
+    public void ToggleInspector() => SetInspectorVisible(Inspector.Visibility != Visibility.Visible);
+
+    /// <summary>
+    /// Focus mode strips the shell back to the thing being read: no rail, no sidebar, no
+    /// inspector, no status bar. Leaving it restores whatever was showing before.
+    /// </summary>
+    public void ToggleFocusMode()
     {
+        _focusMode = !_focusMode;
+
+        if (_focusMode)
+        {
+            _sidebarWasVisible = _sidebarVisible;
+            _inspectorWasVisible = Inspector.Visibility == Visibility.Visible;
+            if (_sidebarVisible) ToggleSidebar();
+            SetInspectorVisible(false);
+            Rail.Visibility = Visibility.Collapsed;
+            StatusBar.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            Rail.Visibility = Visibility.Visible;
+            StatusBar.Visibility = Visibility.Visible;
+            if (_sidebarWasVisible && !_sidebarVisible) ToggleSidebar();
+            if (_inspectorWasVisible) SetInspectorVisible(true);
+        }
+    }
+
+    public void SetAppearance(AppearanceMode mode)
+    {
+        App.GetService<WorkspaceSettings>().Appearance = mode;
+        _theme.Appearance = mode;
+        UpdateStatusBar();
+    }
+
+    private async void OnQuickCaptureClick(object sender, RoutedEventArgs e) => await CaptureAsync();
+
+    private async Task CaptureAsync(ObjectKind kind = ObjectKind.InboxItem)
+    {
+        if (!_workspace.IsUnlocked) return;
+        if (RootLayout.XamlRoot is not { } root) return;
+
+        if (await QuickCapture.ShowAsync(root, kind) is not null) Navigate(CurrentDestination);
     }
 
     private void OnLockClick(object sender, RoutedEventArgs e) => LockWorkspace();

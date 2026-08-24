@@ -10,11 +10,11 @@
 - [x] F-01 Verify WinUI 3 toolchain builds on target machine (WindowsAppSDK 2.4.0 / .NET 10)
 - [x] F-02 Solution layout (`Campus.sln`) + `Directory.Build.props` + `Directory.Packages.props`
 - [x] F-03 `Campus.Domain` — object model, enums, value types
-- [ ] F-04 `Campus.Storage` — SQLite schema, migrations, repositories
+- [x] F-04 `Campus.Storage` — SQLite schema, migrations, repositories
 - [x] F-05 `Campus.Vault` — crypto primitives, content-addressed object store
-- [ ] F-06 `Campus.Search` — FTS5 index + query parser
-- [ ] F-07 `Campus.Sync` — change journal, device registry, conflict engine
-- [ ] F-08 `Campus.Extensions.Sdk` — public extension contracts
+- [x] F-06 `Campus.Search` — FTS5 index + query parser
+- [~] F-07 `Campus.Sync` — change journal, device registry, conflict engine
+- [~] F-08 `Campus.Extensions.Sdk` — public extension contracts
 - [x] F-09 DI container + app host bootstrap
 - [~] F-10 Logging, crash capture, diagnostics
 - [x] F-11 `.gitignore`, `.editorconfig`, repo hygiene
@@ -57,7 +57,7 @@
 ### Iconography & Emoji
 
 - [x] I-01 Icon engine: vector glyph set, weight + optical-size aware (SF-Symbols-like), never emoji
-- [~] I-02 Full app icon inventory (~180 glyphs) drawn as path data
+- [x] I-02 Full app icon inventory (~180 glyphs) drawn as path data
 - [x] I-03 Icon sizing scale + comfortable hit targets (min 32px control, 44px touch)
 - [x] I-04 Icon color always via `Label.*` / semantic tokens
 - [ ] E-01 Emoji data pipeline — full Unicode emoji set, groups, subgroups, CLDR names, keywords
@@ -72,16 +72,16 @@
 
 ## P1 — Security & Vault
 
-- [ ] S-01 Windows Hello unlock (`UserConsentVerifier` + WinUI interop)
-- [ ] S-02 Key hierarchy: Hello-gated key protector → Master Key → per-object keys
+- [x] S-01 Windows Hello unlock (`UserConsentVerifier` + WinUI interop)
+- [x] S-02 Key hierarchy: Hello-gated key protector → Master Key → per-object keys
 - [x] S-03 AES-256-GCM object encryption
 - [x] S-04 Encrypted filenames + metadata + thumbnails + index + database
 - [x] S-05 Content-addressed storage (SHA-256, dedup)
 - [x] S-06 Vault layout: `objects/` `chunks/` `thumbnails/` `index/`
-- [ ] S-07 Desktop shortcut + real vault under `%LOCALAPPDATA%\Campus`
+- [x] S-07 Desktop shortcut + real vault under `%LOCALAPPDATA%\Campus`
 - [x] S-08 Recovery Key generation + verification flow
-- [~] S-09 Lock command (`Ctrl+Shift+L`) — zeroize keys, close viewers, clear buffers
-- [~] S-10 Auto-lock policies (5/10/30 min, on PC lock, on app close)
+- [x] S-09 Lock command (`Ctrl+Shift+L`) — zeroize keys, close viewers, clear buffers
+- [x] S-10 Auto-lock policies (5/10/30 min, on PC lock, on app close)
 - [ ] S-11 Export flow with optional re-authentication
 - [ ] S-12 Sensitive Mode (drag-out restrictions, clipboard clearing)
 - [ ] S-13 Honest threat-model doc — what encryption does and does not protect against
@@ -96,53 +96,53 @@
 - [x] U-06 Status Bar
 - [ ] U-07 Tabs: pin, preview mode, reopen closed, drag-reorder, overflow
 - [ ] U-08 Split view: right / down, nested, drag-to-split
-- [ ] U-09 Command Palette (`Ctrl+Shift+P`)
-- [ ] U-10 Quick Open (`Ctrl+P`)
-- [ ] U-11 Quick Capture (`Ctrl+Alt+N`) global hotkey, works minimized
-- [ ] U-12 Global keyboard shortcut map + customization
-- [ ] U-13 Context menus (full action set on every object)
+- [x] U-09 Command Palette (`Ctrl+Shift+P`)
+- [x] U-10 Quick Open (`Ctrl+P`)
+- [x] U-11 Quick Capture (`Ctrl+Alt+N`) global hotkey, works minimized
+- [~] U-12 Global keyboard shortcut map + customization
+- [~] U-13 Context menus (full action set on every object)
 - [ ] U-14 Drag & drop from Explorer, between panes, onto destinations
-- [ ] U-15 Toast / notification surface
+- [~] U-15 Toast / notification surface
 - [~] U-16 Empty states, loading states, error states
-- [ ] U-17 Focus Mode
+- [x] U-17 Focus Mode
 - [ ] U-18 Study / Presentation Mode with session timer
 
 ## P1 — Core Features
 
-- [ ] C-01 Home dashboard (today, upcoming, continue, recent, quick capture, print queue)
-- [ ] C-02 Inbox + triage → convert to any object type
+- [x] C-01 Home dashboard (today, upcoming, continue, recent, quick capture, print queue)
+- [x] C-02 Inbox + triage → convert to any object type
 - [ ] C-03 Subjects (CRUD, colors, teachers, per-subject overview)
-- [ ] C-04 Virtual Collections (query-backed, not folders)
+- [x] C-04 Virtual Collections (query-backed, not folders)
 - [ ] C-05 Smart Collections with saved queries
-- [ ] C-06 Library (textbooks, solved books, references, explanations)
-- [ ] C-07 Notes (quick, lesson, daily, pinned, scratchpad)
-- [ ] C-08 Tasks (today/upcoming/overdue/completed/someday, priority, checklists)
-- [ ] C-09 Assignments (assigned, due, teacher, points, submission, attachments)
-- [ ] C-10 Requirements (bring-this / prepare-this tracking)
-- [ ] C-11 Print Center (To Print / Printed / Archive, queue, page counts, drag-in)
-- [ ] C-12 Links (YouTube / Telegram / web, metadata fetch, thumbnails, collections)
+- [x] C-06 Library (textbooks, solved books, references, explanations)
+- [x] C-07 Notes (quick, lesson, daily, pinned, scratchpad)
+- [x] C-08 Tasks (today/upcoming/overdue/completed/someday, priority, checklists)
+- [x] C-09 Assignments (assigned, due, teacher, points, submission, attachments)
+- [x] C-10 Requirements (bring-this / prepare-this tracking)
+- [x] C-11 Print Center (To Print / Printed / Archive, queue, page counts, drag-in)
+- [x] C-12 Links (YouTube / Telegram / web, metadata fetch, thumbnails, collections)
 - [ ] C-13 Boards + Threads (Discord-forum-style academic objects)
-- [ ] C-14 Tags + tag management
+- [~] C-14 Tags + tag management
 - [ ] C-15 Relations + Backlinks (`[[wiki-links]]`)
 - [ ] C-16 Academic Profile (About Me, school, year, term)
 - [ ] C-17 Goals + progress tracking
 - [ ] C-18 Planner (Day / Week / Month / Term) + School Timeline
-- [ ] C-19 Files tree view (virtual, not disk-mirrored)
-- [ ] C-20 History per object
+- [~] C-19 Files tree view (virtual, not disk-mirrored)
+- [~] C-20 History per object
 - [ ] C-21 Versioning
-- [ ] C-22 Trash + restore + permanent delete
-- [ ] C-23 Favorites / pinning
+- [~] C-22 Trash + restore + permanent delete
+- [~] C-23 Favorites / pinning
 - [ ] C-24 School Year Archive
-- [ ] C-25 Universal Search (content + metadata + annotations + captions)
+- [x] C-25 Universal Search (content + metadata + annotations + captions)
 - [ ] C-26 Import pipeline (identify → hash → scan → metadata → thumbnail → index → encrypt → store)
 - [ ] C-27 Export (original / PDF / selection / collection)
 - [ ] C-28 Backup & Recovery (`.campusbackup`, schedules, retention)
 - [~] C-29 Settings (all sections, grouped-page style)
-- [~] C-30 Offline-first guarantee — zero network dependency for core
+- [x] C-30 Offline-first guarantee — zero network dependency for core
 
 ## P1 — Viewers & Editors
 
-- [ ] V-01 Viewer host + content provider registry
+- [~] V-01 Viewer host + content provider registry
 - [ ] V-02 PDF viewer (zoom, fit, thumbnails, outline, search, text selection, rotate, print)
 - [ ] V-03 PDF annotations (highlight, draw, comment, persisted encrypted)
 - [ ] V-04 Image viewer (PNG/JPEG/WEBP/GIF/BMP/TIFF/HEIC) + crop/rotate/annotate
@@ -172,20 +172,20 @@
 - [ ] P-02 `Campus.Indexer.exe` out-of-process text extraction
 - [ ] P-03 Startup registration (service only, never UI)
 - [ ] P-04 Desktop shortcut + `.campus` file association + shell icon registration
-- [~] P-05 Single-instance + deep-link activation
+- [x] P-05 Single-instance + deep-link activation
 
 ## P2 — Accessibility
 
-- [~] A-01 Full keyboard-only navigation
+- [x] A-01 Full keyboard-only navigation
 - [~] A-02 Screen reader names/roles/values on every control
-- [ ] A-03 UI scaling + independent text scaling
+- [~] A-03 UI scaling + independent text scaling
 - [ ] A-04 Reduced motion
 - [ ] A-05 High contrast
 - [x] A-06 Visible focus indicators everywhere
 - [ ] A-07 Reading aids: dyslexia-friendly options, line spacing, reading ruler
 - [ ] A-08 Large cursor / large hit targets mode
-- [ ] A-09 Shortcut customization UI
-- [ ] A-10 Command palette coverage for every action
+- [~] A-09 Shortcut customization UI
+- [x] A-10 Command palette coverage for every action
 
 ## P3 — iOS (Campus Pocket) + Sync
 

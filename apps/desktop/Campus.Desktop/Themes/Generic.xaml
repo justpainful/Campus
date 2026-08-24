@@ -24,14 +24,22 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="icons:CampusIcon">
+                    <!--
+                        The path sits on a fixed 24-unit canvas which is then scaled to the
+                        requested size. A Canvas measures its children unconstrained, so the
+                        drawing is never clipped to a layout slot smaller than the grid it was
+                        authored on — which is exactly what happens if the path is placed
+                        directly in a panel narrower than 24 pixels.
+                    -->
                     <Grid>
-                        <Path
-                            x:Name="PART_Path"
-                            StrokeLineJoin="Round"
-                            StrokeStartLineCap="Round"
-                            StrokeEndLineCap="Round"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Top" />
+                        <Canvas x:Name="PART_Canvas" Width="24" Height="24"
+                                HorizontalAlignment="Left" VerticalAlignment="Top">
+                            <Path
+                                x:Name="PART_Path"
+                                StrokeLineJoin="Round"
+                                StrokeStartLineCap="Round"
+                                StrokeEndLineCap="Round" />
+                        </Canvas>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

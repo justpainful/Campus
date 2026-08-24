@@ -31,6 +31,7 @@ public enum IconVariant { Outline = 0, Filled = 1 }
 public sealed class CampusIcon : Control
 {
     private Path? _path;
+    private Canvas? _canvas;
 
     public CampusIcon()
     {
@@ -85,6 +86,7 @@ public sealed class CampusIcon : Control
     {
         base.OnApplyTemplate();
         _path = GetTemplateChild("PART_Path") as Path;
+        _canvas = GetTemplateChild("PART_Canvas") as Canvas;
         UpdateVisual();
     }
 
@@ -99,9 +101,11 @@ public sealed class CampusIcon : Control
         var glyph = IconRegistry.Resolve(Symbol, Variant);
         _path.Data = glyph.Geometry;
 
-        // The grid is 24 units wide; scale it to whatever size was asked for.
+        // The canvas is the authored 24-unit grid; scaling it, rather than the path, is what
+        // keeps the whole drawing visible at sizes below 24.
         var scale = IconSize / IconRegistry.GridSize;
-        _path.RenderTransform = new ScaleTransform { ScaleX = scale, ScaleY = scale };
+        if (_canvas is not null)
+            _canvas.RenderTransform = new ScaleTransform { ScaleX = scale, ScaleY = scale };
 
         if (glyph.IsFilled)
         {

@@ -9,6 +9,7 @@
 
 param(
     [string]$Destination = 'home',
+    [string]$Show = '',
     [string]$Out = '',
     [switch]$NoBuild,
     [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
@@ -19,7 +20,7 @@ $ErrorActionPreference = 'Stop'
 $exe = Join-Path $RepoRoot 'apps\desktop\Campus.Desktop\bin\Debug\net10.0-windows10.0.26100.0\win-x64\Campus.exe'
 $shots = Join-Path $env:TEMP 'campus-shots'
 New-Item -ItemType Directory -Force -Path $shots | Out-Null
-if (-not $Out) { $Out = Join-Path $shots "$Destination.png" }
+if (-not $Out) { $Out = Join-Path $shots "$(if ($Show) { $Show } else { $Destination }).png" }
 
 Get-Process -Name Campus -ErrorAction SilentlyContinue | Stop-Process -Force
 Start-Sleep -Milliseconds 700
@@ -37,7 +38,9 @@ if (-not $NoBuild) {
 $log = Join-Path $env:LOCALAPPDATA 'Campus\logs\startup.log'
 Remove-Item $log -ErrorAction SilentlyContinue
 
-Start-Process -FilePath $exe -ArgumentList '--dev-workspace', '--open', $Destination | Out-Null
+$arguments = @('--dev-workspace', '--open', $Destination)
+if ($Show) { $arguments += @('--dev-show', $Show) }
+Start-Process -FilePath $exe -ArgumentList $arguments | Out-Null
 Start-Sleep -Seconds 6
 
 powershell.exe -NoProfile -ExecutionPolicy Bypass `

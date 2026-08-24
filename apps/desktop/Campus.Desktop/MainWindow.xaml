@@ -5,7 +5,8 @@
     xmlns:shell="using:Campus.Desktop.Shell"
     xmlns:icons="using:Campus.Desktop.Design.Icons"
     xmlns:brand="using:Campus.Desktop.Design.Brand"
-    xmlns:controls="using:Campus.Desktop.Design.Controls">
+    xmlns:controls="using:Campus.Desktop.Design.Controls"
+    xmlns:views="using:Campus.Desktop.Views">
 
     <Grid x:Name="RootLayout" Background="{ThemeResource Theme.Background.Primary}">
         <Grid.RowDefinitions>
@@ -210,7 +211,8 @@
         </Grid>
 
         <!-- =========================================================== STATUS BAR -->
-        <Grid Grid.Row="2"
+        <Grid x:Name="StatusBar"
+              Grid.Row="2"
               Height="{StaticResource Theme.Size.StatusBarHeight}"
               Background="{ThemeResource Theme.Background.Primary}">
             <Border VerticalAlignment="Top" Height="1"
@@ -237,6 +239,9 @@
             The lock screen covers the workspace and the status bar but not the title bar, so the
             window can still be moved, minimised and closed while it is locked.
         -->
+        <!-- The palette sits above everything, including the lock screen's own row span. -->
+        <views:CommandPalette x:Name="Palette" Grid.Row="0" Grid.RowSpan="3" />
+
         <Frame
             x:Name="LockFrame"
             Grid.Row="1"
