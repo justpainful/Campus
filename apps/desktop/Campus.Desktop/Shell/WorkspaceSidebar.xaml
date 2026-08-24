@@ -76,6 +76,14 @@
             </Button>
         </StackPanel>
 
+        <StackPanel x:Name="CollectionSection" Spacing="4" Visibility="Collapsed">
+            <Grid Margin="8,0,8,2">
+                <TextBlock Text="SAVED SEARCHES" Style="{StaticResource Text.SectionHeader}"
+                           VerticalAlignment="Center" />
+            </Grid>
+            <ItemsControl x:Name="CollectionList" ItemTemplate="{StaticResource SidebarRowTemplate}" />
+        </StackPanel>
+
         <StackPanel x:Name="SubjectSection" Spacing="4">
             <TextBlock Text="SUBJECTS" Style="{StaticResource Text.SectionHeader}" Margin="8,0,8,2" />
             <ItemsControl x:Name="SubjectList" ItemTemplate="{StaticResource SidebarRowTemplate}" />

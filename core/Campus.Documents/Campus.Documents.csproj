@@ -7,6 +7,7 @@
     <PackageReference Include="PDFtoImage" />
     <PackageReference Include="DocumentFormat.OpenXml" />
     <PackageReference Include="Markdig" />
+    <PackageReference Include="PdfPig" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Campus.Domain\Campus.Domain.csproj" />

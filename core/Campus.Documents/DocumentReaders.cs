@@ -51,6 +51,10 @@ public static class DocumentReaders
             facts.PixelWidth = (int)size.Width;
             facts.PixelHeight = (int)size.Height;
         }
+
+        // The words, so that searching for a phrase finds the textbook it is in rather than only
+        // the textbooks whose file names happen to contain it. A scan has none, and says so.
+        facts.Text = Truncate(PdfText.Extract(stream));
     }
 
     // ------------------------------------------------------------------------- Word

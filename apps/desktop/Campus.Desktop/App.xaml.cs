@@ -123,6 +123,9 @@ public partial class App : Application
         // Extensions, each in a process of its own.
         services.AddSingleton<ExtensionService>();
 
+        // Copies of the vault, taken as it sits on disk and therefore already encrypted.
+        services.AddSingleton<BackupService>();
+
         return services.BuildServiceProvider();
     }
 

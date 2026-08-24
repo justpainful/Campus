@@ -150,8 +150,24 @@ public sealed class CommandRegistry
             () => { window.SetAppearance(AppearanceMode.Dark); return Task.CompletedTask; }));
 
         registry.Register(new CampusCommand(
-            "theme.system", "Appearance: Follow system", "View", CampusSymbols.Contrast,
-            () => { window.SetAppearance(AppearanceMode.System); return Task.CompletedTask; }));
+            "view.split", "Split the workspace", "View", CampusSymbols.SplitRight,
+            () => { window.ToggleSplit(); return Task.CompletedTask; }, "Ctrl+\\"));
+
+        registry.Register(new CampusCommand(
+            "view.study", "Study mode", "View", CampusSymbols.Fullscreen,
+            () => { window.ToggleStudyMode(); return Task.CompletedTask; }, "Ctrl+Shift+D"));
+
+        // Getting the workspace out, in both senses: a readable copy, and one that can be read
+        // back in. Both are deliberate acts and both say what they produce.
+        registry.Register(new CampusCommand(
+            "workspace.export", "Export everything", "Workspace", CampusSymbols.Export,
+            () => window.ExportEverythingAsync(),
+            CanExecute: () => workspace.IsUnlocked));
+
+        registry.Register(new CampusCommand(
+            "workspace.backup", "Back up now", "Workspace", CampusSymbols.Backup,
+            () => window.BackUpNowAsync(),
+            CanExecute: () => workspace.IsUnlocked));
 
         return registry;
     }

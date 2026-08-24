@@ -86,6 +86,7 @@ public sealed partial class WorkspaceSidebar : UserControl
         SubjectList.ItemsSource = subjectEntries;
         SubjectSection.Visibility = subjectEntries.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
 
+        await LoadCollectionsAsync();
         await LoadTagsAsync();
         UpdateFilterNotice();
     }
@@ -121,6 +122,33 @@ public sealed partial class WorkspaceSidebar : UserControl
         TagSection.Visibility = tags.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
+    /// <summary>
+    /// The searches somebody kept. A saved search is stored as the question, so its row shows how
+    /// many things match it right now rather than how many matched on the day it was saved.
+    /// </summary>
+    private async Task LoadCollectionsAsync()
+    {
+        var saved = await _workspace.SavedQueries.AllAsync();
+        var entries = new List<SidebarEntry>();
+
+        foreach (var collection in saved)
+        {
+            entries.Add(new SidebarEntry
+            {
+                Key = $"saved:{collection.Id.Value}",
+                Label = collection.Name,
+                Symbol = collection.IconName ?? CampusSymbols.Collection,
+                Count = await _workspace.Objects.CountAsync(collection.Query),
+            });
+        }
+
+        CollectionList.ItemsSource = entries;
+        CollectionSection.Visibility = entries.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        _saved = saved;
+    }
+
+    private IReadOnlyList<Campus.Storage.SavedQuery> _saved = [];
+
     private void UpdateFilterNotice()
     {
         if (!_navigation.HasFilter)
@@ -148,6 +176,19 @@ public sealed partial class WorkspaceSidebar : UserControl
             // Clicking the subject you are already filtered to clears the filter, so the row is
             // a toggle rather than a one-way door.
             _navigation.SubjectId = Nullable.Equals(_navigation.SubjectId, id) ? null : id;
+        }
+        else if (key.StartsWith("saved:", StringComparison.Ordinal))
+        {
+            var id = key["saved:".Length..];
+            var collection = _saved.FirstOrDefault(c => c.Id.Value == id);
+
+            // A saved search opens as a list of its own rather than narrowing the current one:
+            // it is a question already, not a filter on somebody else's question.
+            if (collection is not null)
+            {
+                App.GetService<ShellRouter>().GoTo(
+                    ShellDestinations.Search, collection.Query.Text ?? collection.Name);
+            }
         }
         else if (key.StartsWith("tag:", StringComparison.Ordinal))
         {

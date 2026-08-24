@@ -520,6 +520,75 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// Writes the whole workspace out as a folder of markdown and the original files.
+    ///
+    /// The dialog says plainly that the result is not encrypted, because it is not, and somebody
+    /// exporting a term of work deserves to be told that before it lands in Documents rather than
+    /// after.
+    /// </summary>
+    public async Task ExportEverythingAsync()
+    {
+        if (!_workspace.IsUnlocked) return;
+
+        var picker = new Windows.Storage.Pickers.FolderPicker();
+        WinRT.Interop.InitializeWithWindow.Initialize(picker,
+            WinRT.Interop.WindowNative.GetWindowHandle(this));
+        picker.FileTypeFilter.Add("*");
+
+        var folder = await picker.PickSingleFolderAsync();
+        if (folder is null) return;
+
+        if (RootLayout.XamlRoot is { } root && !await Views.ObjectCommands.ConfirmAsync(
+            root,
+            "Export everything?",
+            "Campus will write a folder of markdown files and copies of your documents. That "
+            + "folder is NOT encrypted — anyone who can open it can read it.",
+            "Export")) return;
+
+        Notifications.Show("Exporting…");
+
+        try
+        {
+            var result = await App.GetService<ExportService>()
+                .ExportEverythingAsync(folder.Path, ExportShape.Complete);
+
+            Notifications.Show(
+                $"Exported {result.Objects} items and {result.Files} files to {folder.Name}.",
+                NoticeKind.Success);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException
+                                      or InvalidOperationException)
+        {
+            Notifications.Show($"The export failed: {ex.Message}", NoticeKind.Error);
+        }
+    }
+
+    /// <summary>Takes a backup now, into the folder backups normally go to.</summary>
+    public async Task BackUpNowAsync()
+    {
+        if (!_workspace.IsUnlocked) return;
+
+        Notifications.Show("Backing up…");
+
+        try
+        {
+            var backup = await App.GetService<BackupService>()
+                .CreateAsync(App.GetService<WorkspaceSettings>().Backup.Destination);
+
+            Notifications.Show(backup is null
+                ? "Nothing was backed up."
+                : $"Backed up — {ViewModels.ObjectItem.FormatSize(backup.SizeBytes)}. "
+                  + "It needs your recovery key to open.",
+                NoticeKind.Success);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException
+                                      or InvalidOperationException)
+        {
+            Notifications.Show($"The backup failed: {ex.Message}", NoticeKind.Error);
+        }
+    }
+
     public void SetAppearance(AppearanceMode mode)
     {
         App.GetService<WorkspaceSettings>().Appearance = mode;
