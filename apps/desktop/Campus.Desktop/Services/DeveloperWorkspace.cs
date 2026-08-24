@@ -391,33 +391,38 @@ public static class DeveloperWorkspace
                 + "That is what makes potential a useful idea at all.",
             ]), ct).ConfigureAwait(false);
 
+        // Written as joined lines rather than as a raw string literal: everything in this file
+        // sits inside `#if DEBUG`, and in a release build the compiler scans that region for
+        // preprocessor directives — where a line beginning with `#` is one, string or not.
         var notes = Path.Combine(staging, "Chemistry — bonding.md");
-        await File.WriteAllTextAsync(notes, """
-            # Bonding
-
-            Two ways atoms end up sharing the electrons they need.
-
-            ## Ionic
-
-            One atom **gives** an electron to another. Metals and non-metals.
-
-            - Sodium gives, chlorine takes
-            - The result is two ions that attract each other
-
-            ## Covalent
-
-            Both atoms **share** a pair. Non-metals with non-metals.
-
-            > A double bond is two shared pairs, not one stronger pair.
-
-            | Bond     | Electrons | Between            |
-            |----------|-----------|--------------------|
-            | Ionic    | Given     | Metal + non-metal  |
-            | Covalent | Shared    | Non-metal + non-metal |
-
-            - [x] Chapter read
-            - [ ] Questions 1 to 12
-            """, ct).ConfigureAwait(false);
+        await File.WriteAllTextAsync(notes, string.Join('
+',
+        [
+            "# Bonding",
+            "",
+            "Two ways atoms end up sharing the electrons they need.",
+            "",
+            "## Ionic",
+            "",
+            "One atom **gives** an electron to another. Metals and non-metals.",
+            "",
+            "- Sodium gives, chlorine takes",
+            "- The result is two ions that attract each other",
+            "",
+            "## Covalent",
+            "",
+            "Both atoms **share** a pair. Non-metals with non-metals.",
+            "",
+            "> A double bond is two shared pairs, not one stronger pair.",
+            "",
+            "| Bond     | Electrons | Between               |",
+            "|----------|-----------|-----------------------|",
+            "| Ionic    | Given     | Metal + non-metal     |",
+            "| Covalent | Shared    | Non-metal + non-metal |",
+            "",
+            "- [x] Chapter read",
+            "- [ ] Questions 1 to 12",
+        ]), ct).ConfigureAwait(false);
 
         var vocabulary = Path.Combine(staging, "English — Connect vocabulary.txt");
         await File.WriteAllTextAsync(vocabulary, string.Join(Environment.NewLine,
