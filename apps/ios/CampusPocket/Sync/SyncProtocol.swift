@@ -8,7 +8,7 @@ import Foundation
 enum SyncProtocol {
     static let version = 1
     static let serviceType = "_campus-sync._tcp"
-    static let port: UInt16 = 47_821
+    static let port: UInt16 = 47_821  // The port Campus listens on while you are waiting.
 
     /// Sent by the phone to open a session. The nonce is signed with the paired key, so a device
     /// on the same Wi-Fi that never completed pairing cannot open one.
@@ -27,10 +27,11 @@ enum SyncProtocol {
         var reason: String?
     }
 
-    /// A batch of captures. Attachments follow as length-prefixed blobs in the order referenced.
+    /// A batch of captures. Attachments follow as length-prefixed blobs, in the order the items
+    /// that carry them appear here — which is why an item whose file has gone is still sent with
+    /// an empty one rather than skipped.
     struct Push: Codable, Sendable {
         var items: [CaptureItem]
-        var attachmentBytes: [String: Int]
     }
 
     /// What the PC actually stored. The phone marks only these as delivered, so an interrupted

@@ -34,8 +34,17 @@ public sealed class PairedDevice
     public string DeviceId { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
     public DevicePlatform Platform { get; set; }
-    /// <summary>Peer's long-term public key, base64.</summary>
+    /// <summary>Peer's long-term public key, base64. Empty for devices paired by shared secret.</summary>
     public string PublicKey { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The secret both devices hold, base64, for peers paired by scanning a code.
+    ///
+    /// A shared secret rather than a key pair because there are exactly two parties and no third
+    /// one to verify anything for. It never leaves the encrypted database, and it is the only
+    /// thing that distinguishes this phone from any other device on the same network.
+    /// </summary>
+    public string? SharedKey { get; set; }
     public DateTimeOffset PairedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset? LastSeenAt { get; set; }
     public long LastAcknowledgedSequence { get; set; }

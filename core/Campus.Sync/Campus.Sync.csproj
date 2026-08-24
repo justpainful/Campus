@@ -4,6 +4,9 @@
     <RootNamespace>Campus.Sync</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="QRCoder" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Campus.Domain\Campus.Domain.csproj" />
     <ProjectReference Include="..\Campus.Vault\Campus.Vault.csproj" />
     <ProjectReference Include="..\Campus.Storage\Campus.Storage.csproj" />

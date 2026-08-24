@@ -1,5 +1,6 @@
 using Campus.Desktop.Design;
 using Campus.Desktop.Design.Controls;
+using Campus.Sync;
 using Campus.Desktop.Design.Icons;
 using Campus.Desktop.Services;
 using Campus.Domain;
@@ -195,6 +196,14 @@ public sealed partial class SyncPage : Page
             "Connect to one that is waiting",
             CampusSymbols.Download, "Connect", first: false,
             async () => await FetchAsync()));
+
+        rows.Children.Add(Row(
+            "Take what the phone caught",
+            addresses.Count > 0
+                ? $"Campus Pocket connects to {addresses[0]} on port {PhoneSync.Port}"
+                : "No local network address found",
+            CampusSymbols.Phone, "Wait for the phone", first: false,
+            async () => await ReceiveFromPhoneAsync()));
 
         TransferSection.Content = rows;
     }
@@ -406,6 +415,95 @@ public sealed partial class SyncPage : Page
         {
             Done($"Could not fetch: {ex.Message}", failed: true);
         }
+
+        await ReloadAsync();
+    }
+
+    /// <summary>
+    /// Waits for Campus Pocket to connect and takes what it has caught.
+    ///
+    /// One phone, once, while somebody is looking at this page. Nothing listens in the background,
+    /// because a workspace that encrypts itself should not also be answering the school Wi-Fi.
+    /// </summary>
+    private async Task ReceiveFromPhoneAsync()
+    {
+        Status("Waiting for the phone to connect…");
+
+        try
+        {
+            var result = await _sync.ReceiveFromPhoneAsync();
+
+            if (result is null)
+            {
+                Done("Nothing connected.");
+                return;
+            }
+
+            var message = $"Took {result.Accepted} from {result.DeviceName}";
+            if (result.Attachments > 0) message += $", including {result.Attachments} files";
+            if (result.Rejected > 0) message += $". {result.Rejected} could not be stored";
+
+            Done(message + ".");
+        }
+        catch (Exception ex) when (ex is IOException or System.Net.Sockets.SocketException
+                                      or InvalidDataException)
+        {
+            Done($"The phone could not be read: {ex.Message}", failed: true);
+        }
+
+        await ReloadAsync();
+    }
+
+    /// <summary>
+    /// Pairs a phone by showing it a code to scan.
+    ///
+    /// The secret is inside the code because the code is on a screen being read by a camera in the
+    /// same room — a better channel than anything the two could negotiate over a network neither
+    /// of them trusts. It is shown once and is not recoverable afterwards.
+    /// </summary>
+    private async void OnPairPhoneClick(object sender, RoutedEventArgs e)
+    {
+        if (!_workspace.IsUnlocked) return;
+
+        var name = await ObjectCommands.AskAsync(XamlRoot, "What is the phone called?", "", "My iPhone");
+        if (name is null) return;
+
+        var code = await _sync.BeginPhonePairingAsync(name);
+
+        var body = new StackPanel { Spacing = 16, Width = 380 };
+
+        body.Children.Add(new TextBlock
+        {
+            Text = "In Campus Pocket, open Settings and choose \u201CPair with your PC\u201D, then "
+                 + "point the camera here.",
+            Style = (Style)Application.Current.Resources["Text.Callout"],
+            TextWrapping = TextWrapping.Wrap,
+        });
+
+        body.Children.Add(new Border
+        {
+            Padding = new Thickness(16),
+            CornerRadius = (CornerRadius)Application.Current.Resources["Theme.Radius.Card"],
+            Background = (Brush)Application.Current.Resources[ThemeTokens.Label.OnAccent],
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Child = new QrCode { Payload = code, ModuleSize = 5 },
+        });
+
+        body.Children.Add(new TextBlock
+        {
+            Text = "This code contains the secret the two devices will share. It is shown once, "
+                 + "and anyone who photographs it can pair with this workspace.",
+            Style = (Style)Application.Current.Resources["Text.Footnote"],
+            TextWrapping = TextWrapping.Wrap,
+        });
+
+        await new ContentDialog
+        {
+            XamlRoot = XamlRoot,
+            Title = $"Pair {name}",
+            Content = body,
+            CloseButtonText = "Done",
+        }.ShowAsync();
 
         await ReloadAsync();
     }

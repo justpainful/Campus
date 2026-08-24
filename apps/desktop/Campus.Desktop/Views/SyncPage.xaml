@@ -38,8 +38,12 @@
                 <Grid>
                     <TextBlock Text="DEVICES" Style="{StaticResource Text.SectionHeader}"
                                VerticalAlignment="Center" />
-                    <Button HorizontalAlignment="Right" Style="{StaticResource Button.Secondary}"
-                            Content="Pair a device" Click="OnPairClick" MinWidth="0" />
+                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                        <Button Style="{StaticResource Button.Secondary}"
+                                Content="Pair a computer" Click="OnPairClick" MinWidth="0" />
+                        <Button Style="{StaticResource Button.Primary}"
+                                Content="Pair a phone" Click="OnPairPhoneClick" MinWidth="0" />
+                    </StackPanel>
                 </Grid>
                 <Border Style="{StaticResource Surface.Section}" Padding="4">
                     <StackPanel x:Name="DeviceList" />

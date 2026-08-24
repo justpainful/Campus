@@ -194,6 +194,14 @@ public static class Migrations
                 tags
             );
             """),
+
+        (3, """
+            -- Pairing a phone establishes a shared secret rather than a public key: the two
+            -- devices are the only parties, and there is no third one to verify a signature for.
+            -- The column is separate from public_key so that neither is ever mistaken for the
+            -- other. It is only ever written to a database that is already encrypted.
+            ALTER TABLE devices ADD COLUMN shared_key TEXT;
+            """),
     ];
 
     public static int LatestVersion => Steps[^1].Version;

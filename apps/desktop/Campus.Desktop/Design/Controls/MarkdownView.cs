@@ -161,7 +161,7 @@ public sealed partial class MarkdownView : StackPanel
 
             row.Children.Add(task is not null
                 ? TaskMarker(task.Checked)
-                : Marker(list.IsOrdered ? $"{number}." : Bullet(depth)));
+                : list.IsOrdered ? NumberMarker(number) : Marker(depth));
 
             foreach (var child in item) AddBlock(child, content);
             row.Children.Add(content);
@@ -176,16 +176,39 @@ public sealed partial class MarkdownView : StackPanel
             ? inline.FirstOrDefault() as TaskList
             : null;
 
-    private static string Bullet(int depth) => depth switch { 0 => "•", 1 => "◦", _ => "▪" };
-
-    private TextBlock Marker(string glyph) => new()
+    /// <summary>
+    /// The bullet, drawn rather than typed.
+    ///
+    /// A bullet character depends on the font having one at a sensible size and baseline, and the
+    /// display faces Campus uses do not agree about either. A small filled dot is the same shape
+    /// in every theme and sits where a bullet should.
+    /// </summary>
+    private FrameworkElement Marker(int depth)
     {
-        Text = glyph,
+        var dot = new Microsoft.UI.Xaml.Shapes.Ellipse
+        {
+            Width = depth == 0 ? 5 : 4,
+            Height = depth == 0 ? 5 : 4,
+            Fill = depth == 0 ? Brush(ThemeTokens.Label.Tertiary) : null,
+            Stroke = depth == 0 ? null : Brush(ThemeTokens.Label.Tertiary),
+            StrokeThickness = 1,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment = VerticalAlignment.Top,
+            Margin = new Thickness(0, 11, 8, 0),
+        };
+
+        return dot;
+    }
+
+    private TextBlock NumberMarker(int number) => new()
+    {
+        Text = $"{number}.",
         FontFamily = Font("Theme.Font.Text"),
-        FontSize = 15,
+        FontSize = 14,
         Foreground = Brush(ThemeTokens.Label.Tertiary),
         TextAlignment = TextAlignment.Right,
-        Margin = new Thickness(0, 0, 8, 0),
+        VerticalAlignment = VerticalAlignment.Top,
+        Margin = new Thickness(0, 4, 8, 0),
     };
 
     private CampusIcon TaskMarker(bool done) => new()
@@ -282,6 +305,9 @@ public sealed partial class MarkdownView : StackPanel
             BorderBrush = Brush(ThemeTokens.Separator.Standard),
             BorderThickness = new Thickness(1),
             CornerRadius = (CornerRadius)Application.Current.Resources["Theme.Radius.S"],
+            // Sized to its columns rather than to the page, so the border ends where the table
+            // ends instead of running off to the right of the last cell.
+            HorizontalAlignment = HorizontalAlignment.Left,
         };
 
         var rows = table.OfType<Markdig.Extensions.Tables.TableRow>().ToList();
@@ -318,15 +344,14 @@ public sealed partial class MarkdownView : StackPanel
             }
         }
 
-        var scroller = new ScrollViewer
+        host.Children.Add(new ScrollViewer
         {
             Content = grid,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
             VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
             HorizontalScrollMode = ScrollMode.Auto,
-        };
-
-        host.Children.Add(scroller);
+            HorizontalAlignment = HorizontalAlignment.Left,
+        });
     }
 
     private void AddText(string text, Panel host)

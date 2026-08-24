@@ -38,6 +38,9 @@ public sealed class DeviceRepository(CampusDatabase database)
                     : DateTimeOffset.FromUnixTimeMilliseconds(reader.GetInt64(lastSeen)),
                 LastAcknowledgedSequence = reader.GetInt64(reader.GetOrdinal("last_ack_seq")),
                 Trusted = reader.GetInt32(reader.GetOrdinal("trusted")) != 0,
+                SharedKey = reader.IsDBNull(reader.GetOrdinal("shared_key"))
+                    ? null
+                    : reader.GetString(reader.GetOrdinal("shared_key")),
             });
         }
 
@@ -53,15 +56,18 @@ public sealed class DeviceRepository(CampusDatabase database)
         await using var command = _db.CreateCommand("""
             INSERT INTO devices
                 (device_id, display_name, platform, public_key, paired_at,
-                 last_seen_at, last_ack_seq, trusted)
-            VALUES (@id, @name, @platform, @key, @paired, @seen, @ack, @trusted)
+                 last_seen_at, last_ack_seq, trusted, shared_key)
+            VALUES (@id, @name, @platform, @key, @paired, @seen, @ack, @trusted, @shared)
             ON CONFLICT(device_id) DO UPDATE SET
                 display_name = excluded.display_name,
                 platform = excluded.platform,
                 public_key = excluded.public_key,
                 last_seen_at = excluded.last_seen_at,
                 last_ack_seq = MAX(devices.last_ack_seq, excluded.last_ack_seq),
-                trusted = excluded.trusted;
+                trusted = excluded.trusted,
+                -- A pairing secret is never cleared by an update that does not carry one; only
+                -- re-pairing replaces it.
+                shared_key = COALESCE(excluded.shared_key, devices.shared_key);
             """);
 
         command.Parameters.AddWithValue("@id", device.DeviceId);
@@ -73,6 +79,7 @@ public sealed class DeviceRepository(CampusDatabase database)
             device.LastSeenAt is { } seen ? seen.ToUnixTimeMilliseconds() : DBNull.Value);
         command.Parameters.AddWithValue("@ack", device.LastAcknowledgedSequence);
         command.Parameters.AddWithValue("@trusted", device.Trusted ? 1 : 0);
+        command.Parameters.AddWithValue("@shared", (object?)device.SharedKey ?? DBNull.Value);
 
         await command.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
     }

@@ -201,6 +201,50 @@ public sealed class SyncService(WorkspaceService workspace)
         }
     }
 
+    // -------------------------------------------------------------------------- phone
+
+    /// <summary>
+    /// Starts pairing a phone: makes the secret, records the device, and returns the code to
+    /// show. The code carries the secret because it is shown on a screen and read by a camera in
+    /// the same room — a stronger channel than anything two devices could negotiate over a
+    /// network neither of them trusts.
+    /// </summary>
+    public async Task<string> BeginPhonePairingAsync(
+        string displayName, DevicePlatform platform = DevicePlatform.IOS,
+        CancellationToken ct = default)
+    {
+        var key = PhoneSync.NewSharedKey();
+
+        // The phone announces its own id when it first connects; until then the record is keyed
+        // by the secret, which is what the greeting is checked against.
+        var id = Domain.CampusId.New().Value;
+
+        await Engine.PairAsync(new PairedDevice
+        {
+            DeviceId = id,
+            DisplayName = displayName,
+            Platform = platform,
+            PairedAt = DateTimeOffset.UtcNow,
+            SharedKey = Convert.ToBase64String(key),
+        }, ct);
+
+        return PhoneSync.BuildPairingCode(id, Environment.MachineName, key);
+    }
+
+    /// <summary>
+    /// Waits for the paired phone to connect and takes what it caught. Stops when the caller
+    /// stops waiting; nothing listens in the background.
+    /// </summary>
+    public async Task<PhoneSyncResult?> ReceiveFromPhoneAsync(CancellationToken ct = default)
+    {
+        var receiver = new PhoneReceiver(
+            _workspace.Database, _workspace.Vault, _workspace.DeviceId, "Campus");
+
+        receiver.Progress += (_, message) => Progress?.Invoke(this, message);
+
+        return await receiver.ReceiveAsync(PhoneSync.Port, ct);
+    }
+
     // ------------------------------------------------------------------------ pairing
 
     /// <summary>
