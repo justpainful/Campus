@@ -1,0 +1,20 @@
+<Application
+    x:Class="Campus.Desktop.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+
+                <!-- The base semantic theme. Everything downstream inherits from this. -->
+                <ResourceDictionary Source="ms-appx:///Design/Theme.xaml" />
+                <ResourceDictionary Source="ms-appx:///Design/Metrics.xaml" />
+                <ResourceDictionary Source="ms-appx:///Design/Brand.xaml" />
+
+                <!-- Component styles, all expressed in theme roles. -->
+                <ResourceDictionary Source="ms-appx:///Design/Components.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

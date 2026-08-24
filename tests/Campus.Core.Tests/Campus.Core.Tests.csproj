@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>$(CampusLibraryTargetFramework)</TargetFramework>
+    <RootNamespace>Campus.Core.Tests</RootNamespace>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\core\Campus.Domain\Campus.Domain.csproj" />
+    <ProjectReference Include="..\..\core\Campus.Vault\Campus.Vault.csproj" />
+  </ItemGroup>
+
+</Project>

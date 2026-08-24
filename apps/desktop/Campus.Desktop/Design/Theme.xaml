@@ -1,0 +1,425 @@
+<!--
+    Campus — Base Semantic Theme
+
+    This file is the ONE place in the application where a literal colour value may appear.
+    Everything else refers to a role: Theme.Surface.Secondary, Theme.Label.Primary,
+    Theme.Fill.Tertiary. A component never learns what colour it is actually painted.
+
+    Structure mirrors the token tree:
+        Background / GroupedBackground / Surface / Label / Fill / Separator
+        Accent / Destructive / Success / Warning / Info / Disabled / Selected / Focused
+
+    Dark is built on true black with elevated neutral greys — #000000, #1C1C1E, #2C2C2E, #3A3A3C —
+    with no blue tint. Light is built on #FFFFFF content over #F2F2F7 grouped canvas.
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.ThemeDictionaries>
+
+        <!-- ================================================================= DARK -->
+        <ResourceDictionary x:Key="Dark">
+
+            <!-- Canvas levels. Level 0 is true black; each step up is a lighter neutral. -->
+            <Color x:Key="Theme.Color.Background.Primary">#FF000000</Color>
+            <Color x:Key="Theme.Color.Background.Secondary">#FF1C1C1E</Color>
+            <Color x:Key="Theme.Color.Background.Tertiary">#FF2C2C2E</Color>
+
+            <!-- Grouped canvas — Settings-style pages sit on the base and float sections above it. -->
+            <Color x:Key="Theme.Color.GroupedBackground.Primary">#FF000000</Color>
+            <Color x:Key="Theme.Color.GroupedBackground.Secondary">#FF1C1C1E</Color>
+            <Color x:Key="Theme.Color.GroupedBackground.Tertiary">#FF2C2C2E</Color>
+
+            <!-- Surfaces. Raising an element raises its surface, not its border weight. -->
+            <Color x:Key="Theme.Color.Surface.Primary">#FF1C1C1E</Color>
+            <Color x:Key="Theme.Color.Surface.Secondary">#FF2C2C2E</Color>
+            <Color x:Key="Theme.Color.Surface.Tertiary">#FF3A3A3C</Color>
+            <Color x:Key="Theme.Color.Surface.Elevated">#FF2C2C2E</Color>
+
+            <!-- Text hierarchy. Never plain white below Primary. -->
+            <Color x:Key="Theme.Color.Label.Primary">#FFFFFFFF</Color>
+            <Color x:Key="Theme.Color.Label.Secondary">#99FFFFFF</Color>
+            <Color x:Key="Theme.Color.Label.Tertiary">#4DFFFFFF</Color>
+            <Color x:Key="Theme.Color.Label.Quaternary">#2EFFFFFF</Color>
+            <Color x:Key="Theme.Color.Label.OnAccent">#FFFFFFFF</Color>
+
+            <!-- Fills — control backgrounds, hover, pressed, selection. Distinct from Surface. -->
+            <Color x:Key="Theme.Color.Fill.Primary">#5C787880</Color>
+            <Color x:Key="Theme.Color.Fill.Secondary">#52787880</Color>
+            <Color x:Key="Theme.Color.Fill.Tertiary">#3D767680</Color>
+            <Color x:Key="Theme.Color.Fill.Quaternary">#2E747480</Color>
+
+            <Color x:Key="Theme.Color.Separator.Standard">#99545458</Color>
+            <Color x:Key="Theme.Color.Separator.Opaque">#FF38383A</Color>
+
+            <!-- Accent. Interactive things only — never a decorative panel fill. -->
+            <Color x:Key="Theme.Color.Accent.Primary">#FF0A84FF</Color>
+            <Color x:Key="Theme.Color.Accent.Hover">#FF409CFF</Color>
+            <Color x:Key="Theme.Color.Accent.Pressed">#FF0060DF</Color>
+            <Color x:Key="Theme.Color.Accent.Disabled">#4D0A84FF</Color>
+            <Color x:Key="Theme.Color.Accent.Subtle">#2E0A84FF</Color>
+
+            <Color x:Key="Theme.Color.Destructive.Primary">#FFFF453A</Color>
+            <Color x:Key="Theme.Color.Destructive.Hover">#FFFF6961</Color>
+            <Color x:Key="Theme.Color.Destructive.Pressed">#FFD70015</Color>
+            <Color x:Key="Theme.Color.Destructive.Subtle">#2EFF453A</Color>
+
+            <Color x:Key="Theme.Color.Success.Primary">#FF30D158</Color>
+            <Color x:Key="Theme.Color.Success.Subtle">#2E30D158</Color>
+            <Color x:Key="Theme.Color.Warning.Primary">#FFFFD60A</Color>
+            <Color x:Key="Theme.Color.Warning.Subtle">#2EFFD60A</Color>
+            <Color x:Key="Theme.Color.Info.Primary">#FF64D2FF</Color>
+            <Color x:Key="Theme.Color.Info.Subtle">#2E64D2FF</Color>
+
+            <Color x:Key="Theme.Color.Disabled.Label">#4DFFFFFF</Color>
+            <Color x:Key="Theme.Color.Disabled.Fill">#2E747480</Color>
+            <Color x:Key="Theme.Color.Selected.Fill">#3D0A84FF</Color>
+            <Color x:Key="Theme.Color.Selected.Rail">#FF0A84FF</Color>
+            <Color x:Key="Theme.Color.Focused.Ring">#FFFFFFFF</Color>
+            <Color x:Key="Theme.Color.Focused.RingOuter">#FF000000</Color>
+
+            <Color x:Key="Theme.Color.Scrim">#99000000</Color>
+            <Color x:Key="Theme.Color.Shadow">#66000000</Color>
+
+            <!-- Subject accents. A fixed, calm set so subjects stay distinguishable without
+                 the app turning into a colour chart. -->
+            <Color x:Key="Theme.Color.Subject.Blue">#FF0A84FF</Color>
+            <Color x:Key="Theme.Color.Subject.Teal">#FF40C8E0</Color>
+            <Color x:Key="Theme.Color.Subject.Green">#FF30D158</Color>
+            <Color x:Key="Theme.Color.Subject.Indigo">#FF5E5CE6</Color>
+            <Color x:Key="Theme.Color.Subject.Orange">#FFFF9F0A</Color>
+            <Color x:Key="Theme.Color.Subject.Pink">#FFFF375F</Color>
+            <Color x:Key="Theme.Color.Subject.Purple">#FFBF5AF2</Color>
+            <Color x:Key="Theme.Color.Subject.Graphite">#FF8E8E93</Color>
+
+            <!-- Annotation highlights, kept legible on a dark page render. -->
+            <Color x:Key="Theme.Color.Highlight.Yellow">#66FFD60A</Color>
+            <Color x:Key="Theme.Color.Highlight.Green">#6630D158</Color>
+            <Color x:Key="Theme.Color.Highlight.Blue">#660A84FF</Color>
+            <Color x:Key="Theme.Color.Highlight.Pink">#66FF375F</Color>
+            <Color x:Key="Theme.Color.Highlight.Purple">#66BF5AF2</Color>
+
+            <!--
+                WinUI's own controls — radio buttons, checkboxes, toggles, sliders, progress —
+                paint themselves from the Windows accent colour, which is whatever the user
+                picked in Settings and is frequently orange or pink. Campus has one accent, so
+                these platform roles are redirected onto it. Without this block the design system
+                would govern our components and the platform would govern everything else.
+            -->
+            <Color x:Key="SystemAccentColor">#FF0A84FF</Color>
+            <Color x:Key="SystemAccentColorLight1">#FF3D9BFF</Color>
+            <Color x:Key="SystemAccentColorLight2">#FF6FB4FF</Color>
+            <Color x:Key="SystemAccentColorLight3">#FFA1CDFF</Color>
+            <Color x:Key="SystemAccentColorDark1">#FF0870D6</Color>
+            <Color x:Key="SystemAccentColorDark2">#FF065CAD</Color>
+            <Color x:Key="SystemAccentColorDark3">#FF054784</Color>
+
+            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#FF0A84FF" />
+            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#FF409CFF" />
+            <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="#FF0060DF" />
+            <SolidColorBrush x:Key="AccentFillColorDisabledBrush" Color="#2E747480" />
+
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#FF0A84FF" />
+            <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="#FF409CFF" />
+            <SolidColorBrush x:Key="AccentTextFillColorTertiaryBrush" Color="#FF0060DF" />
+            <SolidColorBrush x:Key="AccentTextFillColorDisabledBrush" Color="#4DFFFFFF" />
+
+            <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorDisabledBrush" Color="#4DFFFFFF" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSelectedTextBrush" Color="#FFFFFFFF" />
+
+        </ResourceDictionary>
+
+        <!-- ================================================================ LIGHT -->
+        <ResourceDictionary x:Key="Light">
+
+            <Color x:Key="Theme.Color.Background.Primary">#FFFFFFFF</Color>
+            <Color x:Key="Theme.Color.Background.Secondary">#FFF2F2F7</Color>
+            <Color x:Key="Theme.Color.Background.Tertiary">#FFFFFFFF</Color>
+
+            <Color x:Key="Theme.Color.GroupedBackground.Primary">#FFF2F2F7</Color>
+            <Color x:Key="Theme.Color.GroupedBackground.Secondary">#FFFFFFFF</Color>
+            <Color x:Key="Theme.Color.GroupedBackground.Tertiary">#FFF2F2F7</Color>
+
+            <Color x:Key="Theme.Color.Surface.Primary">#FFFFFFFF</Color>
+            <Color x:Key="Theme.Color.Surface.Secondary">#FFF2F2F7</Color>
+            <Color x:Key="Theme.Color.Surface.Tertiary">#FFFFFFFF</Color>
+            <Color x:Key="Theme.Color.Surface.Elevated">#FFFFFFFF</Color>
+
+            <Color x:Key="Theme.Color.Label.Primary">#FF000000</Color>
+            <Color x:Key="Theme.Color.Label.Secondary">#99000000</Color>
+            <Color x:Key="Theme.Color.Label.Tertiary">#4D000000</Color>
+            <Color x:Key="Theme.Color.Label.Quaternary">#2E000000</Color>
+            <Color x:Key="Theme.Color.Label.OnAccent">#FFFFFFFF</Color>
+
+            <Color x:Key="Theme.Color.Fill.Primary">#33787880</Color>
+            <Color x:Key="Theme.Color.Fill.Secondary">#29787880</Color>
+            <Color x:Key="Theme.Color.Fill.Tertiary">#1F767680</Color>
+            <Color x:Key="Theme.Color.Fill.Quaternary">#14747480</Color>
+
+            <Color x:Key="Theme.Color.Separator.Standard">#4A3C3C43</Color>
+            <Color x:Key="Theme.Color.Separator.Opaque">#FFC6C6C8</Color>
+
+            <Color x:Key="Theme.Color.Accent.Primary">#FF007AFF</Color>
+            <Color x:Key="Theme.Color.Accent.Hover">#FF0071EB</Color>
+            <Color x:Key="Theme.Color.Accent.Pressed">#FF0062CC</Color>
+            <Color x:Key="Theme.Color.Accent.Disabled">#4D007AFF</Color>
+            <Color x:Key="Theme.Color.Accent.Subtle">#1F007AFF</Color>
+
+            <Color x:Key="Theme.Color.Destructive.Primary">#FFFF3B30</Color>
+            <Color x:Key="Theme.Color.Destructive.Hover">#FFE8342A</Color>
+            <Color x:Key="Theme.Color.Destructive.Pressed">#FFC9271F</Color>
+            <Color x:Key="Theme.Color.Destructive.Subtle">#1FFF3B30</Color>
+
+            <Color x:Key="Theme.Color.Success.Primary">#FF34C759</Color>
+            <Color x:Key="Theme.Color.Success.Subtle">#1F34C759</Color>
+            <Color x:Key="Theme.Color.Warning.Primary">#FFFFCC00</Color>
+            <Color x:Key="Theme.Color.Warning.Subtle">#1FFFCC00</Color>
+            <Color x:Key="Theme.Color.Info.Primary">#FF32ADE6</Color>
+            <Color x:Key="Theme.Color.Info.Subtle">#1F32ADE6</Color>
+
+            <Color x:Key="Theme.Color.Disabled.Label">#4D000000</Color>
+            <Color x:Key="Theme.Color.Disabled.Fill">#14747480</Color>
+            <Color x:Key="Theme.Color.Selected.Fill">#1F007AFF</Color>
+            <Color x:Key="Theme.Color.Selected.Rail">#FF007AFF</Color>
+            <Color x:Key="Theme.Color.Focused.Ring">#FF000000</Color>
+            <Color x:Key="Theme.Color.Focused.RingOuter">#FFFFFFFF</Color>
+
+            <Color x:Key="Theme.Color.Scrim">#66000000</Color>
+            <Color x:Key="Theme.Color.Shadow">#26000000</Color>
+
+            <Color x:Key="Theme.Color.Subject.Blue">#FF007AFF</Color>
+            <Color x:Key="Theme.Color.Subject.Teal">#FF00A2C7</Color>
+            <Color x:Key="Theme.Color.Subject.Green">#FF34C759</Color>
+            <Color x:Key="Theme.Color.Subject.Indigo">#FF5856D6</Color>
+            <Color x:Key="Theme.Color.Subject.Orange">#FFFF9500</Color>
+            <Color x:Key="Theme.Color.Subject.Pink">#FFFF2D55</Color>
+            <Color x:Key="Theme.Color.Subject.Purple">#FFAF52DE</Color>
+            <Color x:Key="Theme.Color.Subject.Graphite">#FF8E8E93</Color>
+
+            <Color x:Key="Theme.Color.Highlight.Yellow">#80FFCC00</Color>
+            <Color x:Key="Theme.Color.Highlight.Green">#8034C759</Color>
+            <Color x:Key="Theme.Color.Highlight.Blue">#80007AFF</Color>
+            <Color x:Key="Theme.Color.Highlight.Pink">#80FF2D55</Color>
+            <Color x:Key="Theme.Color.Highlight.Purple">#80AF52DE</Color>
+
+            <!--
+                WinUI's own controls — radio buttons, checkboxes, toggles, sliders, progress —
+                paint themselves from the Windows accent colour, which is whatever the user
+                picked in Settings and is frequently orange or pink. Campus has one accent, so
+                these platform roles are redirected onto it. Without this block the design system
+                would govern our components and the platform would govern everything else.
+            -->
+            <Color x:Key="SystemAccentColor">#FF007AFF</Color>
+            <Color x:Key="SystemAccentColorLight1">#FF3395FF</Color>
+            <Color x:Key="SystemAccentColorLight2">#FF66AFFF</Color>
+            <Color x:Key="SystemAccentColorLight3">#FF99CAFF</Color>
+            <Color x:Key="SystemAccentColorDark1">#FF0068D9</Color>
+            <Color x:Key="SystemAccentColorDark2">#FF0056B3</Color>
+            <Color x:Key="SystemAccentColorDark3">#FF00458C</Color>
+
+            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#FF007AFF" />
+            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#FF0071EB" />
+            <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="#FF0062CC" />
+            <SolidColorBrush x:Key="AccentFillColorDisabledBrush" Color="#14747480" />
+
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#FF007AFF" />
+            <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="#FF0071EB" />
+            <SolidColorBrush x:Key="AccentTextFillColorTertiaryBrush" Color="#FF0062CC" />
+            <SolidColorBrush x:Key="AccentTextFillColorDisabledBrush" Color="#4D000000" />
+
+            <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorDisabledBrush" Color="#4D000000" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSelectedTextBrush" Color="#FFFFFFFF" />
+
+        </ResourceDictionary>
+
+        <!-- ======================================================== HIGH CONTRAST -->
+        <!--
+            When the user asks Windows for higher contrast we do not merely darken: surfaces
+            separate further, text goes to full strength, and separators become opaque so
+            nothing depends on a subtle level difference any more.
+        -->
+        <ResourceDictionary x:Key="HighContrast">
+
+            <Color x:Key="Theme.Color.Background.Primary">#FF000000</Color>
+            <Color x:Key="Theme.Color.Background.Secondary">#FF000000</Color>
+            <Color x:Key="Theme.Color.Background.Tertiary">#FF1A1A1A</Color>
+
+            <Color x:Key="Theme.Color.GroupedBackground.Primary">#FF000000</Color>
+            <Color x:Key="Theme.Color.GroupedBackground.Secondary">#FF1A1A1A</Color>
+            <Color x:Key="Theme.Color.GroupedBackground.Tertiary">#FF000000</Color>
+
+            <Color x:Key="Theme.Color.Surface.Primary">#FF000000</Color>
+            <Color x:Key="Theme.Color.Surface.Secondary">#FF1A1A1A</Color>
+            <Color x:Key="Theme.Color.Surface.Tertiary">#FF333333</Color>
+            <Color x:Key="Theme.Color.Surface.Elevated">#FF1A1A1A</Color>
+
+            <Color x:Key="Theme.Color.Label.Primary">#FFFFFFFF</Color>
+            <Color x:Key="Theme.Color.Label.Secondary">#FFFFFFFF</Color>
+            <Color x:Key="Theme.Color.Label.Tertiary">#FFE0E0E0</Color>
+            <Color x:Key="Theme.Color.Label.Quaternary">#FFC0C0C0</Color>
+            <Color x:Key="Theme.Color.Label.OnAccent">#FF000000</Color>
+
+            <Color x:Key="Theme.Color.Fill.Primary">#FF4D4D4D</Color>
+            <Color x:Key="Theme.Color.Fill.Secondary">#FF3A3A3A</Color>
+            <Color x:Key="Theme.Color.Fill.Tertiary">#FF2B2B2B</Color>
+            <Color x:Key="Theme.Color.Fill.Quaternary">#FF1F1F1F</Color>
+
+            <Color x:Key="Theme.Color.Separator.Standard">#FFFFFFFF</Color>
+            <Color x:Key="Theme.Color.Separator.Opaque">#FFFFFFFF</Color>
+
+            <Color x:Key="Theme.Color.Accent.Primary">#FF3FA9FF</Color>
+            <Color x:Key="Theme.Color.Accent.Hover">#FF7CC4FF</Color>
+            <Color x:Key="Theme.Color.Accent.Pressed">#FF1B7FD4</Color>
+            <Color x:Key="Theme.Color.Accent.Disabled">#FF5A5A5A</Color>
+            <Color x:Key="Theme.Color.Accent.Subtle">#FF16324D</Color>
+
+            <Color x:Key="Theme.Color.Destructive.Primary">#FFFF6E64</Color>
+            <Color x:Key="Theme.Color.Destructive.Hover">#FFFF9990</Color>
+            <Color x:Key="Theme.Color.Destructive.Pressed">#FFE0362B</Color>
+            <Color x:Key="Theme.Color.Destructive.Subtle">#FF4D1714</Color>
+
+            <Color x:Key="Theme.Color.Success.Primary">#FF4CE06B</Color>
+            <Color x:Key="Theme.Color.Success.Subtle">#FF12401C</Color>
+            <Color x:Key="Theme.Color.Warning.Primary">#FFFFE44D</Color>
+            <Color x:Key="Theme.Color.Warning.Subtle">#FF4D4103</Color>
+            <Color x:Key="Theme.Color.Info.Primary">#FF8CDDFF</Color>
+            <Color x:Key="Theme.Color.Info.Subtle">#FF123D4D</Color>
+
+            <Color x:Key="Theme.Color.Disabled.Label">#FF9A9A9A</Color>
+            <Color x:Key="Theme.Color.Disabled.Fill">#FF2B2B2B</Color>
+            <Color x:Key="Theme.Color.Selected.Fill">#FF16324D</Color>
+            <Color x:Key="Theme.Color.Selected.Rail">#FF3FA9FF</Color>
+            <Color x:Key="Theme.Color.Focused.Ring">#FFFFFF00</Color>
+            <Color x:Key="Theme.Color.Focused.RingOuter">#FF000000</Color>
+
+            <Color x:Key="Theme.Color.Scrim">#CC000000</Color>
+            <Color x:Key="Theme.Color.Shadow">#00000000</Color>
+
+            <Color x:Key="Theme.Color.Subject.Blue">#FF3FA9FF</Color>
+            <Color x:Key="Theme.Color.Subject.Teal">#FF5FD8F0</Color>
+            <Color x:Key="Theme.Color.Subject.Green">#FF4CE06B</Color>
+            <Color x:Key="Theme.Color.Subject.Indigo">#FF8D8BFF</Color>
+            <Color x:Key="Theme.Color.Subject.Orange">#FFFFB63D</Color>
+            <Color x:Key="Theme.Color.Subject.Pink">#FFFF6B88</Color>
+            <Color x:Key="Theme.Color.Subject.Purple">#FFD98BFF</Color>
+            <Color x:Key="Theme.Color.Subject.Graphite">#FFBFBFBF</Color>
+
+            <Color x:Key="Theme.Color.Highlight.Yellow">#99FFE44D</Color>
+            <Color x:Key="Theme.Color.Highlight.Green">#994CE06B</Color>
+            <Color x:Key="Theme.Color.Highlight.Blue">#993FA9FF</Color>
+            <Color x:Key="Theme.Color.Highlight.Pink">#99FF6B88</Color>
+            <Color x:Key="Theme.Color.Highlight.Purple">#99D98BFF</Color>
+
+            <!--
+                WinUI's own controls — radio buttons, checkboxes, toggles, sliders, progress —
+                paint themselves from the Windows accent colour, which is whatever the user
+                picked in Settings and is frequently orange or pink. Campus has one accent, so
+                these platform roles are redirected onto it. Without this block the design system
+                would govern our components and the platform would govern everything else.
+            -->
+            <Color x:Key="SystemAccentColor">#FF3FA9FF</Color>
+            <Color x:Key="SystemAccentColorLight1">#FF66BBFF</Color>
+            <Color x:Key="SystemAccentColorLight2">#FF8CCCFF</Color>
+            <Color x:Key="SystemAccentColorLight3">#FFB3DDFF</Color>
+            <Color x:Key="SystemAccentColorDark1">#FF2E8FDB</Color>
+            <Color x:Key="SystemAccentColorDark2">#FF1F76B8</Color>
+            <Color x:Key="SystemAccentColorDark3">#FF135C94</Color>
+
+            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#FF3FA9FF" />
+            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#FF7CC4FF" />
+            <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="#FF1B7FD4" />
+            <SolidColorBrush x:Key="AccentFillColorDisabledBrush" Color="#FF2B2B2B" />
+
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#FF3FA9FF" />
+            <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="#FF7CC4FF" />
+            <SolidColorBrush x:Key="AccentTextFillColorTertiaryBrush" Color="#FF1B7FD4" />
+            <SolidColorBrush x:Key="AccentTextFillColorDisabledBrush" Color="#FF9A9A9A" />
+
+            <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorDisabledBrush" Color="#FF9A9A9A" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSelectedTextBrush" Color="#FF000000" />
+
+        </ResourceDictionary>
+
+    </ResourceDictionary.ThemeDictionaries>
+
+    <!--
+        Brushes. Components bind to these, never to the Color resources above.
+        Each brush is a thin role wrapper so a role can later gain state behaviour
+        without every call site changing.
+    -->
+    <SolidColorBrush x:Key="Theme.Background.Primary" Color="{ThemeResource Theme.Color.Background.Primary}" />
+    <SolidColorBrush x:Key="Theme.Background.Secondary" Color="{ThemeResource Theme.Color.Background.Secondary}" />
+    <SolidColorBrush x:Key="Theme.Background.Tertiary" Color="{ThemeResource Theme.Color.Background.Tertiary}" />
+
+    <SolidColorBrush x:Key="Theme.GroupedBackground.Primary" Color="{ThemeResource Theme.Color.GroupedBackground.Primary}" />
+    <SolidColorBrush x:Key="Theme.GroupedBackground.Secondary" Color="{ThemeResource Theme.Color.GroupedBackground.Secondary}" />
+    <SolidColorBrush x:Key="Theme.GroupedBackground.Tertiary" Color="{ThemeResource Theme.Color.GroupedBackground.Tertiary}" />
+
+    <SolidColorBrush x:Key="Theme.Surface.Primary" Color="{ThemeResource Theme.Color.Surface.Primary}" />
+    <SolidColorBrush x:Key="Theme.Surface.Secondary" Color="{ThemeResource Theme.Color.Surface.Secondary}" />
+    <SolidColorBrush x:Key="Theme.Surface.Tertiary" Color="{ThemeResource Theme.Color.Surface.Tertiary}" />
+    <SolidColorBrush x:Key="Theme.Surface.Elevated" Color="{ThemeResource Theme.Color.Surface.Elevated}" />
+
+    <SolidColorBrush x:Key="Theme.Label.Primary" Color="{ThemeResource Theme.Color.Label.Primary}" />
+    <SolidColorBrush x:Key="Theme.Label.Secondary" Color="{ThemeResource Theme.Color.Label.Secondary}" />
+    <SolidColorBrush x:Key="Theme.Label.Tertiary" Color="{ThemeResource Theme.Color.Label.Tertiary}" />
+    <SolidColorBrush x:Key="Theme.Label.Quaternary" Color="{ThemeResource Theme.Color.Label.Quaternary}" />
+    <SolidColorBrush x:Key="Theme.Label.OnAccent" Color="{ThemeResource Theme.Color.Label.OnAccent}" />
+
+    <SolidColorBrush x:Key="Theme.Fill.Primary" Color="{ThemeResource Theme.Color.Fill.Primary}" />
+    <SolidColorBrush x:Key="Theme.Fill.Secondary" Color="{ThemeResource Theme.Color.Fill.Secondary}" />
+    <SolidColorBrush x:Key="Theme.Fill.Tertiary" Color="{ThemeResource Theme.Color.Fill.Tertiary}" />
+    <SolidColorBrush x:Key="Theme.Fill.Quaternary" Color="{ThemeResource Theme.Color.Fill.Quaternary}" />
+
+    <SolidColorBrush x:Key="Theme.Separator.Standard" Color="{ThemeResource Theme.Color.Separator.Standard}" />
+    <SolidColorBrush x:Key="Theme.Separator.Opaque" Color="{ThemeResource Theme.Color.Separator.Opaque}" />
+
+    <SolidColorBrush x:Key="Theme.Accent.Primary" Color="{ThemeResource Theme.Color.Accent.Primary}" />
+    <SolidColorBrush x:Key="Theme.Accent.Hover" Color="{ThemeResource Theme.Color.Accent.Hover}" />
+    <SolidColorBrush x:Key="Theme.Accent.Pressed" Color="{ThemeResource Theme.Color.Accent.Pressed}" />
+    <SolidColorBrush x:Key="Theme.Accent.Disabled" Color="{ThemeResource Theme.Color.Accent.Disabled}" />
+    <SolidColorBrush x:Key="Theme.Accent.Subtle" Color="{ThemeResource Theme.Color.Accent.Subtle}" />
+
+    <SolidColorBrush x:Key="Theme.Destructive.Primary" Color="{ThemeResource Theme.Color.Destructive.Primary}" />
+    <SolidColorBrush x:Key="Theme.Destructive.Hover" Color="{ThemeResource Theme.Color.Destructive.Hover}" />
+    <SolidColorBrush x:Key="Theme.Destructive.Pressed" Color="{ThemeResource Theme.Color.Destructive.Pressed}" />
+    <SolidColorBrush x:Key="Theme.Destructive.Subtle" Color="{ThemeResource Theme.Color.Destructive.Subtle}" />
+
+    <SolidColorBrush x:Key="Theme.Success.Primary" Color="{ThemeResource Theme.Color.Success.Primary}" />
+    <SolidColorBrush x:Key="Theme.Success.Subtle" Color="{ThemeResource Theme.Color.Success.Subtle}" />
+    <SolidColorBrush x:Key="Theme.Warning.Primary" Color="{ThemeResource Theme.Color.Warning.Primary}" />
+    <SolidColorBrush x:Key="Theme.Warning.Subtle" Color="{ThemeResource Theme.Color.Warning.Subtle}" />
+    <SolidColorBrush x:Key="Theme.Info.Primary" Color="{ThemeResource Theme.Color.Info.Primary}" />
+    <SolidColorBrush x:Key="Theme.Info.Subtle" Color="{ThemeResource Theme.Color.Info.Subtle}" />
+
+    <SolidColorBrush x:Key="Theme.Disabled.Label" Color="{ThemeResource Theme.Color.Disabled.Label}" />
+    <SolidColorBrush x:Key="Theme.Disabled.Fill" Color="{ThemeResource Theme.Color.Disabled.Fill}" />
+    <SolidColorBrush x:Key="Theme.Selected.Fill" Color="{ThemeResource Theme.Color.Selected.Fill}" />
+    <SolidColorBrush x:Key="Theme.Selected.Rail" Color="{ThemeResource Theme.Color.Selected.Rail}" />
+    <SolidColorBrush x:Key="Theme.Focused.Ring" Color="{ThemeResource Theme.Color.Focused.Ring}" />
+    <SolidColorBrush x:Key="Theme.Focused.RingOuter" Color="{ThemeResource Theme.Color.Focused.RingOuter}" />
+    <SolidColorBrush x:Key="Theme.Scrim" Color="{ThemeResource Theme.Color.Scrim}" />
+
+    <SolidColorBrush x:Key="Theme.Subject.Blue" Color="{ThemeResource Theme.Color.Subject.Blue}" />
+    <SolidColorBrush x:Key="Theme.Subject.Teal" Color="{ThemeResource Theme.Color.Subject.Teal}" />
+    <SolidColorBrush x:Key="Theme.Subject.Green" Color="{ThemeResource Theme.Color.Subject.Green}" />
+    <SolidColorBrush x:Key="Theme.Subject.Indigo" Color="{ThemeResource Theme.Color.Subject.Indigo}" />
+    <SolidColorBrush x:Key="Theme.Subject.Orange" Color="{ThemeResource Theme.Color.Subject.Orange}" />
+    <SolidColorBrush x:Key="Theme.Subject.Pink" Color="{ThemeResource Theme.Color.Subject.Pink}" />
+    <SolidColorBrush x:Key="Theme.Subject.Purple" Color="{ThemeResource Theme.Color.Subject.Purple}" />
+    <SolidColorBrush x:Key="Theme.Subject.Graphite" Color="{ThemeResource Theme.Color.Subject.Graphite}" />
+
+    <SolidColorBrush x:Key="Theme.Highlight.Yellow" Color="{ThemeResource Theme.Color.Highlight.Yellow}" />
+    <SolidColorBrush x:Key="Theme.Highlight.Green" Color="{ThemeResource Theme.Color.Highlight.Green}" />
+    <SolidColorBrush x:Key="Theme.Highlight.Blue" Color="{ThemeResource Theme.Color.Highlight.Blue}" />
+    <SolidColorBrush x:Key="Theme.Highlight.Pink" Color="{ThemeResource Theme.Color.Highlight.Pink}" />
+    <SolidColorBrush x:Key="Theme.Highlight.Purple" Color="{ThemeResource Theme.Color.Highlight.Purple}" />
+
+</ResourceDictionary>

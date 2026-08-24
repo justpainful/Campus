@@ -1,0 +1,29 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.cache
+artifacts/
+publish/
+TestResults/
+BenchmarkDotNet.Artifacts/
+node_modules/
+.DS_Store
+Thumbs.db
+
+# Generated brand assets (regenerate with tools/brand-export)
+brand/generated/
+
+# Local runtime data — never commit a vault
+**/CampusVault/
+*.campusbackup
+local.settings.json
+
+# iOS
+apps/ios/**/build/
+apps/ios/**/DerivedData/
+apps/ios/**/*.xcuserdatad/
+apps/ios/**/xcuserdata/
+*.ipa
+*.dSYM.zip

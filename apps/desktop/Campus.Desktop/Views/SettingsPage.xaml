@@ -1,0 +1,140 @@
+<Page
+    x:Class="Campus.Desktop.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Campus.Desktop.Design.Controls"
+    xmlns:icons="using:Campus.Desktop.Design.Icons"
+    Background="{ThemeResource Theme.GroupedBackground.Primary}">
+
+    <!--
+        A grouped page: the canvas is the grouped background and the sections float on it. No
+        section draws a border, and no row is a card of its own.
+    -->
+    <ScrollViewer Padding="0,0,0,40">
+        <StackPanel MaxWidth="720" HorizontalAlignment="Stretch" Margin="24,20,24,0">
+
+            <TextBlock Text="Settings" Style="{StaticResource Text.LargeTitle}" Margin="16,0,0,20" />
+
+            <controls:SettingsSection
+                Header="APPEARANCE"
+                Footer="System follows Windows and updates the moment it changes — no restart.">
+                <StackPanel>
+                    <controls:SettingsRow
+                        Title="Appearance"
+                        Subtitle="How Campus decides between light and dark"
+                        Symbol="contrast"
+                        ShowSeparator="False">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <RadioButton x:Name="AppearanceSystem" Content="System"
+                                         GroupName="Appearance" Checked="OnAppearanceChanged" Tag="System" />
+                            <RadioButton x:Name="AppearanceLight" Content="Light"
+                                         GroupName="Appearance" Checked="OnAppearanceChanged" Tag="Light" />
+                            <RadioButton x:Name="AppearanceDark" Content="Dark"
+                                         GroupName="Appearance" Checked="OnAppearanceChanged" Tag="Dark" />
+                        </StackPanel>
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow
+                        Title="Theme gallery"
+                        Subtitle="Every surface, label, fill and state in one place"
+                        Symbol="palette">
+                        <Button Style="{StaticResource Button.Secondary}"
+                                Content="Open" Click="OnOpenGalleryClick"
+                                AutomationProperties.Name="Open theme gallery" />
+                    </controls:SettingsRow>
+                </StackPanel>
+            </controls:SettingsSection>
+
+            <controls:SettingsSection
+                Header="ACCESSIBILITY"
+                Footer="Anything Windows already enforces stays on here, whatever these switches say.">
+                <StackPanel>
+                    <controls:SettingsRow
+                        Title="Increase contrast"
+                        Subtitle="Separate surfaces further and make hairlines opaque"
+                        Symbol="accessibility"
+                        ShowSeparator="False">
+                        <ToggleSwitch x:Name="ContrastToggle" OnContent="" OffContent=""
+                                      Toggled="OnAccessibilityToggled"
+                                      AutomationProperties.Name="Increase contrast" />
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow
+                        Title="Reduce motion"
+                        Subtitle="Collapse transitions to nothing"
+                        Symbol="speed">
+                        <ToggleSwitch x:Name="MotionToggle" OnContent="" OffContent=""
+                                      Toggled="OnAccessibilityToggled"
+                                      AutomationProperties.Name="Reduce motion" />
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow
+                        Title="Reduce transparency"
+                        Subtitle="Paint materials as solid surfaces"
+                        Symbol="eye">
+                        <ToggleSwitch x:Name="TransparencyToggle" OnContent="" OffContent=""
+                                      Toggled="OnAccessibilityToggled"
+                                      AutomationProperties.Name="Reduce transparency" />
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow
+                        Title="Large hit targets"
+                        Subtitle="Grow every control to a comfortable 44 pixels"
+                        Symbol="target">
+                        <ToggleSwitch x:Name="HitTargetToggle" OnContent="" OffContent=""
+                                      Toggled="OnAccessibilityToggled"
+                                      AutomationProperties.Name="Large hit targets" />
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow
+                        Title="Always show focus ring"
+                        Subtitle="Keep the keyboard focus visible even after a click"
+                        Symbol="focus">
+                        <ToggleSwitch x:Name="FocusRingToggle" OnContent="" OffContent=""
+                                      Toggled="OnAccessibilityToggled"
+                                      AutomationProperties.Name="Always show focus ring" />
+                    </controls:SettingsRow>
+                </StackPanel>
+            </controls:SettingsSection>
+
+            <controls:SettingsSection
+                Header="SECURITY"
+                Footer="Locking clears every key from memory. Files on disk stay unreadable until the next unlock.">
+                <StackPanel>
+                    <controls:SettingsRow
+                        x:Name="VaultRow"
+                        Title="Vault"
+                        Subtitle="Not created yet"
+                        Symbol="shield"
+                        ShowSeparator="False">
+                        <Button x:Name="VaultButton" Style="{StaticResource Button.Primary}"
+                                Content="Create vault" Click="OnVaultButtonClick" />
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow
+                        Title="Lock now"
+                        Subtitle="Ctrl+Shift+L"
+                        Symbol="lock">
+                        <Button Style="{StaticResource Button.Secondary}"
+                                Content="Lock" Click="OnLockNowClick" />
+                    </controls:SettingsRow>
+                </StackPanel>
+            </controls:SettingsSection>
+
+            <controls:SettingsSection Header="ABOUT">
+                <StackPanel>
+                    <controls:SettingsRow Title="Campus" Subtitle="Personal Academic Workspace"
+                                          ShowSeparator="False">
+                        <TextBlock x:Name="VersionText" Style="{StaticResource Text.Footnote}" />
+                    </controls:SettingsRow>
+                    <controls:SettingsRow Title="Vault location"
+                                          Symbol="folder">
+                        <TextBlock x:Name="VaultPathText" Style="{StaticResource Text.Footnote}"
+                                   TextTrimming="CharacterEllipsis" MaxWidth="300" />
+                    </controls:SettingsRow>
+                </StackPanel>
+            </controls:SettingsSection>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

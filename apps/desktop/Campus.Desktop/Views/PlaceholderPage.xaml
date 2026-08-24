@@ -1,0 +1,43 @@
+<Page
+    x:Class="Campus.Desktop.Views.PlaceholderPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:icons="using:Campus.Desktop.Design.Icons"
+    Background="{ThemeResource Theme.Background.Primary}">
+
+    <!--
+        The empty state for a destination that is not built yet. It names what belongs here
+        rather than showing a blank frame, so the shape of the app is legible while it is
+        still being filled in.
+    -->
+    <StackPanel
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        Spacing="14"
+        MaxWidth="380">
+
+        <Border
+            Width="72" Height="72"
+            HorizontalAlignment="Center"
+            CornerRadius="{StaticResource Theme.Radius.Surface}"
+            Background="{ThemeResource Theme.Fill.Quaternary}">
+            <icons:CampusIcon
+                x:Name="Glyph"
+                IconSize="{StaticResource Theme.Icon.Display}"
+                Weight="Light"
+                Foreground="{ThemeResource Theme.Label.Tertiary}" />
+        </Border>
+
+        <TextBlock
+            x:Name="TitleText"
+            Style="{StaticResource Text.Title2}"
+            HorizontalAlignment="Center"
+            TextAlignment="Center" />
+
+        <TextBlock
+            x:Name="DescriptionText"
+            Style="{StaticResource Text.Callout}"
+            HorizontalAlignment="Center"
+            TextAlignment="Center" />
+    </StackPanel>
+</Page>
