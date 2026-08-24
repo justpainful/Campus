@@ -65,12 +65,11 @@ public sealed class ImportService(WorkspaceService workspace)
 
         try
         {
-            var facts = FileInspector.Inspect(path);
-
             // Reading the document happens before the bytes are stored, while the file is still
-            // a plain file on disk. Doing it afterwards would mean decrypting what was just
-            // encrypted for no reason.
-            DocumentReaders.Enrich(facts, path);
+            // a plain file on disk — doing it afterwards would mean decrypting what was just
+            // encrypted for no reason — and out of process, because a malformed document should
+            // cost a page count rather than the session.
+            var facts = await FileFactsReader.ReadAsync(path, ct).ConfigureAwait(false);
 
             var stored = await _workspace.Vault.Objects.PutFileAsync(path, ct).ConfigureAwait(false);
 

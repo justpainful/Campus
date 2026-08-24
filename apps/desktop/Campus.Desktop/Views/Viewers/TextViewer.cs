@@ -70,6 +70,9 @@ public sealed class TextViewer : Grid, IContentViewer
         _scroller.HorizontalScrollMode = ScrollMode.Auto;
 
         Children.Add(_scroller);
+
+        // A guide for people who lose their line, if they have asked for one.
+        Design.Controls.ReadingRuler.Attach(this);
     }
 
     public async Task LoadAsync(Stream content, CampusObject entity, FilePayload payload)

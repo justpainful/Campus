@@ -340,7 +340,9 @@ public sealed partial class MarkdownView : StackPanel
     {
         FontFamily = Font("Theme.Font.Reading"),
         FontSize = 15,
-        LineHeight = 24,
+        // Line height follows the reading preference rather than a constant, so the setting that
+        // says "more air between lines" actually produces more air between lines.
+        LineHeight = AccessibilityScaling.ReadingLineHeight(15),
         Foreground = Brush(ThemeTokens.Label.Primary),
         TextWrapping = TextWrapping.Wrap,
         Margin = new Thickness(0, 4, 0, 8),

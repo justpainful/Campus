@@ -94,6 +94,113 @@
                                       Toggled="OnAccessibilityToggled"
                                       AutomationProperties.Name="Always show focus ring" />
                     </controls:SettingsRow>
+
+                    <controls:SettingsRow
+                        Title="Text size"
+                        Subtitle="Scales what you read without scaling the whole interface"
+                        Symbol="text.size">
+                        <Slider x:Name="TextScaleSlider" Width="200"
+                                Minimum="80" Maximum="180" StepFrequency="10" TickFrequency="20"
+                                ValueChanged="OnScaleChanged"
+                                AutomationProperties.Name="Text size" />
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow
+                        Title="Interface size"
+                        Subtitle="Scales icons, bars and rows"
+                        Symbol="accessibility">
+                        <Slider x:Name="UiScaleSlider" Width="200"
+                                Minimum="80" Maximum="140" StepFrequency="10" TickFrequency="20"
+                                ValueChanged="OnScaleChanged"
+                                AutomationProperties.Name="Interface size" />
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow
+                        Title="Large mouse pointer"
+                        Subtitle="Only Windows can change the pointer — this opens the setting"
+                        Symbol="accessibility">
+                        <Button Style="{StaticResource Button.Secondary}"
+                                Content="Open Windows settings" Click="OnPointerSettingsClick"
+                                AutomationProperties.Name="Open Windows pointer settings" />
+                    </controls:SettingsRow>
+                </StackPanel>
+            </controls:SettingsSection>
+
+            <controls:SettingsSection
+                Header="READING"
+                Footer="These change how documents and notes are set, not how the interface looks.">
+                <StackPanel>
+                    <controls:SettingsRow
+                        Title="Plainer reading face"
+                        Subtitle="A wider, more open typeface for long passages"
+                        Symbol="book"
+                        ShowSeparator="False">
+                        <ToggleSwitch x:Name="DyslexiaToggle" OnContent="" OffContent=""
+                                      Toggled="OnAccessibilityToggled"
+                                      AutomationProperties.Name="Plainer reading face" />
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow
+                        Title="Line spacing"
+                        Subtitle="More air between lines of prose"
+                        Symbol="text.size">
+                        <Slider x:Name="LineSpacingSlider" Width="200"
+                                Minimum="100" Maximum="200" StepFrequency="10" TickFrequency="25"
+                                ValueChanged="OnScaleChanged"
+                                AutomationProperties.Name="Line spacing" />
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow
+                        Title="Reading ruler"
+                        Subtitle="A band that follows the pointer to keep your place"
+                        Symbol="focus">
+                        <ToggleSwitch x:Name="RulerToggle" OnContent="" OffContent=""
+                                      Toggled="OnAccessibilityToggled"
+                                      AutomationProperties.Name="Reading ruler" />
+                    </controls:SettingsRow>
+                </StackPanel>
+            </controls:SettingsSection>
+
+            <controls:SettingsSection
+                Header="BACKUP"
+                Footer="A backup is a copy of the vault exactly as it is on disk — already encrypted, and openable only with your recovery key. There is no way around that, which is the same reason the workspace is worth having.">
+                <StackPanel>
+                    <controls:SettingsRow
+                        Title="Automatic backups"
+                        Subtitle="Taken when Campus opens, if one is due"
+                        Symbol="backup"
+                        ShowSeparator="False">
+                        <ToggleSwitch x:Name="BackupToggle" OnContent="" OffContent=""
+                                      Toggled="OnBackupChanged"
+                                      AutomationProperties.Name="Automatic backups" />
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow Title="How often" Symbol="clock">
+                        <ComboBox x:Name="BackupCadenceChoice" MinWidth="150"
+                                  SelectionChanged="OnBackupChanged"
+                                  AutomationProperties.Name="Backup frequency">
+                            <ComboBoxItem Content="Only when I ask" />
+                            <ComboBoxItem Content="Daily" />
+                            <ComboBoxItem Content="Weekly" />
+                        </ComboBox>
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow x:Name="BackupFolderRow" Title="Where they go" Symbol="folder">
+                        <Button Style="{StaticResource Button.Secondary}"
+                                Content="Choose…" Click="OnBackupFolderClick"
+                                AutomationProperties.Name="Choose the backup folder" />
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow x:Name="BackupNowRow" Title="Back up now" Symbol="save">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button Style="{StaticResource Button.Secondary}"
+                                    Content="Restore…" Click="OnRestoreClick"
+                                    AutomationProperties.Name="Restore from a backup" />
+                            <Button Style="{StaticResource Button.Primary}"
+                                    Content="Back up" Click="OnBackupNowClick"
+                                    AutomationProperties.Name="Back up now" />
+                        </StackPanel>
+                    </controls:SettingsRow>
                 </StackPanel>
             </controls:SettingsSection>
 

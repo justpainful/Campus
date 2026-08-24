@@ -104,6 +104,10 @@ public sealed class ThemeService
             ReadingLineSpacing = settings.ReadingLineSpacing,
             ReadingRuler = settings.ReadingRuler,
         };
+        // The preferences are not only remembered: the named sizes the whole design system is
+        // drawn from are re-derived from them here, which is what makes them visible.
+        AccessibilityScaling.Apply(Accessibility);
+
         ApplyToAllRoots();
         RaiseChanged();
     }

@@ -50,6 +50,23 @@
     The plugin host ships beside the app in a folder of its own, so an extension's dependencies
     can never be resolved out of Campus's own directory by accident.
   -->
+  <!--
+    The indexer ships beside the app too. It is a separate program so that a malformed document
+    cannot take the workspace down with it.
+  -->
+  <Target Name="CopyIndexer" AfterTargets="Build">
+    <MSBuild Projects="$(MSBuildThisFileDirectory)..\..\host\Campus.Indexer\Campus.Indexer.csproj"
+             Targets="Build"
+             Properties="Configuration=$(Configuration)" />
+    <ItemGroup>
+      <IndexerOutput Include="$(MSBuildThisFileDirectory)..\..\host\Campus.Indexer\bin\$(Configuration)\net10.0\win-x64\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(IndexerOutput)"
+          DestinationFolder="$(OutDir)indexer\%(RecursiveDir)"
+          SkipUnchangedFiles="true"
+          Condition="'@(IndexerOutput)' != ''" />
+  </Target>
+
   <Target Name="CopyPluginHost" AfterTargets="Build">
     <!--
       Built through MSBuild rather than referenced: a self-contained app cannot reference another

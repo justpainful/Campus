@@ -60,6 +60,9 @@ public sealed class OfficeViewer : Grid, IContentViewer
         _scroller.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
         SetColumn(_scroller, 1);
         Children.Add(_scroller);
+
+        // A guide for people who lose their line, if they have asked for one.
+        Design.Controls.ReadingRuler.Attach(this);
     }
 
     public async Task LoadAsync(Stream content, CampusObject entity, FilePayload payload)
@@ -276,7 +279,7 @@ public sealed class OfficeViewer : Grid, IContentViewer
         Text = text,
         FontFamily = (FontFamily)Application.Current.Resources["Theme.Font.Reading"],
         FontSize = size,
-        LineHeight = size * 1.55,
+        LineHeight = AccessibilityScaling.ReadingLineHeight(size),
         FontWeight = weight,
         Foreground = ViewerChrome.Brush(token),
         TextWrapping = TextWrapping.Wrap,

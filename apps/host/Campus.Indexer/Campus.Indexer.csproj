@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>$(CampusLibraryTargetFramework)</TargetFramework>
+    <RootNamespace>Campus.Indexer</RootNamespace>
+    <AssemblyName>Campus.Indexer</AssemblyName>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- Self-contained for the same reason the plugin host is: it ships beside a self-contained app. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\core\Campus.Documents\Campus.Documents.csproj" />
+  </ItemGroup>
+</Project>

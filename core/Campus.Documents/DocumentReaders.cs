@@ -153,9 +153,14 @@ public static class DocumentReaders
         var buffer = new char[80_000];
         using var reader = new StreamReader(path, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
         var read = reader.Read(buffer, 0, buffer.Length);
-        facts.Text = Truncate(new string(buffer, 0, Math.Max(read, 0)));
+        var raw = new string(buffer, 0, Math.Max(read, 0));
 
-        if (facts.Media == MediaKind.Markdown) facts.EmbeddedTitle = FirstHeading(facts.Text);
+        // The heading is read from the raw text rather than from the indexed copy: collapsing
+        // whitespace is right for a search index and fatal for anything that depends on a line
+        // starting with a hash.
+        if (facts.Media == MediaKind.Markdown) facts.EmbeddedTitle = FirstHeading(raw);
+
+        facts.Text = Truncate(raw);
     }
 
     /// <summary>A markdown file's first `#` heading is a better title than its file name.</summary>
