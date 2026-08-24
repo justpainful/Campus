@@ -37,7 +37,7 @@ if (-not $NoBuild) {
 $log = Join-Path $env:LOCALAPPDATA 'Campus\logs\startup.log'
 Remove-Item $log -ErrorAction SilentlyContinue
 
-Start-Process -FilePath $exe -ArgumentList '--open', $Destination | Out-Null
+Start-Process -FilePath $exe -ArgumentList '--dev-workspace', '--open', $Destination | Out-Null
 Start-Sleep -Seconds 6
 
 powershell.exe -NoProfile -ExecutionPolicy Bypass `

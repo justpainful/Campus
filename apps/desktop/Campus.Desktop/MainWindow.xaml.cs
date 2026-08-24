@@ -2,6 +2,7 @@ using Campus.Desktop.Design;
 using Microsoft.UI.Input;
 using Campus.Desktop.Services;
 using Campus.Desktop.Shell;
+using Campus.Desktop.ViewModels;
 using Campus.Desktop.Views;
 using Campus.Domain;
 using Microsoft.UI.Xaml;
@@ -27,7 +28,10 @@ public sealed partial class MainWindow : Window
         _theme.ThemeChanged += (_, _) => UpdateStatusBar();
 
         _workspace = App.GetService<WorkspaceService>();
-        _workspace.LockStateChanged += (_, unlocked) => ApplyLockState(unlocked);
+        // Unlock finishes on a background thread, so the UI change is marshalled rather than
+        // applied wherever the continuation happened to land.
+        _workspace.LockStateChanged += (_, unlocked) =>
+            DispatcherQueue.TryEnqueue(() => ApplyLockState(unlocked));
 
         Title = "Campus";
         ExtendsContentIntoTitleBar = true;
@@ -99,7 +103,12 @@ public sealed partial class MainWindow : Window
                 ContentFrame.Navigate(typeof(SettingsPage));
                 break;
             default:
-                ContentFrame.Content = new PlaceholderPage(destination?.Title ?? id, destination?.Symbol ?? "file.unknown");
+                // Most destinations are the same page over a different query.
+                if (CollectionCatalog.For(id) is { } collection)
+                    ContentFrame.Navigate(typeof(CollectionPage), collection);
+                else
+                    ContentFrame.Content = new PlaceholderPage(
+                        destination?.Title ?? id, destination?.Symbol ?? "file.unknown");
                 break;
         }
     }
@@ -159,6 +168,9 @@ public sealed partial class MainWindow : Window
         {
             LockFrame.Content = null;
             _workspace.StartAutoLock(DispatcherQueue);
+            // The current page was built against a locked workspace and read nothing, so it is
+            // rebuilt now that there is something to read.
+            Navigate(CurrentDestination);
         }
         else
         {

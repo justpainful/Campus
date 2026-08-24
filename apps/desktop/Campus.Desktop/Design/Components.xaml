@@ -431,6 +431,84 @@
         <Setter Property="MinHeight" Value="{StaticResource Theme.Size.ControlHeight}" />
     </Style>
 
+    <!-- ============================================================== SEGMENTS -->
+    <!--
+        One segment. Unselected segments are transparent so the group reads as a single pill;
+        the selected one gets a raised surface, and both states keep the same label colour so
+        selection never depends on a colour difference alone.
+    -->
+    <Style x:Key="Segment.Button" TargetType="ToggleButton">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{ThemeResource Theme.Label.Secondary}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="{StaticResource Theme.Radius.S}" />
+        <Setter Property="Padding" Value="14,5,14,5" />
+        <Setter Property="MinHeight" Value="28" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="FontFamily" Value="{StaticResource Theme.Font.Text}" />
+        <Setter Property="FontSize" Value="{StaticResource Theme.Text.Callout}" />
+        <Setter Property="UseSystemFocusVisuals" Value="True" />
+        <Setter Property="FocusVisualPrimaryBrush" Value="{ThemeResource Theme.Focused.Ring}" />
+        <Setter Property="FocusVisualSecondaryBrush" Value="{ThemeResource Theme.Focused.RingOuter}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Grid>
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="{TemplateBinding CornerRadius}" />
+                        <ContentPresenter x:Name="Presenter"
+                                          Padding="{TemplateBinding Padding}"
+                                          Content="{TemplateBinding Content}"
+                                          Foreground="{TemplateBinding Foreground}"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          AutomationProperties.AccessibilityView="Raw" />
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <VisualState.Setters>
+                                        <Setter Target="Root.Background" Value="{ThemeResource Theme.Fill.Quaternary}" />
+                                        <Setter Target="Presenter.Foreground" Value="{ThemeResource Theme.Label.Primary}" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <VisualState.Setters>
+                                        <Setter Target="Root.Background" Value="{ThemeResource Theme.Fill.Tertiary}" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Checked">
+                                    <VisualState.Setters>
+                                        <Setter Target="Root.Background" Value="{ThemeResource Theme.Surface.Tertiary}" />
+                                        <Setter Target="Presenter.Foreground" Value="{ThemeResource Theme.Label.Primary}" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="CheckedPointerOver">
+                                    <VisualState.Setters>
+                                        <Setter Target="Root.Background" Value="{ThemeResource Theme.Surface.Tertiary}" />
+                                        <Setter Target="Presenter.Foreground" Value="{ThemeResource Theme.Label.Primary}" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="CheckedPressed">
+                                    <VisualState.Setters>
+                                        <Setter Target="Root.Background" Value="{ThemeResource Theme.Surface.Secondary}" />
+                                        <Setter Target="Presenter.Foreground" Value="{ThemeResource Theme.Label.Primary}" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <VisualState.Setters>
+                                        <Setter Target="Presenter.Foreground" Value="{ThemeResource Theme.Disabled.Label}" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- ================================================================ DEFAULTS -->
     <!-- Bare TextBlocks inherit the reading size and primary label, so nothing is left unstyled. -->
     <Style TargetType="TextBlock">

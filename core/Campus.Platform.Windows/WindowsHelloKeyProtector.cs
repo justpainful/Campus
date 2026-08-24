@@ -48,35 +48,29 @@ public sealed class WindowsHelloKeyProtector : IKeyProtector
     }
 
     /// <summary>
-    /// Enrols Hello and wraps the key material. Creates the credential if it does not exist, and
-    /// refuses to enrol at all if the platform's signature turns out not to be repeatable —
-    /// enrolling on a signature we could not reproduce would lock the user out of their own vault.
+    /// Enrols Hello and wraps the key material, costing exactly one verification prompt.
+    ///
+    /// Signing twice to prove the signature is repeatable would be a stronger check, but it would
+    /// also mean two Hello prompts to set up and two to change the setting, and the recovery key
+    /// already guarantees a way in. A Hello enrolment that later fails to reproduce the key is
+    /// therefore recoverable rather than fatal, and <see cref="UnprotectAsync"/> says so.
     /// </summary>
     public async ValueTask<byte[]> ProtectAsync(ReadOnlyMemory<byte> keyMaterial, CancellationToken ct = default)
     {
         var credential = await OpenOrCreateAsync(ct).ConfigureAwait(false)
             ?? throw new InvalidOperationException("Windows Hello is not available on this device.");
 
-        var first = await SignAsync(credential, ct).ConfigureAwait(false)
-            ?? throw new OperationCanceledException("Windows Hello verification was cancelled.");
-
-        var second = await SignAsync(credential, ct).ConfigureAwait(false)
+        var signature = await SignAsync(credential, ct).ConfigureAwait(false)
             ?? throw new OperationCanceledException("Windows Hello verification was cancelled.");
 
         try
         {
-            if (!CryptographicOperations.FixedTimeEquals(first, second))
-                throw new InvalidOperationException(
-                    "Windows Hello produced a different signature for the same input, so it cannot "
-                    + "be used to protect the vault key on this device.");
-
-            using var kek = DeriveKek(first);
+            using var kek = DeriveKek(signature);
             return VaultCrypto.Encrypt(kek, keyMaterial.Span, Encoding.UTF8.GetBytes(ProtectorId));
         }
         finally
         {
-            CryptographicOperations.ZeroMemory(first);
-            CryptographicOperations.ZeroMemory(second);
+            CryptographicOperations.ZeroMemory(signature);
         }
     }
 

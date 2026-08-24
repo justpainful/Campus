@@ -64,6 +64,14 @@ public partial class App : Application
             theme.RegisterRoot(root);
 
         _window.Activate();
+
+        // Started after the window exists so it can react to the unlock, and never blocked on:
+        // waiting for it here would deadlock, because its continuations come back to this thread.
+        if (DeveloperWorkspace.Requested)
+        {
+            _window.DispatcherQueue.TryEnqueue(async () =>
+                await DeveloperWorkspace.PrepareAsync(GetService<WorkspaceService>()));
+        }
     }
 
     /// <summary>

@@ -22,8 +22,14 @@ public sealed class WorkspaceService : IDisposable
     public WorkspaceService(WorkspaceSettings settings)
     {
         _settings = settings;
-        Paths = VaultPaths.Default();
-        _vault = new CampusVault(Paths, new WindowsHelloKeyProtector());
+        // A development run points at its own directory so it can never open, seed or damage the
+        // real workspace.
+        var isDevelopment = DeveloperWorkspace.Requested;
+        Paths = isDevelopment ? new VaultPaths(DeveloperWorkspace.Root) : VaultPaths.Default();
+
+        // The development workspace opens unattended, so it gets no platform protector — a Hello
+        // prompt would sit there waiting for a face that nobody is going to show it.
+        _vault = new CampusVault(Paths, isDevelopment ? null : new WindowsHelloKeyProtector());
         _database = new CampusDatabase(Paths.Database);
         DeviceId = DeviceIdentity.Current();
     }

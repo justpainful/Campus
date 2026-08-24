@@ -181,4 +181,23 @@
         </Setter>
     </Style>
 
+    <!--
+        SegmentedControl. One pill holding the whole group; the selected segment is a raised
+        surface inside it rather than a differently-coloured label.
+    -->
+    <Style TargetType="controls:SegmentedControl">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:SegmentedControl">
+                    <Border
+                        Background="{ThemeResource Theme.Fill.Quaternary}"
+                        CornerRadius="{StaticResource Theme.Radius.M}"
+                        Padding="2">
+                        <StackPanel x:Name="PART_Panel" Orientation="Horizontal" Spacing="2" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
