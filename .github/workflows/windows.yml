@@ -1,0 +1,84 @@
+name: Campus (Windows)
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "apps/ios/**"
+      - "docs/**"
+      - "**/*.md"
+  pull_request:
+    paths-ignore:
+      - "apps/ios/**"
+      - "docs/**"
+      - "**/*.md"
+  workflow_dispatch:
+
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/Directory.Packages.props', '**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore Campus.slnx
+
+      # Brand geometry and the emoji catalogue are generated, not committed. Regenerating them
+      # here is what proves the generators still work — a committed asset can quietly outlive the
+      # script that produced it.
+      - name: Regenerate brand assets
+        run: pwsh tools/brand/Export-BrandAssets.ps1
+
+      - name: Regenerate the emoji catalogue
+        run: python tools/emoji/generate.py
+
+      - name: Build
+        run: dotnet build Campus.slnx -c Release --no-restore
+
+      - name: Test
+        run: dotnet test tests/Campus.Core.Tests/Campus.Core.Tests.csproj -c Release --no-build --logger "trx;LogFileName=results.trx"
+
+      - name: Publish the desktop app
+        run: >
+          dotnet publish apps/desktop/Campus.Desktop/Campus.Desktop.csproj
+          -c Release -r win-x64 --self-contained true
+          -o publish/win-x64
+
+      - name: Upload the build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Campus-win-x64
+          path: publish/win-x64
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-test-results
+          path: "**/TestResults/*.trx"
+          if-no-files-found: ignore
+          retention-days: 7

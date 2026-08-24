@@ -18,7 +18,7 @@
 - [x] F-09 DI container + app host bootstrap
 - [~] F-10 Logging, crash capture, diagnostics
 - [x] F-11 `.gitignore`, `.editorconfig`, repo hygiene
-- [~] F-12 Unit test project + CI build for desktop
+- [x] F-12 Unit test project + CI build for desktop
 
 ## P0 — Brand & Design System
 
@@ -189,18 +189,18 @@
 
 ## P3 — iOS (Campus Pocket) + Sync
 
-- [ ] M-01 SwiftUI app skeleton, Apple-native theme parity
-- [ ] M-02 Quick Capture: Note / Task / Assignment / Requirement / Photo / File / Link
-- [ ] M-03 Fully offline local Outbox
-- [ ] M-04 Document scanner (crop, straighten, perspective, → PDF)
-- [ ] M-05 Share Extension
-- [ ] M-06 Pairing via QR
-- [ ] M-07 Local Wi-Fi encrypted sync
-- [ ] M-08 USB sync path (AFC / documents) with graceful fallback
-- [ ] M-09 Sync journal + incremental deltas
-- [ ] M-10 Conflict resolution UI (both sides)
-- [ ] M-11 CI/CD on GitHub Actions macOS runner → build + archive
-- [ ] M-12 Repo wired to `github.com/justpainful/Campus`
+- [x] M-01 SwiftUI app skeleton, Apple-native theme parity
+- [x] M-02 Quick Capture: Note / Task / Assignment / Requirement / Photo / File / Link
+- [x] M-03 Fully offline local Outbox
+- [x] M-04 Document scanner (crop, straighten, perspective, → PDF)
+- [~] M-05 Share Extension
+- [x] M-06 Pairing via QR
+- [~] M-07 Local Wi-Fi encrypted sync
+- [~] M-08 USB sync path (AFC / documents) with graceful fallback
+- [~] M-09 Sync journal + incremental deltas
+- [~] M-10 Conflict resolution UI (both sides)
+- [x] M-11 CI/CD on GitHub Actions macOS runner → build + archive
+- [~] M-12 Repo wired to `github.com/justpainful/Campus`
 
 ## P4 — Later
 

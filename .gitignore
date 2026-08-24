@@ -27,3 +27,6 @@ apps/ios/**/*.xcuserdatad/
 apps/ios/**/xcuserdata/
 *.ipa
 *.dSYM.zip
+
+# OneDrive folder customisation
+desktop.ini

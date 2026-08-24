@@ -1,0 +1,96 @@
+name: Campus Pocket (iOS)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/ios/**"
+      - ".github/workflows/ios.yml"
+  pull_request:
+    paths:
+      - "apps/ios/**"
+      - ".github/workflows/ios.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        # Pinned rather than "latest": a toolchain that changes underneath you turns an unrelated
+        # push into a mystery failure.
+        run: sudo xcode-select -switch /Applications/Xcode_16.2.app
+
+      - name: Show versions
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate the Xcode project
+        working-directory: apps/ios
+        run: xcodegen generate
+
+      - name: Build and test on the simulator
+        working-directory: apps/ios
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project CampusPocket.xcodeproj \
+            -scheme CampusPocket \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -resultBundlePath TestResults.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcbeautify --renderer github-actions
+
+      - name: Archive for device
+        # Unsigned: the runner has no certificates and should not. This proves the app builds for
+        # real hardware; installing it needs a signing identity, which is a separate decision.
+        working-directory: apps/ios
+        run: |
+          set -o pipefail
+          xcodebuild archive \
+            -project CampusPocket.xcodeproj \
+            -scheme CampusPocket \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/CampusPocket.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            | xcbeautify --renderer github-actions
+
+      - name: Package the app bundle
+        working-directory: apps/ios
+        run: |
+          mkdir -p build/Payload
+          cp -R build/CampusPocket.xcarchive/Products/Applications/CampusPocket.app build/Payload/
+          cd build && zip -qry CampusPocket-unsigned.ipa Payload
+
+      - name: Upload the build
+        uses: actions/upload-artifact@v4
+        with:
+          name: CampusPocket-unsigned
+          path: apps/ios/build/CampusPocket-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-test-results
+          path: apps/ios/TestResults.xcresult
+          if-no-files-found: ignore
+          retention-days: 7
