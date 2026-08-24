@@ -4,7 +4,8 @@
     xmlns:icons="using:Campus.Desktop.Design.Icons"
     xmlns:brand="using:Campus.Desktop.Design.Brand"
     xmlns:design="using:Campus.Desktop.Design"
-    xmlns:controls="using:Campus.Desktop.Design.Controls">
+    xmlns:controls="using:Campus.Desktop.Design.Controls"
+    xmlns:emoji="using:Campus.Desktop.Design.Emoji">
 
     <design:StringToVisibilityConverter x:Key="StringToVisibility" />
     <design:BoolToVisibilityConverter x:Key="BoolToVisibility" />
@@ -203,6 +204,26 @@
                         Padding="2">
                         <StackPanel x:Name="PART_Panel" Orientation="Horizontal" Spacing="2" />
                     </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        CampusEmoji. An image from the active pack, and nothing else: there is no fallback to the
+        system emoji font, because one Segoe face appearing among a consistent set is the exact
+        thing packs exist to prevent.
+    -->
+    <Style TargetType="emoji:CampusEmoji">
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="emoji:CampusEmoji">
+                    <Grid>
+                        <Image x:Name="PART_Image" Stretch="Uniform" />
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

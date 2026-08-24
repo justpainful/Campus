@@ -135,6 +135,31 @@
                 </StackPanel>
             </controls:SettingsSection>
 
+            <controls:SettingsSection
+                Header="EMOJI"
+                Footer="Campus draws emoji from an artwork pack, never from the Windows emoji font. Build a pack from a colour emoji font you own with tools/emoji/build_pack.py, then drop the folder into the packs directory.">
+                <StackPanel>
+                    <controls:SettingsRow
+                        x:Name="EmojiPackRow"
+                        Title="Artwork"
+                        Subtitle="Checking..."
+                        Symbol="emoji"
+                        ShowSeparator="False">
+                        <ComboBox x:Name="EmojiPackChoice" MinWidth="180"
+                                  SelectionChanged="OnEmojiPackChanged"
+                                  AutomationProperties.Name="Emoji artwork pack" />
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow
+                        Title="Packs folder"
+                        Subtitle="Put a pack here and Campus finds it"
+                        Symbol="folder">
+                        <Button Style="{StaticResource Button.Secondary}"
+                                Content="Open" Click="OnOpenPacksFolderClick" />
+                    </controls:SettingsRow>
+                </StackPanel>
+            </controls:SettingsSection>
+
             <controls:SettingsSection Header="ABOUT">
                 <StackPanel>
                     <controls:SettingsRow Title="Campus" Subtitle="Personal Academic Workspace"

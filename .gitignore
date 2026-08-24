@@ -30,3 +30,6 @@ apps/ios/**/xcuserdata/
 
 # OneDrive folder customisation
 desktop.ini
+
+# Emoji artwork packs are derived from a font, and Apple's is not ours to commit
+apps/desktop/Campus.Desktop/Assets/emoji-packs/

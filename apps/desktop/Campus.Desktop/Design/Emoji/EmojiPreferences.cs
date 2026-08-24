@@ -22,6 +22,7 @@ public sealed class EmojiPreferences
         public Dictionary<string, int> Frequency { get; set; } = [];
         public Dictionary<string, int> ToneByEmoji { get; set; } = [];
         public int SortMode { get; set; }
+        public string? PackId { get; set; }
     }
 
     private Snapshot _state = new();
@@ -41,6 +42,13 @@ public sealed class EmojiPreferences
     {
         get => (EmojiSortMode)_state.SortMode;
         set { _state.SortMode = (int)value; Save(); }
+    }
+
+    /// <summary>The artwork pack to draw with. Null means "whichever has the widest coverage".</summary>
+    public string? PackId
+    {
+        get => _state.PackId;
+        set { _state.PackId = value; Save(); }
     }
 
     public IReadOnlyList<string> Recents => _state.Recents;

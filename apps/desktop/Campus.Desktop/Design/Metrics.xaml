@@ -88,8 +88,12 @@
     <FontFamily x:Key="Theme.Font.Text">Segoe UI Variable Text, Segoe UI, Segoe UI Variable</FontFamily>
     <FontFamily x:Key="Theme.Font.Small">Segoe UI Variable Small, Segoe UI, Segoe UI Variable</FontFamily>
     <FontFamily x:Key="Theme.Font.Mono">Cascadia Mono, Consolas, Courier New</FontFamily>
-    <!-- The system colour emoji face. Campus ships no emoji artwork of its own. -->
-    <FontFamily x:Key="Theme.Font.Emoji">Segoe UI Emoji, Apple Color Emoji, Noto Color Emoji</FontFamily>
+    <!--
+        Only used for emoji typed into a plain text field, where the platform picks the face.
+        Everything Campus draws itself goes through an emoji pack instead. Apple is listed
+        first so that installing that font into Windows fixes text fields too.
+    -->
+    <FontFamily x:Key="Theme.Font.Emoji">Apple Color Emoji, Segoe UI Emoji</FontFamily>
     <FontFamily x:Key="Theme.Font.Arabic">Segoe UI, Tahoma, Arial</FontFamily>
     <!-- Opt-in reading face for the dyslexia-friendly accessibility setting. -->
     <FontFamily x:Key="Theme.Font.Reading">Verdana, Segoe UI, Tahoma</FontFamily>

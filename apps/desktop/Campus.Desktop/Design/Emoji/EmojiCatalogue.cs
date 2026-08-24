@@ -36,6 +36,12 @@ public sealed class EmojiEntry
     /// <summary>Rendered variants, in Unicode order. Empty when the emoji takes no tone.</summary>
     public IReadOnlyList<string> Variants { get; init; } = [];
 
+    /// <summary>
+    /// The same variants as code-point sequences. Artwork is looked up by these, not by the
+    /// characters, because a pack names its files after code points.
+    /// </summary>
+    public IReadOnlyList<string> VariantKeys { get; init; } = [];
+
     /// <summary>Extra words this emoji should be findable by.</summary>
     public string Aliases { get; set; } = string.Empty;
 
@@ -48,26 +54,44 @@ public sealed class EmojiEntry
     /// </summary>
     public string ForTone(SkinTone tone)
     {
-        if (tone == SkinTone.Default || Variants.Count == 0) return Text;
+        var index = VariantIndex(tone);
+        return index < 0 ? Text : Variants[index];
+    }
+
+    /// <summary>The code-point sequence for a tone, which is what artwork is looked up by.</summary>
+    public string KeyForTone(SkinTone tone)
+    {
+        var index = VariantIndex(tone);
+        return index < 0 || index >= VariantKeys.Count ? Key : VariantKeys[index];
+    }
+
+    /// <summary>Where a tone sits in the variant list, or -1 for the untoned form.</summary>
+    private int VariantIndex(SkinTone tone)
+    {
+        if (tone == SkinTone.Default || Variants.Count == 0) return -1;
 
         var index = (int)tone - 1;
         return Tone switch
         {
-            ToneKind.Single when index < Variants.Count => Variants[index],
-            // Dual variants are laid out as a 5×5 grid in Unicode order, so the matching pair
-            // sits on the diagonal.
-            ToneKind.Dual when (index * 5) + index < Variants.Count => Variants[(index * 5) + index],
-            _ => Text,
+            ToneKind.Single when index < Variants.Count => index,
+            // Dual variants are laid out as a 5x5 grid in Unicode order, so the pair where both
+            // people share a tone sits on the diagonal.
+            ToneKind.Dual when (index * 5) + index < Variants.Count => (index * 5) + index,
+            _ => -1,
         };
     }
 
     /// <summary>All variants for the tone picker, with the untoned form first.</summary>
-    public IReadOnlyList<string> ToneChoices()
+    public IReadOnlyList<(string Key, string Text, SkinTone Tone)> ToneChoices()
     {
-        if (Tone == ToneKind.None) return [Text];
+        if (Tone == ToneKind.None) return [(Key, Text, SkinTone.Default)];
 
-        var choices = new List<string>(6) { Text };
-        for (var i = 1; i <= 5; i++) choices.Add(ForTone((SkinTone)i));
+        var choices = new List<(string, string, SkinTone)>(6) { (Key, Text, SkinTone.Default) };
+        for (var i = 1; i <= 5; i++)
+        {
+            var tone = (SkinTone)i;
+            choices.Add((KeyForTone(tone), ForTone(tone), tone));
+        }
         return choices;
     }
 }
@@ -176,9 +200,10 @@ public sealed class EmojiCatalogue
         var key = parts[1];
         var name = parts[2];
         var tone = (ToneKind)int.Parse(parts[3]);
-        var variants = parts.Length > 4 && parts[4].Length > 0
-            ? parts[4].Split('|').Select(ToText).ToArray()
+        var variantKeys = parts.Length > 4 && parts[4].Length > 0
+            ? parts[4].Split('|')
             : [];
+        var variants = variantKeys.Select(ToText).ToArray();
 
         // Subgroup names are hyphenated in the source ("face-smiling"); split them so a search
         // for "smiling" matches.
@@ -193,6 +218,7 @@ public sealed class EmojiCatalogue
             Subgroup = subgroup,
             Tone = tone,
             Variants = variants,
+            VariantKeys = variantKeys,
             SearchText = haystack,
         };
     }

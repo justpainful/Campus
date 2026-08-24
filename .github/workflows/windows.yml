@@ -52,7 +52,14 @@ jobs:
         run: pwsh tools/brand/Export-BrandAssets.ps1
 
       - name: Regenerate the emoji catalogue
-        run: python tools/emoji/generate.py
+        run: |
+          python -m pip install --quiet fonttools uharfbuzz
+          python tools/emoji/generate.py
+
+      # No artwork pack is built here: packs come from a colour emoji font, and the one Campus is
+      # meant to use is licensed to Apple hardware. This proves the extractor still works.
+      - name: Test the emoji pack builder
+        run: python tools/emoji/test_build_pack.py
 
       - name: Build
         run: dotnet build Campus.slnx -c Release --no-restore

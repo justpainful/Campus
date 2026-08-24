@@ -11,23 +11,35 @@ using Microsoft.UI.Xaml.Input;
 namespace Campus.Desktop.Design.Emoji;
 
 /// <summary>One square in the grid. Display tracks the chosen tone without reloading the grid.</summary>
-public sealed partial class EmojiCell(EmojiEntry entry, string display) : ObservableObject
+public sealed partial class EmojiCell(EmojiEntry entry, string sequence, string display)
+    : ObservableObject
 {
     public EmojiEntry Entry { get; } = entry;
     public string Key => Entry.Key;
     public string Name => Entry.Name;
     public bool HasTones => Entry.Tone != ToneKind.None;
 
+    /// <summary>Code points of the variant being shown. Artwork is looked up by this.</summary>
+    [ObservableProperty]
+    public partial string Sequence { get; set; } = sequence;
+
+    /// <summary>The characters themselves, used only when no pack has this emoji.</summary>
     [ObservableProperty]
     public partial string Display { get; set; } = display;
+
+    public void Show(string sequence, string display)
+    {
+        Sequence = sequence;
+        Display = display;
+    }
 }
 
 /// <summary>
 /// The emoji picker: every emoji Unicode defines, every skin tone, search, pinning, hand
 /// ordering, and a press-and-hold gesture for tones that matches the phone keyboard.
 ///
-/// Glyphs are drawn by the system colour emoji font. Campus does not ship emoji artwork of its
-/// own — see docs/emoji-licensing.md for why, and for how to point this at an artwork pack.
+/// Glyphs come from the active artwork pack, never from the system emoji font, and there is no
+/// fallback to one. See docs/emoji.md for how to build a pack from a font you own.
 /// </summary>
 public sealed partial class EmojiPicker : UserControl
 {
@@ -69,9 +81,19 @@ public sealed partial class EmojiPicker : UserControl
         ShowGroup(_preferences.Recents.Count > 0 ? RecentGroup : FirstRealGroup());
 
         Loaded += (_, _) => SearchBox.Focus(FocusState.Programmatic);
+
+        EmojiPackStore.Current.ActivePackChanged += OnPackChanged;
+        Unloaded += (_, _) => EmojiPackStore.Current.ActivePackChanged -= OnPackChanged;
     }
 
     private static EmojiCatalogue Catalogue => _catalogue!;
+
+    private void OnPackChanged(object? sender, EventArgs e) => DispatcherQueue.TryEnqueue(() =>
+    {
+        UpdateToneButton();
+        BuildTonePanel();
+        ShowGroup(_activeGroup.Length > 0 ? _activeGroup : FirstRealGroup());
+    });
 
     private string FirstRealGroup()
         => Catalogue.Groups.Count > 0 ? Catalogue.Groups[0].Name : RecentGroup;
@@ -177,11 +199,19 @@ public sealed partial class EmojiPicker : UserControl
     {
         _cells.Clear();
         foreach (var entry in entries)
-            _cells.Add(new EmojiCell(entry, entry.ForTone(_preferences.ToneFor(entry.Key))));
+        {
+            var tone = _preferences.ToneFor(entry.Key);
+            _cells.Add(new EmojiCell(entry, entry.KeyForTone(tone), entry.ForTone(tone)));
+        }
 
+        // With no artwork installed, the grid is not shown at all. Campus will not quietly fall
+        // back to the system emoji font — that is the whole reason packs exist.
+        var noPack = EmojiPackStore.Current.Active is null;
         var empty = _cells.Count == 0;
-        NoResults.Visibility = empty ? Visibility.Visible : Visibility.Collapsed;
-        Cells.Visibility = empty ? Visibility.Collapsed : Visibility.Visible;
+
+        NoPackNotice.Visibility = noPack ? Visibility.Visible : Visibility.Collapsed;
+        NoResults.Visibility = !noPack && empty ? Visibility.Visible : Visibility.Collapsed;
+        Cells.Visibility = !noPack && !empty ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void OnSearchChanged(object sender, TextChangedEventArgs e)
@@ -222,6 +252,7 @@ public sealed partial class EmojiPicker : UserControl
     private void ShowPreview(EmojiCell cell)
     {
         _previewed = cell;
+        PreviewGlyph.Sequence = cell.Sequence;
         PreviewGlyph.Text = cell.Display;
         PreviewName.Text = cell.Name;
         PreviewHint.Text = cell.HasTones
@@ -283,12 +314,8 @@ public sealed partial class EmojiPicker : UserControl
         var panel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 2 };
         var flyout = new Flyout { Content = panel, Placement = FlyoutPlacementMode.Top };
 
-        var choices = cell.Entry.ToneChoices();
-        for (var i = 0; i < choices.Count; i++)
+        foreach (var (key, text, tone) in cell.Entry.ToneChoices())
         {
-            var tone = (SkinTone)i;
-            var text = choices[i];
-
             var button = new Button
             {
                 Style = (Style)Application.Current.Resources["Button.Plain"],
@@ -296,13 +323,7 @@ public sealed partial class EmojiPicker : UserControl
                 Height = 40,
                 Padding = new Thickness(0),
                 MinWidth = 0,
-                Content = new TextBlock
-                {
-                    Text = text,
-                    FontFamily = (Microsoft.UI.Xaml.Media.FontFamily)Application.Current.Resources["Theme.Font.Emoji"],
-                    FontSize = 24,
-                    IsColorFontEnabled = true,
-                },
+                Content = new CampusEmoji { Sequence = key, Text = text, EmojiSize = 26 },
             };
             AutomationProperties.SetName(button, $"{cell.Name}, {ToneName(tone)}");
 
@@ -311,7 +332,7 @@ public sealed partial class EmojiPicker : UserControl
                 // Choosing a tone here also remembers it for this emoji, so the next time it
                 // appears in the grid it is already the tone you meant.
                 _preferences.SetToneFor(cell.Key, tone);
-                cell.Display = text;
+                cell.Show(key, text);
                 flyout.Hide();
                 Pick(cell, text);
             };
@@ -352,12 +373,11 @@ public sealed partial class EmojiPicker : UserControl
                 Height = 40,
                 Padding = new Thickness(0),
                 MinWidth = 0,
-                Content = new TextBlock
+                Content = new CampusEmoji
                 {
+                    Sequence = hand.KeyForTone(tone),
                     Text = hand.ForTone(tone),
-                    FontFamily = (Microsoft.UI.Xaml.Media.FontFamily)Application.Current.Resources["Theme.Font.Emoji"],
-                    FontSize = 22,
-                    IsColorFontEnabled = true,
+                    EmojiSize = 24,
                 },
             };
             AutomationProperties.SetName(button, ToneName(tone));
@@ -377,7 +397,14 @@ public sealed partial class EmojiPicker : UserControl
     private void UpdateToneButton()
     {
         var hand = Catalogue.Find("270B") ?? Catalogue.Find("1F44B");
-        if (hand is not null) ToneButtonGlyph.Text = hand.ForTone(_preferences.DefaultTone);
+        if (hand is null) return;
+
+        ToneButtonGlyph.Sequence = hand.KeyForTone(_preferences.DefaultTone);
+        ToneButtonGlyph.Text = hand.ForTone(_preferences.DefaultTone);
+
+        var noPack = EmojiPackStore.Current.Active is null;
+        ToneButtonPlaceholder.Visibility = noPack ? Visibility.Visible : Visibility.Collapsed;
+        ToneButton.IsEnabled = !noPack;
     }
 
     // ----------------------------------------------------------------------- sorting

@@ -1,4 +1,5 @@
 using Campus.Desktop.Design;
+using Campus.Desktop.Design.Emoji;
 using Campus.Desktop.Services;
 using Campus.Domain;
 using Microsoft.UI.Xaml;
@@ -11,6 +12,7 @@ public sealed partial class SettingsPage : Page
     private readonly ThemeService _theme = App.GetService<ThemeService>();
     private readonly WorkspaceSettings _settings = App.GetService<WorkspaceSettings>();
     private readonly WorkspaceService _workspace = App.GetService<WorkspaceService>();
+    private readonly EmojiPreferences _emojiPreferences = EmojiPreferences.Load();
     private bool _loading = true;
 
     public SettingsPage()
@@ -50,9 +52,63 @@ public sealed partial class SettingsPage : Page
             _ => 0,
         };
 
+        LoadEmojiPacks();
+
         VersionText.Text = typeof(SettingsPage).Assembly.GetName().Version?.ToString(3) ?? "0.1.0";
         VaultPathText.Text = _workspace.Paths.Root;
         _ = UpdateHelloRowAsync();
+    }
+
+    private void LoadEmojiPacks()
+    {
+        var store = EmojiPackStore.Current;
+        store.Refresh();
+
+        EmojiPackChoice.Items.Clear();
+        foreach (var pack in store.Packs)
+        {
+            EmojiPackChoice.Items.Add(new ComboBoxItem
+            {
+                Content = $"{pack.DisplayName} ({pack.Manifest.Count})",
+                Tag = pack.Id,
+            });
+        }
+
+        if (store.Packs.Count == 0)
+        {
+            EmojiPackChoice.IsEnabled = false;
+            EmojiPackRow.Subtitle = "No pack installed. Emoji will not render until one is.";
+            return;
+        }
+
+        EmojiPackChoice.IsEnabled = true;
+        EmojiPackChoice.SelectedIndex = Math.Max(0,
+            store.Packs.ToList().FindIndex(p => p.Id == store.Active?.Id));
+
+        var active = store.Active;
+        EmojiPackRow.Subtitle = active is null
+            ? "No pack selected."
+            : $"{active.Manifest.Count} emoji · {active.Manifest.License}";
+    }
+
+    private void OnEmojiPackChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_loading) return;
+        if (EmojiPackChoice.SelectedItem is not ComboBoxItem { Tag: string id }) return;
+
+        var store = EmojiPackStore.Current;
+        store.Select(id);
+        _emojiPreferences.PackId = id;
+
+        var active = store.Active;
+        if (active is not null)
+            EmojiPackRow.Subtitle = $"{active.Manifest.Count} emoji · {active.Manifest.License}";
+    }
+
+    private async void OnOpenPacksFolderClick(object sender, RoutedEventArgs e)
+    {
+        Directory.CreateDirectory(EmojiPackStore.UserRoot);
+        await Windows.System.Launcher.LaunchFolderPathAsync(EmojiPackStore.UserRoot);
     }
 
     private async Task UpdateHelloRowAsync()

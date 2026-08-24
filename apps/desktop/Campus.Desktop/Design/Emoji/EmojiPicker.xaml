@@ -32,13 +32,10 @@
                 ToolTipService.ToolTip="{x:Bind Name}"
                 AutomationProperties.Name="{x:Bind Name}">
                 <Grid>
-                    <TextBlock
+                    <local:CampusEmoji
+                        Sequence="{x:Bind Sequence, Mode=OneWay}"
                         Text="{x:Bind Display, Mode=OneWay}"
-                        FontFamily="{StaticResource Theme.Font.Emoji}"
-                        FontSize="24"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        IsColorFontEnabled="True" />
+                        EmojiSize="26" />
                     <!-- A corner mark on anything with tones, so the gesture is discoverable. -->
                     <Border
                         Width="5" Height="5"
@@ -83,9 +80,13 @@
                 Padding="8,4,8,4"
                 AutomationProperties.Name="Default skin tone"
                 ToolTipService.ToolTip="Default skin tone">
-                <TextBlock x:Name="ToneButtonGlyph" Text="✋"
-                           FontFamily="{StaticResource Theme.Font.Emoji}" FontSize="18"
-                           IsColorFontEnabled="True" />
+                <Grid>
+                    <local:CampusEmoji x:Name="ToneButtonGlyph" EmojiSize="20" />
+                    <icons:CampusIcon x:Name="ToneButtonPlaceholder" Symbol="accessibility"
+                                      IconSize="{StaticResource Theme.Icon.L}"
+                                      Foreground="{ThemeResource Theme.Label.Tertiary}"
+                                      Visibility="Collapsed" />
+                </Grid>
                 <Button.Flyout>
                     <Flyout x:Name="ToneFlyout" Placement="Bottom">
                         <StackPanel x:Name="TonePanel" Orientation="Horizontal" Spacing="2" />
@@ -152,8 +153,36 @@
                 Style="{StaticResource Text.Callout}"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
+                TextAlignment="Center"
                 Visibility="Collapsed"
                 Text="Nothing matches that." />
+
+            <StackPanel
+                x:Name="NoPackNotice"
+                Visibility="Collapsed"
+                Spacing="10"
+                MaxWidth="330"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+                <icons:CampusIcon Symbol="emoji" IconSize="{StaticResource Theme.Icon.Display}"
+                                  Weight="Light"
+                                  Foreground="{ThemeResource Theme.Label.Tertiary}" />
+                <TextBlock Text="No emoji artwork installed"
+                           Style="{StaticResource Text.Title3}"
+                           HorizontalAlignment="Center" TextAlignment="Center" />
+                <TextBlock
+                    Style="{StaticResource Text.Footnote}"
+                    HorizontalAlignment="Center" TextAlignment="Center"
+                    Text="Campus will not fall back to the Windows emoji font. Build a pack from a font you own, then choose it in Settings." />
+                <TextBlock
+                    x:Name="NoPackCommand"
+                    Style="{StaticResource Text.Mono}"
+                    FontSize="11"
+                    HorizontalAlignment="Center" TextAlignment="Center"
+                    TextWrapping="Wrap"
+                    Foreground="{ThemeResource Theme.Label.Tertiary}"
+                    Text="python tools/emoji/build_pack.py --font &quot;Apple Color Emoji.ttc&quot; --name apple" />
+            </StackPanel>
         </Grid>
 
         <!-- Preview strip -->
@@ -165,8 +194,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock x:Name="PreviewGlyph" FontFamily="{StaticResource Theme.Font.Emoji}"
-                       FontSize="26" VerticalAlignment="Center" IsColorFontEnabled="True" />
+            <local:CampusEmoji x:Name="PreviewGlyph" EmojiSize="28" VerticalAlignment="Center" />
             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                 <TextBlock x:Name="PreviewName" Style="{StaticResource Text.Footnote}"
                            Foreground="{ThemeResource Theme.Label.Primary}"

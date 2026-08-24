@@ -30,7 +30,7 @@ core/Campus.Platform.Windows    Windows Hello
 tools/brand                     the mark and wordmark, as geometry
 tools/emoji                     the emoji catalogue generator
 docs/security.md                what the encryption does and does not protect
-docs/emoji-licensing.md         why Apple's emoji artwork is not in here
+docs/emoji.md                   emoji artwork, and how to build an Apple pack
 CHECKLIST.md                    every feature, and where it stands
 ```
 
@@ -91,6 +91,10 @@ what that costs and why the alternative is worse.
 **Icons are geometry, never emoji.** Around 150 symbols on a 24-unit grid, stroked at render time
 with six weights and per-size optical correction. Emoji exist in Campus, but as content you
 insert — never as interface.
+
+**Emoji come from a pack, not from a font.** Campus never renders emoji with the system emoji
+font, and has no fallback to one. Build a pack from a colour font you own — see
+[docs/emoji.md](docs/emoji.md) — and every emoji in the app comes from it.
 
 **One accent.** Blue acts, red destroys, amber warns, green confirms. Campus overrides Windows's
 own accent colour inside its own controls, so a system set to orange does not turn half the app
