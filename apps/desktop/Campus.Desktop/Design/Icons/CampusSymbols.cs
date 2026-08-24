@@ -64,6 +64,10 @@ public static class CampusSymbols
     public const string Remove = "remove";
     public const string Close = "close";
     public const string Check = "check";
+    public const string Checkbox = "checkbox";
+    public const string CheckboxChecked = "checkbox.checked";
+    public const string Circle = "circle";
+    public const string CircleCheck = "circle.check";
     public const string Edit = "edit";
     public const string Delete = "delete";
     public const string Copy = "copy";

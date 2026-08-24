@@ -191,6 +191,14 @@
                 </Grid>
 
                 <Frame x:Name="ContentFrame" Grid.Row="1" />
+
+                <!--
+                    Notices float over the workspace rather than taking a row of their own, so
+                    something appearing never pushes what is being read out from under the cursor.
+                -->
+                <StackPanel x:Name="NoticeHost" Grid.Row="1"
+                            HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                            Margin="20" IsHitTestVisible="False" />
             </Grid>
 
             <controls:SplitterBar

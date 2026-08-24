@@ -19,6 +19,7 @@ public sealed partial class MainWindow : Window
     private readonly WorkspaceService _workspace;
     private double _sidebarWidth = 280;
     private CommandRegistry _commands = new();
+    private readonly ShellRouter _router;
     private bool _sidebarVisible = true;
     private bool _focusMode;
     private double _inspectorWidth = 300;
@@ -54,6 +55,13 @@ public sealed partial class MainWindow : Window
 
         Rail.Destinations = _destinations;
         Rail.DestinationInvoked += OnDestinationInvoked;
+
+        Notifications.Attach(NoticeHost, DispatcherQueue);
+
+        // Pages ask the shell to open things rather than reaching for the frame themselves.
+        _router = App.GetService<ShellRouter>();
+        _router.NavigationRequested += (_, request) =>
+            DispatcherQueue.TryEnqueue(() => Handle(request));
 
         RootLayout.KeyDown += OnRootKeyDown;
 
@@ -173,10 +181,38 @@ public sealed partial class MainWindow : Window
 
     private void OnDestinationInvoked(object? sender, string id) => Navigate(id);
 
+    /// <summary>
+    /// Carries out a request from the router. Opening an object means opening the right page for
+    /// it: a file whose format Campus can draw goes to the viewer, and everything else goes to
+    /// the detail page. Deciding that here, once, is what keeps a link in a note behaving the
+    /// same as the same link in a search result.
+    /// </summary>
+    private async void Handle(NavigationRequest request)
+    {
+        if (request.Destination is { } destination)
+        {
+            Navigate(destination, request.Argument);
+            return;
+        }
+
+        if (request.ObjectId is not { } id || !_workspace.IsUnlocked) return;
+
+        var entity = await _workspace.Objects.GetAsync(id);
+        if (entity is null)
+        {
+            Notifications.Show("That item is no longer here.", NoticeKind.Warning);
+            return;
+        }
+
+        ContentFrame.Navigate(
+            entity.Kind == ObjectKind.File ? typeof(Views.Viewers.ViewerHost) : typeof(ObjectDetailPage),
+            id);
+    }
+
     /// <summary>Moves the shell to a destination. Used by pages whose counts link to a list.</summary>
     public void NavigateTo(string destinationId) => Navigate(destinationId);
 
-    private void Navigate(string id)
+    private void Navigate(string id, string? argument = null)
     {
         CurrentDestination = id;
         Rail.Select(id);

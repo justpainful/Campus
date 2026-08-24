@@ -4,6 +4,7 @@
     <Project Path="apps/desktop/Campus.Desktop/Campus.Desktop.csproj" />
   </Folder>
   <Folder Name="/core/">
+    <Project Path="core/Campus.Documents/Campus.Documents.csproj" />
     <Project Path="core/Campus.Domain/Campus.Domain.csproj" />
     <Project Path="core/Campus.Platform.Windows/Campus.Platform.Windows.csproj" />
     <Project Path="core/Campus.Storage/Campus.Storage.csproj" />

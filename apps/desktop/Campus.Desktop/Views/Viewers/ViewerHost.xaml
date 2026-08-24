@@ -1,0 +1,93 @@
+<Page
+    x:Class="Campus.Desktop.Views.Viewers.ViewerHost"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:icons="using:Campus.Desktop.Design.Icons"
+    Background="{ThemeResource Theme.Background.Primary}">
+
+    <!--
+        The frame around whatever is being read. The toolbar and the title belong to the host, so
+        every viewer gets the same chrome and a new viewer only has to know how to draw its own
+        content.
+    -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Padding="16,10,16,10" Background="{ThemeResource Theme.Background.Primary}"
+              ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.ColumnSpan="3" VerticalAlignment="Bottom" Height="1"
+                    Background="{ThemeResource Theme.Separator.Standard}" />
+
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Button Style="{StaticResource Button.Icon}" Click="OnBackClick"
+                        AutomationProperties.Name="Back" ToolTipService.ToolTip="Back">
+                    <icons:CampusIcon Symbol="chevron.left" IconSize="{StaticResource Theme.Icon.L}"
+                                      Foreground="{ThemeResource Theme.Label.Secondary}" />
+                </Button>
+                <icons:CampusIcon x:Name="KindIcon" IconSize="{StaticResource Theme.Icon.L}"
+                                  Foreground="{ThemeResource Theme.Label.Tertiary}" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                <TextBlock x:Name="TitleText"
+                           FontFamily="{StaticResource Theme.Font.Text}"
+                           FontSize="{StaticResource Theme.Text.Body}"
+                           FontWeight="SemiBold"
+                           Foreground="{ThemeResource Theme.Label.Primary}"
+                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+                <TextBlock x:Name="DetailText" Style="{StaticResource Text.Caption}"
+                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+            </StackPanel>
+
+            <!-- Viewers add their own controls here; the shared ones sit to the right of them. -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+                <StackPanel x:Name="ViewerTools" Orientation="Horizontal" Spacing="2" />
+                <Border Width="1" Height="20" Margin="6,0,6,0"
+                        Background="{ThemeResource Theme.Separator.Standard}" />
+                <Button Style="{StaticResource Button.Icon}" Click="OnDetailsClick"
+                        AutomationProperties.Name="Details" ToolTipService.ToolTip="Details">
+                    <icons:CampusIcon Symbol="info" IconSize="{StaticResource Theme.Icon.L}"
+                                      Foreground="{ThemeResource Theme.Label.Secondary}" />
+                </Button>
+                <Button Style="{StaticResource Button.Icon}" Click="OnExportClick"
+                        AutomationProperties.Name="Export a copy"
+                        ToolTipService.ToolTip="Export a copy">
+                    <icons:CampusIcon Symbol="export" IconSize="{StaticResource Theme.Icon.L}"
+                                      Foreground="{ThemeResource Theme.Label.Secondary}" />
+                </Button>
+                <Button Style="{StaticResource Button.Icon}" Click="OnOpenExternallyClick"
+                        AutomationProperties.Name="Open in another app"
+                        ToolTipService.ToolTip="Open in another app">
+                    <icons:CampusIcon Symbol="open.external" IconSize="{StaticResource Theme.Icon.L}"
+                                      Foreground="{ThemeResource Theme.Label.Secondary}" />
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <ContentPresenter x:Name="ViewerSurface" Grid.Row="1" />
+
+        <StackPanel x:Name="Message" Grid.Row="1" Visibility="Collapsed"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Spacing="12" MaxWidth="380">
+            <icons:CampusIcon x:Name="MessageIcon" Symbol="file.unknown"
+                              IconSize="{StaticResource Theme.Icon.Display}" Weight="Light"
+                              Foreground="{ThemeResource Theme.Label.Tertiary}" />
+            <TextBlock x:Name="MessageTitle" Style="{StaticResource Text.Title3}"
+                       HorizontalAlignment="Center" TextAlignment="Center" />
+            <TextBlock x:Name="MessageBody" Style="{StaticResource Text.Callout}"
+                       HorizontalAlignment="Center" TextAlignment="Center" />
+            <Button x:Name="MessageAction" Style="{StaticResource Button.Secondary}"
+                    HorizontalAlignment="Center" Visibility="Collapsed"
+                    Click="OnOpenExternallyClick" Content="Open in another app" />
+        </StackPanel>
+    </Grid>
+</Page>

@@ -105,6 +105,18 @@ public partial class App : Application
         // What the sidebar and the workspace agree they are looking at.
         services.AddSingleton<NavigationState>();
 
+        // Bringing files in, and reading what they can say about themselves.
+        services.AddSingleton<ImportService>();
+
+        // One place that knows how to open something, so a link behaves the same everywhere.
+        services.AddSingleton<ShellRouter>();
+
+        // Keeping a copy of what content used to be, for the things that can be overwritten.
+        services.AddSingleton<VersionService>();
+
+        // Taking the workspace out, whole or in part.
+        services.AddSingleton<ExportService>();
+
         return services.BuildServiceProvider();
     }
 

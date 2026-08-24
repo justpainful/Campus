@@ -31,6 +31,7 @@
     <ProjectReference Include="..\..\..\core\Campus.Domain\Campus.Domain.csproj" />
     <ProjectReference Include="..\..\..\core\Campus.Vault\Campus.Vault.csproj" />
     <ProjectReference Include="..\..\..\core\Campus.Storage\Campus.Storage.csproj" />
+    <ProjectReference Include="..\..\..\core\Campus.Documents\Campus.Documents.csproj" />
     <ProjectReference Include="..\..\..\core\Campus.Platform.Windows\Campus.Platform.Windows.csproj" />
   </ItemGroup>
 

@@ -11,11 +11,18 @@ namespace Campus.Storage;
 /// </summary>
 public static class PayloadSerializer
 {
-    private static readonly JsonSerializerOptions Options = new()
+    internal static readonly JsonSerializerOptions Options = new()
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         WriteIndented = false,
+        Converters =
+        {
+            // Ids are strings on the wire. Without this they serialise as objects and cannot be
+            // read back, which would quietly empty a print job's queue or a collection's members.
+            new CampusIdJsonConverter(),
+            new CampusIdJsonConverter.Nullable(),
+        },
     };
 
     public static string? Serialize(IObjectPayload? payload)

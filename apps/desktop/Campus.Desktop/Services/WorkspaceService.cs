@@ -15,13 +15,13 @@ public sealed class WorkspaceService : IDisposable
 {
     private readonly CampusVault _vault;
     private readonly CampusDatabase _database;
-    private readonly WorkspaceSettings _settings;
+    private readonly WorkspaceSettings _options;
     private DispatcherQueueTimer? _autoLockTimer;
     private DateTimeOffset _lastActivity = DateTimeOffset.UtcNow;
 
     public WorkspaceService(WorkspaceSettings settings)
     {
-        _settings = settings;
+        _options = settings;
         // A development run points at its own directory so it can never open, seed or damage the
         // real workspace.
         var isDevelopment = DeveloperWorkspace.Requested;
@@ -45,9 +45,26 @@ public sealed class WorkspaceService : IDisposable
     /// <summary>Raised on lock and unlock so the shell can swap between the workspace and the lock screen.</summary>
     public event EventHandler<bool>? LockStateChanged;
 
-    public ObjectRepository Objects => _objects
-        ?? throw new InvalidOperationException("The workspace is locked.");
+    // Every repository is null while the workspace is locked, so touching data without a key is a
+    // clear error rather than a query against a closed connection.
+    public ObjectRepository Objects => Required(_objects);
+    public AnnotationRepository Annotations => Required(_annotations);
+    public RelationRepository Relations => Required(_relations);
+    public HistoryRepository History => Required(_history);
+    public ScheduleRepository Schedule => Required(_schedule);
+    public SavedQueryRepository SavedQueries => Required(_savedQueries);
+    public SettingsRepository Settings => Required(_settings);
+
     private ObjectRepository? _objects;
+    private AnnotationRepository? _annotations;
+    private RelationRepository? _relations;
+    private HistoryRepository? _history;
+    private ScheduleRepository? _schedule;
+    private SavedQueryRepository? _savedQueries;
+    private SettingsRepository? _settings;
+
+    private static T Required<T>(T? repository) where T : class
+        => repository ?? throw new InvalidOperationException("The workspace is locked.");
 
     public CampusVault Vault => _vault;
     public CampusDatabase Database => _database;
@@ -101,6 +118,13 @@ public sealed class WorkspaceService : IDisposable
         if (!IsUnlocked) return;
 
         _objects = null;
+        _annotations = null;
+        _relations = null;
+        _history = null;
+        _schedule = null;
+        _savedQueries = null;
+        _settings = null;
+
         _database.CloseAsync().GetAwaiter().GetResult();
         _vault.Lock();
         _autoLockTimer?.Stop();
@@ -119,7 +143,7 @@ public sealed class WorkspaceService : IDisposable
     {
         _autoLockTimer?.Stop();
 
-        if (_settings.AutoLock == AutoLockPolicy.Never) return;
+        if (_options.AutoLock == AutoLockPolicy.Never) return;
 
         _autoLockTimer = dispatcher.CreateTimer();
         _autoLockTimer.Interval = TimeSpan.FromSeconds(20);
@@ -128,7 +152,7 @@ public sealed class WorkspaceService : IDisposable
         {
             if (!IsUnlocked) return;
             var idleFor = DateTimeOffset.UtcNow - _lastActivity;
-            if (idleFor >= TimeSpan.FromMinutes((int)_settings.AutoLock)) Lock();
+            if (idleFor >= TimeSpan.FromMinutes((int)_options.AutoLock)) Lock();
         };
         _autoLockTimer.Start();
     }
@@ -136,7 +160,14 @@ public sealed class WorkspaceService : IDisposable
     private async Task OpenDatabaseAsync(CancellationToken ct)
     {
         await _database.OpenAsync(_vault.Keys, ct).ConfigureAwait(false);
+
         _objects = new ObjectRepository(_database, DeviceId);
+        _annotations = new AnnotationRepository(_database);
+        _relations = new RelationRepository(_database);
+        _history = new HistoryRepository(_database, DeviceId);
+        _schedule = new ScheduleRepository(_database);
+        _savedQueries = new SavedQueryRepository(_database);
+        _settings = new SettingsRepository(_database);
     }
 
     private void RaiseUnlocked()

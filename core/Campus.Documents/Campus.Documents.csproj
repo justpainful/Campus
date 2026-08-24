@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>$(CampusLibraryTargetFramework)</TargetFramework>
+    <RootNamespace>Campus.Documents</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="PDFtoImage" />
+    <PackageReference Include="DocumentFormat.OpenXml" />
+    <PackageReference Include="Markdig" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Campus.Domain\Campus.Domain.csproj" />
+  </ItemGroup>
+</Project>
