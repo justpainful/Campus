@@ -1,3 +1,4 @@
+using Campus.Desktop.Design.Emoji;
 using Campus.Desktop.Design.Icons;
 using Campus.Domain;
 using Microsoft.UI.Xaml;
@@ -48,7 +49,21 @@ public static class QuickCapture
             MinHeight = 72,
             Style = (Style)Application.Current.Resources["Input.Text"],
         };
-        body.Children.Add(text);
+        // The text field and the emoji button share a row so the button never pushes the
+        // field narrower than it needs to be.
+        var textRow = new Grid();
+        textRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        textRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        Grid.SetColumn(text, 0);
+        textRow.Children.Add(text);
+
+        var emojiButton = EmojiFlyout.CreateButton(text);
+        emojiButton.VerticalAlignment = VerticalAlignment.Bottom;
+        emojiButton.Margin = new Thickness(4, 0, 0, 4);
+        Grid.SetColumn(emojiButton, 1);
+        textRow.Children.Add(emojiButton);
+
+        body.Children.Add(textRow);
 
         var kindChoice = new ComboBox { MinWidth = 170, HorizontalAlignment = HorizontalAlignment.Stretch };
         foreach (var (value, label, _) in Kinds)

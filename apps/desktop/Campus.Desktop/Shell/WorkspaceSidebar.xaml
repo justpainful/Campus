@@ -1,0 +1,90 @@
+<UserControl
+    x:Class="Campus.Desktop.Shell.WorkspaceSidebar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:icons="using:Campus.Desktop.Design.Icons"
+    xmlns:local="using:Campus.Desktop.Shell"
+    mc:Ignorable="d"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+
+    <UserControl.Resources>
+        <!-- A sidebar row: a small colour dot or icon, a label, and a count on the trailing edge. -->
+        <DataTemplate x:Key="SidebarRowTemplate" x:DataType="local:SidebarEntry">
+            <Button
+                Style="{StaticResource Button.Plain}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Stretch"
+                Padding="8,6,8,6"
+                MinHeight="32"
+                Click="OnEntryClick"
+                Tag="{x:Bind Key}"
+                AutomationProperties.Name="{x:Bind Label}">
+                <Grid ColumnSpacing="9">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Ellipse
+                        Grid.Column="0"
+                        Width="9" Height="9"
+                        VerticalAlignment="Center"
+                        Fill="{x:Bind local:WorkspaceSidebar.RoleBrush(AccentToken)}"
+                        Visibility="{x:Bind local:WorkspaceSidebar.DotVisibility(AccentToken)}" />
+                    <icons:CampusIcon
+                        Grid.Column="0"
+                        Symbol="{x:Bind Symbol}"
+                        IconSize="{StaticResource Theme.Icon.M}"
+                        Foreground="{ThemeResource Theme.Label.Secondary}"
+                        Visibility="{x:Bind local:WorkspaceSidebar.IconVisibility(AccentToken)}" />
+
+                    <TextBlock
+                        Grid.Column="1"
+                        Text="{x:Bind Label}"
+                        FontFamily="{StaticResource Theme.Font.Text}"
+                        FontSize="{StaticResource Theme.Text.Callout}"
+                        Foreground="{ThemeResource Theme.Label.Primary}"
+                        VerticalAlignment="Center"
+                        TextTrimming="CharacterEllipsis"
+                        TextWrapping="NoWrap" />
+
+                    <TextBlock
+                        Grid.Column="2"
+                        Text="{x:Bind CountText}"
+                        Style="{StaticResource Text.Caption}"
+                        VerticalAlignment="Center" />
+                </Grid>
+            </Button>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <StackPanel Spacing="16" Padding="0,4,0,0">
+
+        <StackPanel x:Name="FilterNotice" Visibility="Collapsed" Spacing="6">
+            <Button
+                Style="{StaticResource Button.Secondary}"
+                HorizontalAlignment="Stretch"
+                Click="OnClearFilterClick"
+                MinHeight="32">
+                <StackPanel Orientation="Horizontal" Spacing="7">
+                    <icons:CampusIcon Symbol="close" IconSize="{StaticResource Theme.Icon.S}" />
+                    <TextBlock x:Name="FilterLabel" VerticalAlignment="Center"
+                               FontSize="{StaticResource Theme.Text.Callout}" />
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <StackPanel x:Name="SubjectSection" Spacing="4">
+            <TextBlock Text="SUBJECTS" Style="{StaticResource Text.SectionHeader}" Margin="8,0,8,2" />
+            <ItemsControl x:Name="SubjectList" ItemTemplate="{StaticResource SidebarRowTemplate}" />
+        </StackPanel>
+
+        <StackPanel x:Name="TagSection" Spacing="4" Visibility="Collapsed">
+            <TextBlock Text="TAGS" Style="{StaticResource Text.SectionHeader}" Margin="8,0,8,2" />
+            <ItemsControl x:Name="TagList" ItemTemplate="{StaticResource SidebarRowTemplate}" />
+        </StackPanel>
+
+    </StackPanel>
+</UserControl>

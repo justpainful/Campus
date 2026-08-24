@@ -29,7 +29,7 @@
 - [x] B-05 App icon — square variant, all sizes
 - [x] B-06 `.campus` file-type icon, all sizes
 - [x] B-07 Generate multi-resolution `.ico` + `.png` asset pack from geometry
-- [ ] B-08 Brand usage doc (`brand/README.md`)
+- [x] B-08 Brand usage doc (`brand/README.md`)
 
 ### Theme (Semantic Color System)
 
@@ -60,12 +60,12 @@
 - [x] I-02 Full app icon inventory (~180 glyphs) drawn as path data
 - [x] I-03 Icon sizing scale + comfortable hit targets (min 32px control, 44px touch)
 - [x] I-04 Icon color always via `Label.*` / semantic tokens
-- [ ] E-01 Emoji data pipeline — full Unicode emoji set, groups, subgroups, CLDR names, keywords
-- [ ] E-02 Skin-tone variant model (all 5 Fitzpatrick modifiers + default, incl. multi-person sequences)
-- [ ] E-03 Emoji picker UI: categories, search, recents, frequently used
-- [ ] E-04 Press-and-hold → skin-tone flyout, per-emoji tone memory
-- [ ] E-05 Custom ordering / pinning / favorites
-- [ ] E-06 Emoji renderer abstraction (font-based today, asset-pack-swappable)
+- [x] E-01 Emoji data pipeline — full Unicode emoji set, groups, subgroups, CLDR names, keywords
+- [x] E-02 Skin-tone variant model (all 5 Fitzpatrick modifiers + default, incl. multi-person sequences)
+- [x] E-03 Emoji picker UI: categories, search, recents, frequently used
+- [x] E-04 Press-and-hold → skin-tone flyout, per-emoji tone memory
+- [x] E-05 Custom ordering / pinning / favorites
+- [x] E-06 Emoji renderer abstraction (font-based today, asset-pack-swappable)
 - [!] E-07 Apple emoji artwork — **licensing blocker**, see `docs/emoji-licensing.md`; picker ships asset-pack-ready
 
 ---
@@ -84,13 +84,13 @@
 - [x] S-10 Auto-lock policies (5/10/30 min, on PC lock, on app close)
 - [ ] S-11 Export flow with optional re-authentication
 - [ ] S-12 Sensitive Mode (drag-out restrictions, clipboard clearing)
-- [ ] S-13 Honest threat-model doc — what encryption does and does not protect against
+- [x] S-13 Honest threat-model doc — what encryption does and does not protect against
 
 ## P1 — Application Shell
 
 - [x] U-01 Window chrome: custom title bar, Mica/acrylic policy, dark-first
 - [x] U-02 Activity Bar (left rail) with all destinations
-- [~] U-03 Primary Sidebar (collapsible, resizable, per-destination content)
+- [x] U-03 Primary Sidebar (collapsible, resizable, per-destination content)
 - [ ] U-04 Workspace area with tab strip
 - [~] U-05 Inspector panel (right, collapsible)
 - [x] U-06 Status Bar

@@ -75,8 +75,9 @@ public sealed partial class MainWindow : Window
         UpdateStatusBar();
 
 #if DEBUG
-        // Lets a screenshot capture transient surfaces that normally need a keystroke.
-        ShowDebugSurface();
+        // Deferred to Loaded: a dialog needs a XamlRoot, which does not exist yet in the
+        // constructor.
+        RootLayout.Loaded += (_, _) => ShowDebugSurface();
 #endif
     }
 
@@ -99,18 +100,50 @@ public sealed partial class MainWindow : Window
         if (index < 0 || index + 1 >= args.Length) return;
 
         var surface = args[index + 1];
-        DispatcherQueue.TryEnqueue(() =>
+        // One more hop, so the workspace has had a chance to unlock before a surface that
+        // reads from it appears.
+        DispatcherQueue.TryEnqueue(async () =>
         {
+            await Task.Delay(1200);
             switch (surface)
             {
                 case "palette": Palette.Show(PaletteMode.Commands); break;
                 case "search": Palette.Show(PaletteMode.Search); break;
                 case "inspector": SetInspectorVisible(true); break;
                 case "focus": ToggleFocusMode(); break;
+                case "emoji": _ = ShowEmojiSheetAsync(); break;
             }
         });
     }
 #endif
+
+    /// <summary>Opens the emoji picker on its own, for screenshots and for the palette.</summary>
+    public async Task ShowEmojiSheetAsync()
+    {
+        if (RootLayout.XamlRoot is not { } root) return;
+
+        var field = new TextBox
+        {
+            Style = (Style)Application.Current.Resources["Input.Text"],
+            PlaceholderText = "Pick an emoji",
+        };
+
+        var picker = new Design.Emoji.EmojiPicker();
+        picker.EmojiPicked += (_, text) => Design.Emoji.EmojiFlyout.Insert(field, text);
+
+        var body = new StackPanel { Spacing = 10 };
+        body.Children.Add(field);
+        body.Children.Add(picker);
+
+        var dialog = new ContentDialog
+        {
+            XamlRoot = root,
+            Title = "Emoji",
+            Content = body,
+            CloseButtonText = "Done",
+        };
+        await dialog.ShowAsync();
+    }
 
     private void OnDestinationInvoked(object? sender, string id) => Navigate(id);
 
@@ -299,6 +332,7 @@ public sealed partial class MainWindow : Window
             // The current page was built against a locked workspace and read nothing, so it is
             // rebuilt now that there is something to read.
             Navigate(CurrentDestination);
+            _ = SidebarContent.RefreshAsync();
         }
         else
         {

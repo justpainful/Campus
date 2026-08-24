@@ -37,6 +37,10 @@
   <ItemGroup>
     <None Remove="Assets\Campus.ico" />
     <Content Include="Assets\Campus.ico" Condition="Exists('Assets\Campus.ico')" />
+    <None Remove="Assets\emoji.dat" />
+    <Content Include="Assets\emoji.dat" Condition="Exists('Assets\emoji.dat')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

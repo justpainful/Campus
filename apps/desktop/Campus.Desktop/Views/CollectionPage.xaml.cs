@@ -16,6 +16,7 @@ namespace Campus.Desktop.Views;
 public sealed partial class CollectionPage : Page
 {
     private readonly WorkspaceService _workspace = App.GetService<WorkspaceService>();
+    private readonly NavigationState _navigation = App.GetService<NavigationState>();
     private readonly ObservableCollection<ObjectItem> _items = [];
     private readonly Dictionary<string, (string Name, string Accent)> _subjects = new(StringComparer.Ordinal);
 
@@ -27,7 +28,11 @@ public sealed partial class CollectionPage : Page
     {
         InitializeComponent();
         Items.ItemsSource = _items;
+        _navigation.FilterChanged += OnFilterStateChanged;
+        Unloaded += (_, _) => _navigation.FilterChanged -= OnFilterStateChanged;
     }
+
+    private async void OnFilterStateChanged(object? sender, EventArgs e) => await ReloadAsync();
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
@@ -88,6 +93,7 @@ public sealed partial class CollectionPage : Page
 
         var segment = _definition.Segments[Math.Clamp(Segments.SelectedIndex, 0, _definition.Segments.Count - 1)];
         var query = segment.BuildQuery();
+        _navigation.Apply(query);
         if (_filter.Length > 0) query.Text = _filter;
 
         try

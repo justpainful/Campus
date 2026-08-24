@@ -102,6 +102,9 @@ public partial class App : Application
         // The vault, its database and the repositories on top, as one unit that locks together.
         services.AddSingleton<WorkspaceService>();
 
+        // What the sidebar and the workspace agree they are looking at.
+        services.AddSingleton<NavigationState>();
+
         return services.BuildServiceProvider();
     }
 

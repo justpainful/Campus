@@ -1,0 +1,185 @@
+<UserControl
+    x:Class="Campus.Desktop.Design.Emoji.EmojiPicker"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:icons="using:Campus.Desktop.Design.Icons"
+    xmlns:local="using:Campus.Desktop.Design.Emoji"
+    Width="420"
+    Height="440"
+    mc:Ignorable="d"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+
+    <UserControl.Resources>
+        <!--
+            One emoji cell. Press and hold, or right-click, opens the skin-tone choices for the
+            emoji that have them — the same gesture the phone keyboard uses.
+        -->
+        <DataTemplate x:Key="EmojiCellTemplate" x:DataType="local:EmojiCell">
+            <Button
+                Style="{StaticResource Button.Plain}"
+                Width="40" Height="40"
+                Padding="0"
+                MinWidth="0"
+                CornerRadius="{StaticResource Theme.Radius.S}"
+                Click="OnEmojiClick"
+                RightTapped="OnEmojiRightTapped"
+                PointerPressed="OnEmojiPointerPressed"
+                PointerReleased="OnEmojiPointerReleased"
+                PointerExited="OnEmojiPointerReleased"
+                PointerEntered="OnEmojiPointerEntered"
+                DataContext="{x:Bind}"
+                ToolTipService.ToolTip="{x:Bind Name}"
+                AutomationProperties.Name="{x:Bind Name}">
+                <Grid>
+                    <TextBlock
+                        Text="{x:Bind Display, Mode=OneWay}"
+                        FontFamily="{StaticResource Theme.Font.Emoji}"
+                        FontSize="24"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        IsColorFontEnabled="True" />
+                    <!-- A corner mark on anything with tones, so the gesture is discoverable. -->
+                    <Border
+                        Width="5" Height="5"
+                        Margin="0,0,3,3"
+                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                        CornerRadius="{StaticResource Theme.Radius.Pill}"
+                        Background="{ThemeResource Theme.Label.Quaternary}"
+                        Visibility="{x:Bind local:EmojiPicker.ToneMarkVisibility(HasTones)}" />
+                </Grid>
+            </Button>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid Background="{ThemeResource Theme.Surface.Elevated}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Search and the default tone -->
+        <Grid Padding="12,12,12,8" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBox
+                x:Name="SearchBox"
+                Style="{StaticResource Input.Search}"
+                PlaceholderText="Search emoji"
+                TextChanged="OnSearchChanged"
+                AutomationProperties.Name="Search emoji" />
+
+            <Button
+                x:Name="ToneButton"
+                Grid.Column="1"
+                Style="{StaticResource Button.Secondary}"
+                MinWidth="0"
+                Padding="8,4,8,4"
+                AutomationProperties.Name="Default skin tone"
+                ToolTipService.ToolTip="Default skin tone">
+                <TextBlock x:Name="ToneButtonGlyph" Text="✋"
+                           FontFamily="{StaticResource Theme.Font.Emoji}" FontSize="18"
+                           IsColorFontEnabled="True" />
+                <Button.Flyout>
+                    <Flyout x:Name="ToneFlyout" Placement="Bottom">
+                        <StackPanel x:Name="TonePanel" Orientation="Horizontal" Spacing="2" />
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+
+            <Button
+                x:Name="SortButton"
+                Grid.Column="2"
+                Style="{StaticResource Button.Icon}"
+                AutomationProperties.Name="Sort order"
+                ToolTipService.ToolTip="Sort order">
+                <icons:CampusIcon Symbol="sort" IconSize="{StaticResource Theme.Icon.M}"
+                                  Foreground="{ThemeResource Theme.Label.Secondary}" />
+                <Button.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Unicode order" Click="OnSortClick" Tag="Unicode" />
+                        <MenuFlyoutItem Text="Most used first" Click="OnSortClick" Tag="Frequency" />
+                        <MenuFlyoutItem Text="By name" Click="OnSortClick" Tag="Name" />
+                        <MenuFlyoutSeparator />
+                        <MenuFlyoutItem Text="Clear recently used" Click="OnClearRecentsClick" />
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+        </Grid>
+
+        <!-- Group tabs -->
+        <ScrollViewer Grid.Row="1" HorizontalScrollMode="Auto" HorizontalScrollBarVisibility="Hidden"
+                      VerticalScrollMode="Disabled" Padding="8,0,8,6">
+            <StackPanel x:Name="GroupTabs" Orientation="Horizontal" Spacing="2" />
+        </ScrollViewer>
+
+        <Border Grid.Row="1" Height="1" VerticalAlignment="Bottom"
+                Background="{ThemeResource Theme.Separator.Standard}" />
+
+        <!-- Grid -->
+        <Grid Grid.Row="2">
+            <GridView
+                x:Name="Cells"
+                Padding="8,8,8,8"
+                SelectionMode="None"
+                IsItemClickEnabled="False"
+                ItemTemplate="{StaticResource EmojiCellTemplate}"
+                AutomationProperties.Name="Emoji">
+                <GridView.ItemContainerStyle>
+                    <Style TargetType="GridViewItem">
+                        <Setter Property="Margin" Value="0" />
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="MinWidth" Value="0" />
+                        <Setter Property="MinHeight" Value="0" />
+                        <Setter Property="Background" Value="Transparent" />
+                    </Style>
+                </GridView.ItemContainerStyle>
+                <GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsWrapGrid Orientation="Horizontal" ItemWidth="42" ItemHeight="42" />
+                    </ItemsPanelTemplate>
+                </GridView.ItemsPanel>
+            </GridView>
+
+            <TextBlock
+                x:Name="NoResults"
+                Style="{StaticResource Text.Callout}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Visibility="Collapsed"
+                Text="Nothing matches that." />
+        </Grid>
+
+        <!-- Preview strip -->
+        <Grid Grid.Row="3" Padding="12,8,12,10" ColumnSpacing="10"
+              Background="{ThemeResource Theme.Surface.Secondary}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock x:Name="PreviewGlyph" FontFamily="{StaticResource Theme.Font.Emoji}"
+                       FontSize="26" VerticalAlignment="Center" IsColorFontEnabled="True" />
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock x:Name="PreviewName" Style="{StaticResource Text.Footnote}"
+                           Foreground="{ThemeResource Theme.Label.Primary}"
+                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+                <TextBlock x:Name="PreviewHint" Style="{StaticResource Text.Caption}"
+                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+            </StackPanel>
+            <Button x:Name="PinButton" Grid.Column="2" Style="{StaticResource Button.Icon}"
+                    Click="OnPinClick" Visibility="Collapsed"
+                    AutomationProperties.Name="Pin this emoji">
+                <icons:CampusIcon x:Name="PinIcon" Symbol="pin" IconSize="{StaticResource Theme.Icon.M}"
+                                  Foreground="{ThemeResource Theme.Label.Secondary}" />
+            </Button>
+        </Grid>
+    </Grid>
+</UserControl>
