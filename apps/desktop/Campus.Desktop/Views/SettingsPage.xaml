@@ -219,6 +219,15 @@
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
+                        Title="Sensitive mode"
+                        Subtitle="Clear the clipboard after copying, and refuse drag-out"
+                        Symbol="eye.slash">
+                        <ToggleSwitch x:Name="SensitiveToggle" OnContent="" OffContent=""
+                                      Toggled="OnSensitiveToggled"
+                                      AutomationProperties.Name="Sensitive mode" />
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow
                         Title="Lock automatically"
                         Subtitle="After this much time with no activity"
                         Symbol="timer">

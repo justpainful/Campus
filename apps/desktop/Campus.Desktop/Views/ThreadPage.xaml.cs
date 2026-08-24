@@ -173,9 +173,9 @@ public sealed partial class ThreadPage : Page
 
             menu.Items.Add(ObjectCommands.Item("Copy text", CampusSymbols.Copy, () =>
             {
-                var package = new Windows.ApplicationModel.DataTransfer.DataPackage();
-                package.SetText(body);
-                Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(package);
+                // Through the sensitive-mode service rather than the clipboard directly, so that
+                // a copy made in that mode is cleared again rather than left sitting there.
+                App.GetService<SensitiveMode>().Copy(body, DispatcherQueue);
                 Notifications.Show("Copied.");
                 return Task.CompletedTask;
             }));

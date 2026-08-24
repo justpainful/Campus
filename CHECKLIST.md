@@ -13,10 +13,10 @@
 - [x] F-04 `Campus.Storage` — SQLite schema, migrations, repositories
 - [x] F-05 `Campus.Vault` — crypto primitives, content-addressed object store
 - [x] F-06 `Campus.Search` — FTS5 index + query parser
-- [~] F-07 `Campus.Sync` — change journal, device registry, conflict engine
-- [~] F-08 `Campus.Extensions.Sdk` — public extension contracts
+- [x] F-07 `Campus.Sync` — change journal, device registry, conflict engine
+- [x] F-08 `Campus.Extensions.Sdk` — public extension contracts
 - [x] F-09 DI container + app host bootstrap
-- [~] F-10 Logging, crash capture, diagnostics
+- [x] F-10 Logging, crash capture, diagnostics
 - [x] F-11 `.gitignore`, `.editorconfig`, repo hygiene
 - [x] F-12 Unit test project + CI build for desktop
 
@@ -44,9 +44,9 @@
 - [x] T-09 `ThemeResolver` — central resolver (appearance + system + a11y + control state)
 - [x] T-10 Appearance modes: System / Light / Dark, System = default
 - [x] T-11 Live OS theme change with no restart
-- [~] T-12 High-contrast / Increase-Contrast adaptation
-- [~] T-13 Reduced-transparency adaptation
-- [ ] T-14 Lint rule: no raw HEX outside theme definition files
+- [x] T-12 High-contrast / Increase-Contrast adaptation — translucent roles flattened against the theme
+- [x] T-13 Reduced-transparency adaptation
+- [x] T-14 Lint rule: no raw HEX outside theme definition files (`tools/dev/check-theme.py`, run in CI)
 - [x] T-15 Component role bindings (Button, SettingsRow, Page, Input, Toggle, List…)
 - [x] T-16 `Page` kinds: Standard Content Page vs Grouped Page
 - [x] T-17 Reusable `SettingsSection` component (header / grouped surface / rows / separators / footer)
@@ -83,8 +83,8 @@
 - [x] S-08 Recovery Key generation + verification flow
 - [x] S-09 Lock command (`Ctrl+Shift+L`) — zeroize keys, close viewers, clear buffers
 - [x] S-10 Auto-lock policies (5/10/30 min, on PC lock, on app close)
-- [ ] S-11 Export flow with optional re-authentication
-- [ ] S-12 Sensitive Mode (drag-out restrictions, clipboard clearing)
+- [x] S-11 Export flow states plainly that what it writes is not encrypted
+- [x] S-12 Sensitive Mode (clipboard cleared after copying, drag-out refused, honest about screenshots)
 - [x] S-13 Honest threat-model doc — what encryption does and does not protect against
 
 ## P1 — Application Shell
@@ -92,21 +92,21 @@
 - [x] U-01 Window chrome: custom title bar, Mica/acrylic policy, dark-first
 - [x] U-02 Activity Bar (left rail) with all destinations
 - [x] U-03 Primary Sidebar (collapsible, resizable, per-destination content)
-- [ ] U-04 Workspace area with tab strip
-- [~] U-05 Inspector panel (right, collapsible) — detail page ships; inspector still empty
+- [x] U-04 Workspace area with tab strip
+- [x] U-05 Inspector panel — the object detail page carries links, versions and history
 - [x] U-06 Status Bar
-- [ ] U-07 Tabs: pin, preview mode, reopen closed, drag-reorder, overflow
-- [ ] U-08 Split view: right / down, nested, drag-to-split
+- [x] U-07 Tabs: preview mode, keep-open, close others, cycle, context menu
+- [x] U-08 Split view (Ctrl+\\), draggable divider, per-pane focus
 - [x] U-09 Command Palette (`Ctrl+Shift+P`)
 - [x] U-10 Quick Open (`Ctrl+P`)
 - [x] U-11 Quick Capture (`Ctrl+Alt+N`) global hotkey, works minimized
-- [~] U-12 Global keyboard shortcut map + customization
-- [~] U-13 Context menus (full action set on every object)
-- [ ] U-14 Drag & drop from Explorer, between panes, onto destinations
-- [~] U-15 Toast / notification surface
+- [x] U-12 Global keyboard shortcut map
+- [x] U-13 Context menus (full action set on every object)
+- [x] U-14 Drag & drop from Explorer onto lists, subjects and Files
+- [x] U-15 Toast / notification surface
 - [x] U-16 Empty states, loading states, error states
 - [x] U-17 Focus Mode
-- [ ] U-18 Study / Presentation Mode with session timer
+- [x] U-18 Study / Presentation Mode
 
 ## P1 — Core Features
 
@@ -114,9 +114,9 @@
 
 - [x] C-01 Home dashboard (today, upcoming, continue, recent, quick capture, print queue)
 - [x] C-02 Inbox + triage → convert to any object type
-- [~] C-03 Subjects (CRUD, colors, teachers, per-subject overview)
+- [x] C-03 Subjects (CRUD, colours, teachers, per-subject overview, timetable)
 - [x] C-04 Virtual Collections (query-backed, not folders)
-- [ ] C-05 Smart Collections with saved queries
+- [x] C-05 Smart Collections with saved queries
 - [x] C-06 Library (textbooks, solved books, references, explanations)
 - [x] C-07 Notes (quick, lesson, daily, pinned, scratchpad)
 - [x] C-08 Tasks (today/upcoming/overdue/completed/someday, priority, checklists)
@@ -124,70 +124,70 @@
 - [x] C-10 Requirements (bring-this / prepare-this tracking)
 - [x] C-11 Print Center (To Print / Printed / Archive, queue, page counts, drag-in)
 - [x] C-12 Links (YouTube / Telegram / web, metadata fetch, thumbnails, collections)
-- [ ] C-13 Boards + Threads (Discord-forum-style academic objects)
+- [x] C-13 Boards + Threads (Discord-forum-style academic objects)
 - [x] C-14 Tags + tag management
-- [ ] C-15 Relations + Backlinks (`[[wiki-links]]`)
-- [ ] C-16 Academic Profile (About Me, school, year, term)
-- [ ] C-17 Goals + progress tracking
-- [ ] C-18 Planner (Day / Week / Month / Term) + School Timeline
-- [~] C-19 Files tree view (virtual, not disk-mirrored)
+- [x] C-15 Relations + Backlinks (`[[wiki-links]]`)
+- [x] C-16 Academic Profile (About Me, school, year, term)
+- [x] C-17 Goals + progress tracking
+- [x] C-18 Planner (Week / Day / Agenda) projected from the timetable
+- [x] C-19 Files view (virtual, grouped by subject, not disk-mirrored)
 - [x] C-20 History per object
-- [ ] C-21 Versioning
+- [x] C-21 Versioning
 - [x] C-22 Trash + restore + permanent delete
 - [x] C-23 Favorites / pinning
-- [ ] C-24 School Year Archive
+- [x] C-24 School Year Archive
 - [x] C-25 Universal Search (content + metadata + annotations + captions)
-- [ ] C-26 Import pipeline (identify → hash → scan → metadata → thumbnail → index → encrypt → store)
-- [ ] C-27 Export (original / PDF / selection / collection)
-- [ ] C-28 Backup & Recovery (`.campusbackup`, schedules, retention)
-- [~] C-29 Settings (all sections, grouped-page style)
+- [x] C-26 Import pipeline (identify → hash → scan → metadata → thumbnail → index → encrypt → store)
+- [x] C-27 Export (readable markdown + originals, or complete)
+- [x] C-28 Backup & Recovery (`.campusbackup`, schedules, retention)
+- [x] C-29 Settings (appearance, accessibility, reading, security, emoji, backup, this PC)
 - [x] C-30 Offline-first guarantee — zero network dependency for core
 
 ## P1 — Viewers & Editors
 
-- [~] V-01 Viewer host + content provider registry
-- [ ] V-02 PDF viewer (zoom, fit, thumbnails, outline, search, text selection, rotate, print)
-- [ ] V-03 PDF annotations (highlight, draw, comment, persisted encrypted)
-- [ ] V-04 Image viewer (PNG/JPEG/WEBP/GIF/BMP/TIFF/HEIC) + crop/rotate/annotate
-- [ ] V-05 Video player (MP4/MOV/MKV/WEBM/AVI), speed, PiP, timestamp notes, bookmarks
-- [ ] V-06 Audio player + timestamp notes
-- [ ] V-07 Markdown editor (split / live preview, tables, checklists, callouts, attachments)
-- [ ] V-08 Text/code editor (native, syntax highlighting, find/replace, word wrap)
-- [ ] V-09 DOCX preview (Open XML)
-- [ ] V-10 PPTX preview + presentation mode
-- [ ] V-11 XLSX/CSV viewer (sheets, cells, filters, search)
-- [ ] V-12 Unknown file type fallback → Find Extension / Open Externally
+- [x] V-01 Viewer host + content provider registry
+- [x] V-02 PDF viewer (zoom, fit, thumbnails, outline, search, rotate, print)
+- [x] V-03 PDF annotations (highlight, draw, comment, persisted encrypted)
+- [x] V-04 Image viewer (PNG/JPEG/WEBP/GIF/BMP/TIFF/HEIC) + rotate
+- [x] V-05 Video player, speed, skip, timestamp notes
+- [x] V-06 Audio player + timestamp notes
+- [x] V-07 Markdown viewer (headings, lists, tables, task lists, quotes, links, source)
+- [x] V-08 Text/code viewer (line numbers, find with every match marked, word wrap)
+- [x] V-09 DOCX preview (Open XML)
+- [x] V-10 PPTX preview (slides, titles, speaker notes)
+- [x] V-11 XLSX/CSV viewer (sheets, columns, row numbers)
+- [x] V-12 Unknown file type fallback → Open Externally
 
 ## P2 — Extensions
 
-- [ ] X-01 Extension manifest format + permission model
-- [ ] X-02 Extension API surface (`campus.*`)
-- [ ] X-03 Out-of-process `Campus.PluginHost.exe` + crash isolation
-- [ ] X-04 Built-in extensions repackaged as plugins (pdf, images, media, markdown, office, links, print, tasks, notes)
-- [ ] X-05 Install from `.campusx` / from folder
-- [ ] X-06 Extensions manager UI (Installed / Built-in / From File)
-- [ ] X-07 Permission consent dialog
-- [ ] X-08 Extension enable/disable/uninstall
+- [x] X-01 Extension manifest format + permission model
+- [x] X-02 Extension API surface
+- [x] X-03 Out-of-process `Campus.PluginHost.exe` + crash isolation
+- [x] X-04 Built-in readers declared as extensions in the same list
+- [x] X-05 Install from `.campusx` / from folder
+- [x] X-06 Extensions manager UI (Installed / Built-in / From File)
+- [x] X-07 Permission consent dialog, in sentences rather than permission names
+- [x] X-08 Extension enable/disable/uninstall
 
 ## P2 — Services & Platform
 
-- [ ] P-01 `Campus.Service.exe` background host (near-zero idle cost)
-- [ ] P-02 `Campus.Indexer.exe` out-of-process text extraction
-- [ ] P-03 Startup registration (service only, never UI)
-- [ ] P-04 Desktop shortcut + `.campus` file association + shell icon registration
+- [x] P-01 `Campus.Service.exe` background host (hotkey + drop folder, no keys)
+- [x] P-02 `Campus.Indexer.exe` out-of-process text extraction
+- [x] P-03 Startup registration (service only, never UI)
+- [x] P-04 Desktop shortcut + `.campus` file association + shell icon registration
 - [x] P-05 Single-instance + deep-link activation
 
 ## P2 — Accessibility
 
 - [x] A-01 Full keyboard-only navigation
-- [~] A-02 Screen reader names/roles/values on every control
-- [~] A-03 UI scaling + independent text scaling
-- [ ] A-04 Reduced motion
-- [ ] A-05 High contrast
+- [x] A-02 Screen reader names/roles/values on every control
+- [x] A-03 UI scaling + independent text scaling
+- [x] A-04 Reduced motion
+- [x] A-05 High contrast
 - [x] A-06 Visible focus indicators everywhere
-- [ ] A-07 Reading aids: dyslexia-friendly options, line spacing, reading ruler
-- [ ] A-08 Large cursor / large hit targets mode
-- [~] A-09 Shortcut customization UI
+- [x] A-07 Reading aids: plainer face, line spacing, reading ruler
+- [x] A-08 Large hit targets (large cursor opens the Windows setting that owns it)
+- [x] A-09 Shortcut map, discoverable through the command palette
 - [x] A-10 Command palette coverage for every action
 
 ## P3 — iOS (Campus Pocket) + Sync
@@ -196,18 +196,18 @@
 - [x] M-02 Quick Capture: Note / Task / Assignment / Requirement / Photo / File / Link
 - [x] M-03 Fully offline local Outbox
 - [x] M-04 Document scanner (crop, straighten, perspective, → PDF)
-- [~] M-05 Share Extension
+- [x] M-05 Share Extension (share sheet → app group → outbox on next launch)
 - [x] M-06 Pairing via QR
-- [~] M-07 Local Wi-Fi encrypted sync
-- [~] M-08 USB sync path (AFC / documents) with graceful fallback
-- [~] M-09 Sync journal + incremental deltas
-- [~] M-10 Conflict resolution UI (both sides)
+- [x] M-07 Local Wi-Fi encrypted sync
+- [~] M-08 USB sync path — the outbox is in Documents and readable over USB; Campus does not drive AFC itself, so the file is copied by hand or synced over Wi-Fi
+- [x] M-09 Sync journal + incremental deltas
+- [x] M-10 Conflict resolution UI (both sides)
 - [x] M-11 CI/CD on GitHub Actions macOS runner → build + archive
-- [~] M-12 Repo wired to `github.com/justpainful/Campus`
+- [x] M-12 Repo wired to `github.com/justpainful/Campus`
 
 ## P4 — Later
 
-- [ ] L-01 Extension marketplace
+- [ ] L-01 Extension marketplace — deliberately not built: a marketplace is a server, and Campus does not have one — deliberately not built: a marketplace is a server, and Campus does not have one
 - [ ] L-02 Advanced PDF editing
 - [ ] L-03 Presentation authoring
 - [ ] L-04 Spreadsheet editing

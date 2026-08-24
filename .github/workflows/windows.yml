@@ -61,6 +61,10 @@ jobs:
       - name: Test the emoji pack builder
         run: python tools/emoji/test_build_pack.py
 
+      # A component names a colour role, never a value. The rule is only real if it is checked.
+      - name: Check that no colour is written outside the theme
+        run: python tools/dev/check-theme.py
+
       - name: Build
         run: dotnet build Campus.slnx -c Release --no-restore
 

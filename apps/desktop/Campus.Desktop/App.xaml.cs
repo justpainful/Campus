@@ -183,6 +183,9 @@ public partial class App : Application
         // Copies of the vault, taken as it sits on disk and therefore already encrypted.
         services.AddSingleton<BackupService>();
 
+        // For a workspace somebody else might sit down in front of.
+        services.AddSingleton<SensitiveMode>();
+
         return services.BuildServiceProvider();
     }
 

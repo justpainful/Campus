@@ -59,6 +59,8 @@ public sealed partial class SettingsPage : Page
         if (!_theme.SystemAnimationsEnabled) { MotionToggle.IsOn = true; MotionToggle.IsEnabled = false; }
         if (!_theme.SystemTransparencyEnabled) { TransparencyToggle.IsOn = true; TransparencyToggle.IsEnabled = false; }
 
+        SensitiveToggle.IsOn = _settings.SensitiveMode;
+
         AutoLockChoice.SelectedIndex = _settings.AutoLock switch
         {
             AutoLockPolicy.After5Minutes => 1,
@@ -304,6 +306,25 @@ public sealed partial class SettingsPage : Page
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             Notifications.Show($"The restore failed: {ex.Message}", NoticeKind.Error);
+        }
+    }
+
+    /// <summary>
+    /// Turning sensitive mode on says plainly what it does and, more importantly, what it does
+    /// not: it closes doors that were left open, and cannot stop somebody photographing a screen.
+    /// </summary>
+    private void OnSensitiveToggled(object sender, RoutedEventArgs e)
+    {
+        if (_loading) return;
+
+        _settings.SensitiveMode = SensitiveToggle.IsOn;
+
+        if (SensitiveToggle.IsOn)
+        {
+            Notifications.Show(
+                "Sensitive mode is on. Copies clear after "
+                + $"{SensitiveMode.ClipboardLifetime.TotalSeconds:0} seconds and files cannot be "
+                + "dragged out. It cannot stop a screenshot.");
         }
     }
 

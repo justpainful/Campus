@@ -35,6 +35,31 @@ final class Outbox {
         try? FileManager.default.createDirectory(
             at: attachmentsURL, withIntermediateDirectories: true)
         load()
+        drainShared()
+    }
+
+    /// Takes whatever the share extension left in the group container.
+    ///
+    /// An extension cannot write here directly — iOS keeps it out of the app's Documents folder,
+    /// which is where the outbox has to live so that a cable can read it — so it drops small files
+    /// in a folder both halves can see and this picks them up.
+    func drainShared() {
+        let shared = SharedInbox.drain()
+        guard !shared.isEmpty else { return }
+
+        for item in shared {
+            let body = [item.note, item.url]
+                .compactMap { $0 }
+                .filter { !$0.isEmpty }
+                .joined(separator: "\n\n")
+
+            items.append(CaptureItem(
+                kind: item.url == nil ? .inbox : .link,
+                title: item.title,
+                body: body.isEmpty ? nil : body))
+        }
+
+        save()
     }
 
     // MARK: - Capture

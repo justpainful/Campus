@@ -679,7 +679,13 @@ public sealed partial class MainWindow : Window
 
     private void OnLockClick(object sender, RoutedEventArgs e) => LockWorkspace();
 
-    private void LockWorkspace() => _workspace.Lock();
+    private void LockWorkspace()
+    {
+        // Locking is the moment somebody walks away from the machine, so anything Campus put on
+        // the clipboard goes now rather than when its timer happens to fire.
+        App.GetService<SensitiveMode>().OnLocked();
+        _workspace.Lock();
+    }
 
     /// <summary>Swaps between the workspace and the lock screen, and keeps the chrome honest.</summary>
     private void ApplyLockState(bool unlocked)

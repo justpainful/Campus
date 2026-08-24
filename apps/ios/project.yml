@@ -29,6 +29,11 @@ targets:
     platform: iOS
     sources:
       - path: CampusPocket
+      # Shared with the extension: one definition of the folder both halves meet in.
+      - path: CampusShared
+    dependencies:
+      - target: CampusShare
+        embed: true
     info:
       path: CampusPocket/Info.plist
       properties:
@@ -58,6 +63,36 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.campus.pocket
         TARGETED_DEVICE_FAMILY: "1,2"
         INFOPLIST_KEY_UIStatusBarStyle: UIStatusBarStyleLightContent
+        CODE_SIGN_ENTITLEMENTS: CampusPocket/CampusPocket.entitlements
+
+  # The share sheet target. It writes one small file into the group container and closes; it
+  # never opens the workspace, never reaches the network, and holds no key.
+  CampusShare:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: CampusShare
+      - path: CampusShared
+    info:
+      path: CampusShare/Info.plist
+      properties:
+        CFBundleDisplayName: Campus
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsWebURLWithMaxCount: 1
+              NSExtensionActivationSupportsText: true
+              NSExtensionActivationSupportsFileWithMaxCount: 1
+              NSExtensionActivationSupportsImageWithMaxCount: 1
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.campus.pocket.share
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGN_ENTITLEMENTS: CampusShare/CampusShare.entitlements
 
   CampusPocketTests:
     type: bundle.unit-test
@@ -72,6 +107,7 @@ schemes:
     build:
       targets:
         CampusPocket: all
+        CampusShare: all
         CampusPocketTests: [test]
     test:
       targets:

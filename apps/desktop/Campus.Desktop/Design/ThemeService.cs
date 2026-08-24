@@ -108,6 +108,10 @@ public sealed class ThemeService
         // drawn from are re-derived from them here, which is what makes them visible.
         AccessibilityScaling.Apply(Accessibility);
 
+        // Translucent roles are flattened when more contrast or less transparency is asked for,
+        // because a hairline whose visibility depends on what is behind it is not a hairline.
+        ContrastAdaptation.Apply(Accessibility);
+
         ApplyToAllRoots();
         RaiseChanged();
     }
@@ -115,7 +119,9 @@ public sealed class ThemeService
     private void OnSystemColoursChanged()
     {
         // Turning high contrast on or off also changes the system colours, so this is where a
-        // contrast change is noticed without a dedicated event to listen to.
+        // contrast change is noticed without a dedicated event to listen to. It is also where a
+        // light/dark switch lands, and the flattened colours have to be derived again against
+        // the background that is now behind them.
         ApplySettings(Accessibility);
         ApplyToAllRoots();
     }
