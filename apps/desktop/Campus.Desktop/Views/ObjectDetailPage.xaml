@@ -220,6 +220,40 @@
                     </Border>
                 </StackPanel>
 
+                <!--
+                    Links, in both directions. A backlink is the same row read the other way
+                    round, so nothing here can go stale on one side only.
+                -->
+                <StackPanel Spacing="8" Margin="0,0,0,24">
+                    <TextBlock Text="LINKS" Style="{StaticResource Text.SectionHeader}"
+                               Margin="16,0,0,0" />
+                    <Border Background="{ThemeResource Theme.GroupedBackground.Secondary}"
+                            CornerRadius="{StaticResource Theme.Radius.Section}"
+                            Padding="12">
+                        <StackPanel Spacing="10">
+                            <StackPanel x:Name="LinkList" Spacing="2" />
+                            <Button Style="{StaticResource Button.Secondary}"
+                                    Content="Link to something" Click="OnAddLinkClick"
+                                    MinWidth="0" HorizontalAlignment="Left" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!--
+                    Earlier text, kept for the kinds that can be overwritten. Restoring snapshots
+                    the current text first, so it is itself undoable.
+                -->
+                <StackPanel x:Name="VersionSection" Spacing="8" Margin="0,0,0,24"
+                            Visibility="Collapsed">
+                    <TextBlock Text="EARLIER VERSIONS" Style="{StaticResource Text.SectionHeader}"
+                               Margin="16,0,0,0" />
+                    <Border Background="{ThemeResource Theme.GroupedBackground.Secondary}"
+                            CornerRadius="{StaticResource Theme.Radius.Section}"
+                            Padding="12">
+                        <StackPanel x:Name="VersionList" Spacing="2" />
+                    </Border>
+                </StackPanel>
+
                 <!-- History -->
                 <controls:SettingsSection Header="HISTORY"
                                           Footer="Every change is recorded, including the ones made on another device.">

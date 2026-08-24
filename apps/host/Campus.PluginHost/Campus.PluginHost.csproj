@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>$(CampusLibraryTargetFramework)</TargetFramework>
+    <RootNamespace>Campus.PluginHost</RootNamespace>
+    <AssemblyName>Campus.PluginHost</AssemblyName>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <!--
+      Self-contained, because the app that launches it is: an isolation boundary that only works
+      when the right runtime happens to be installed is not an isolation boundary.
+    -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>false</PublishSingleFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\core\Campus.Extensions.Sdk\Campus.Extensions.Sdk.csproj" />
+  </ItemGroup>
+</Project>

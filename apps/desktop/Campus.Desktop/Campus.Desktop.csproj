@@ -32,6 +32,8 @@
     <ProjectReference Include="..\..\..\core\Campus.Vault\Campus.Vault.csproj" />
     <ProjectReference Include="..\..\..\core\Campus.Storage\Campus.Storage.csproj" />
     <ProjectReference Include="..\..\..\core\Campus.Documents\Campus.Documents.csproj" />
+    <ProjectReference Include="..\..\..\core\Campus.Sync\Campus.Sync.csproj" />
+    <ProjectReference Include="..\..\..\core\Campus.Extensions.Sdk\Campus.Extensions.Sdk.csproj" />
     <ProjectReference Include="..\..\..\core\Campus.Platform.Windows\Campus.Platform.Windows.csproj" />
   </ItemGroup>
 
@@ -43,5 +45,26 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+  <!--
+    The plugin host ships beside the app in a folder of its own, so an extension's dependencies
+    can never be resolved out of Campus's own directory by accident.
+  -->
+  <Target Name="CopyPluginHost" AfterTargets="Build">
+    <!--
+      Built through MSBuild rather than referenced: a self-contained app cannot reference another
+      executable, and the host is a separate program rather than a library this one links to.
+    -->
+    <MSBuild Projects="$(MSBuildThisFileDirectory)..\..\host\Campus.PluginHost\Campus.PluginHost.csproj"
+             Targets="Build"
+             Properties="Configuration=$(Configuration)" />
+    <ItemGroup>
+      <PluginHostOutput Include="$(MSBuildThisFileDirectory)..\..\host\Campus.PluginHost\bin\$(Configuration)\net10.0\win-x64\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PluginHostOutput)"
+          DestinationFolder="$(OutDir)pluginhost\%(RecursiveDir)"
+          SkipUnchangedFiles="true"
+          Condition="'@(PluginHostOutput)' != ''" />
+  </Target>
 
 </Project>

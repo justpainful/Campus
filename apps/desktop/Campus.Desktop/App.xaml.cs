@@ -117,6 +117,12 @@ public partial class App : Application
         // Taking the workspace out, whole or in part.
         services.AddSingleton<ExportService>();
 
+        // Moving changes between devices, without anything in the middle.
+        services.AddSingleton<SyncService>();
+
+        // Extensions, each in a process of its own.
+        services.AddSingleton<ExtensionService>();
+
         return services.BuildServiceProvider();
     }
 

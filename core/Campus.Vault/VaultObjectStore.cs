@@ -50,6 +50,57 @@ public sealed class VaultObjectStore(VaultPaths paths, VaultKeyRing keys)
         return new PutResult(hash, data.Length, AlreadyExisted: false);
     }
 
+    /// <summary>
+    /// Stores whatever a stream produces, including streams that cannot be rewound.
+    ///
+    /// The address is the hash of the content, so the content has to be read once to know where
+    /// it goes and once more to write it. A stream that cannot be read twice — a socket, an entry
+    /// inside a zip — is spooled to a temporary file first. That file is deleted before this
+    /// returns, whatever happens.
+    /// </summary>
+    public async Task<PutResult> PutStreamAsync(Stream source, CancellationToken ct = default)
+    {
+        if (source.CanSeek)
+        {
+            var start = source.Position;
+            var hash = await VaultCrypto.Sha256HexAsync(source, ct).ConfigureAwait(false);
+            var length = source.Position - start;
+
+            if (Exists(hash)) return new PutResult(hash, length, AlreadyExisted: true);
+
+            source.Position = start;
+            await WriteObjectAsync(hash, source, length, ct).ConfigureAwait(false);
+            return new PutResult(hash, length, AlreadyExisted: false);
+        }
+
+        var spool = Path.Combine(Path.GetTempPath(), "campus-" + Guid.NewGuid().ToString("N") + ".spool");
+
+        try
+        {
+            long spooled;
+            await using (var buffer = new FileStream(
+                spool, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 81920,
+                FileOptions.DeleteOnClose | FileOptions.SequentialScan))
+            {
+                await source.CopyToAsync(buffer, ct).ConfigureAwait(false);
+                spooled = buffer.Length;
+
+                buffer.Position = 0;
+                var hash = await VaultCrypto.Sha256HexAsync(buffer, ct).ConfigureAwait(false);
+
+                if (Exists(hash)) return new PutResult(hash, spooled, AlreadyExisted: true);
+
+                buffer.Position = 0;
+                await WriteObjectAsync(hash, buffer, spooled, ct).ConfigureAwait(false);
+                return new PutResult(hash, spooled, AlreadyExisted: false);
+            }
+        }
+        finally
+        {
+            TryDelete(spool);
+        }
+    }
+
     private async Task WriteObjectAsync(string hash, Stream source, long length, CancellationToken ct)
     {
         var target = _paths.ObjectPath(_keys.BlindName(hash));

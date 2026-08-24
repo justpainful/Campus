@@ -190,7 +190,30 @@
                     </ScrollViewer>
                 </Grid>
 
-                <Frame x:Name="ContentFrame" Grid.Row="1" />
+                <!--
+                    The workspace splits into two panes on request. The second pane and its
+                    divider take no width until it is opened, so the ordinary case is one frame
+                    filling the space with nothing in the way.
+                -->
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition x:Name="SecondPaneColumn" Width="0" />
+                    </Grid.ColumnDefinitions>
+
+                    <Frame x:Name="ContentFrame" />
+
+                    <controls:SplitterBar
+                        x:Name="PaneGrip"
+                        Grid.Column="1"
+                        Orientation="Vertical"
+                        Visibility="Collapsed"
+                        Dragged="OnPaneResize"
+                        AutomationProperties.Name="Resize the second pane" />
+
+                    <Frame x:Name="SecondFrame" Grid.Column="2" Visibility="Collapsed" />
+                </Grid>
 
                 <!--
                     Notices float over the workspace rather than taking a row of their own, so

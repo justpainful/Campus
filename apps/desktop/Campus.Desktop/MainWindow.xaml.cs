@@ -1,4 +1,5 @@
 using Campus.Desktop.Design;
+using Campus.Desktop.Design.Icons;
 using Microsoft.UI.Input;
 using Campus.Desktop.Services;
 using Campus.Desktop.Shell;
@@ -20,6 +21,11 @@ public sealed partial class MainWindow : Window
     private double _sidebarWidth = 280;
     private CommandRegistry _commands = new();
     private readonly ShellRouter _router;
+    private WorkspaceTabs _tabs = null!;
+    private bool _splitOpen;
+    private double _secondPaneWidth = 520;
+    private bool _secondPaneActive;
+    private bool _studyMode;
     private bool _sidebarVisible = true;
     private bool _focusMode;
     private double _inspectorWidth = 300;
@@ -57,6 +63,16 @@ public sealed partial class MainWindow : Window
         Rail.DestinationInvoked += OnDestinationInvoked;
 
         Notifications.Attach(NoticeHost, DispatcherQueue);
+
+        // The workspace keeps a strip of what is open. Destinations and objects are both tabs;
+        // there is no second kind of "place you are".
+        _tabs = new WorkspaceTabs(Tabs, TabStrip);
+        _tabs.Activated += (_, tab) => Show(tab);
+        _tabs.Emptied += (_, _) => ActiveFrame.Content = null;
+
+        // Clicking in a pane makes it the one that receives what you open next.
+        ContentFrame.PointerPressed += (_, _) => _secondPaneActive = false;
+        SecondFrame.PointerPressed += (_, _) => _secondPaneActive = true;
 
         // Pages ask the shell to open things rather than reaching for the frame themselves.
         _router = App.GetService<ShellRouter>();
@@ -204,13 +220,37 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        ContentFrame.Navigate(
-            entity.Kind == ObjectKind.File ? typeof(Views.Viewers.ViewerHost) : typeof(ObjectDetailPage),
-            id);
+        var item = new ObjectItem(entity);
+
+        _tabs.Open(new WorkspaceTab
+        {
+            Key = "object:" + id.Value,
+            Title = entity.Title.Length > 0 ? entity.Title : "Untitled",
+            Symbol = item.Symbol,
+            PageType = entity.Kind switch
+            {
+                ObjectKind.File => typeof(Views.Viewers.ViewerHost),
+                ObjectKind.Thread => typeof(ThreadPage),
+                ObjectKind.Board => typeof(BoardPage),
+                ObjectKind.Subject => typeof(SubjectPage),
+                _ => typeof(ObjectDetailPage),
+            },
+            Parameter = id,
+        }, pinned: request.InNewTab);
     }
 
     /// <summary>Moves the shell to a destination. Used by pages whose counts link to a list.</summary>
     public void NavigateTo(string destinationId) => Navigate(destinationId);
+
+    /// <summary>The frame that receives what is opened next.</summary>
+    private Frame ActiveFrame => _splitOpen && _secondPaneActive ? SecondFrame : ContentFrame;
+
+    /// <summary>Puts a tab's page in the active frame.</summary>
+    private void Show(WorkspaceTab tab)
+    {
+        if (tab.Parameter is null) ActiveFrame.Navigate(tab.PageType);
+        else ActiveFrame.Navigate(tab.PageType, tab.Parameter);
+    }
 
     private void Navigate(string id, string? argument = null)
     {
@@ -220,57 +260,72 @@ public sealed partial class MainWindow : Window
         var destination = _destinations.FirstOrDefault(d => d.Id == id);
         SidebarTitle.Text = destination?.Title.ToUpperInvariant() ?? string.Empty;
 
-        // Only the pages that exist are wired up; the rest land on a placeholder that names
-        // what will live there rather than showing an empty frame.
-        switch (id)
+        // A destination is a tab like anything else, so switching to Notes and coming back to a
+        // file you were reading does not lose the file.
+        if (PageFor(id) is { } page)
         {
-            // Reachable directly so the whole theme can be reviewed without walking the UI.
-            case "gallery":
-                ContentFrame.Navigate(typeof(ThemeGalleryPage));
+            _tabs.Open(new WorkspaceTab
+            {
+                Key = "destination:" + id + (argument is null ? "" : ":" + argument),
+                Title = id == "gallery" ? "Theme" : destination?.Title ?? id,
+                Symbol = destination?.Symbol ?? CampusSymbols.File,
+                PageType = page,
+                Parameter = argument,
+            }, pinned: true);
+
+            if (id == "gallery")
+            {
                 SidebarTitle.Text = "THEME";
                 Rail.Select(ShellDestinations.Settings);
-                break;
-            case ShellDestinations.Settings:
-                // Navigated rather than assigned, so Settings can push the theme gallery and
-                // the gallery's back button has somewhere to go.
-                ContentFrame.Navigate(typeof(SettingsPage));
-                break;
-            case ShellDestinations.Home:
-                ContentFrame.Navigate(typeof(HomePage));
-                break;
-            case ShellDestinations.Subjects:
-                ContentFrame.Navigate(typeof(SubjectsPage));
-                break;
-            case ShellDestinations.Planner:
-                ContentFrame.Navigate(typeof(PlannerPage));
-                break;
-            case ShellDestinations.Files:
-                ContentFrame.Navigate(typeof(FilesPage));
-                break;
-            case ShellDestinations.Goals:
-                ContentFrame.Navigate(typeof(GoalsPage));
-                break;
-            case ShellDestinations.Boards:
-                ContentFrame.Navigate(typeof(BoardsPage));
-                break;
-            case ShellDestinations.Profile:
-                ContentFrame.Navigate(typeof(ProfilePage));
-                break;
-            case ShellDestinations.Search:
-                // The argument is a query the caller already has — from the palette, or from a
-                // saved search — so arriving here can land straight on results.
-                ContentFrame.Navigate(typeof(SearchPage), argument);
-                break;
+            }
+            return;
+        }
+
+        // Anything without a page yet lands on a placeholder that names what will live there
+        // rather than showing an empty frame.
+        switch (id)
+        {
             default:
-                // Most destinations are the same page over a different query.
                 if (CollectionCatalog.For(id) is { } collection)
-                    ContentFrame.Navigate(typeof(CollectionPage), collection);
+                {
+                    _tabs.Open(new WorkspaceTab
+                    {
+                        Key = "destination:" + id,
+                        Title = collection.Title,
+                        Symbol = collection.Symbol,
+                        PageType = typeof(CollectionPage),
+                        Parameter = collection,
+                    }, pinned: true);
+                }
                 else
-                    ContentFrame.Content = new PlaceholderPage(
+                {
+                    ActiveFrame.Content = new PlaceholderPage(
                         destination?.Title ?? id, destination?.Symbol ?? "file.unknown");
+                }
                 break;
         }
     }
+
+    /// <summary>
+    /// The page behind a destination, where one exists. Collections are handled separately
+    /// because they all share one page and differ only by the query they carry.
+    /// </summary>
+    private static Type? PageFor(string id) => id switch
+    {
+        "gallery" => typeof(ThemeGalleryPage),
+        ShellDestinations.Settings => typeof(SettingsPage),
+        ShellDestinations.Home => typeof(HomePage),
+        ShellDestinations.Subjects => typeof(SubjectsPage),
+        ShellDestinations.Planner => typeof(PlannerPage),
+        ShellDestinations.Files => typeof(FilesPage),
+        ShellDestinations.Goals => typeof(GoalsPage),
+        ShellDestinations.Boards => typeof(BoardsPage),
+        ShellDestinations.Profile => typeof(ProfilePage),
+        ShellDestinations.Search => typeof(SearchPage),
+        ShellDestinations.Sync => typeof(SyncPage),
+        ShellDestinations.Extensions => typeof(ExtensionsPage),
+        _ => null,
+    };
 
     private void OnRootKeyDown(object sender, KeyRoutedEventArgs e)
     {
@@ -305,6 +360,35 @@ public sealed partial class MainWindow : Window
         if (e.Key == VirtualKey.B)
         {
             ToggleSidebar();
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == VirtualKey.W)
+        {
+            _tabs.CloseActive();
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == VirtualKey.Tab)
+        {
+            _tabs.Cycle(shift ? -1 : 1);
+            e.Handled = true;
+            return;
+        }
+
+        // Ctrl+\ splits the workspace, matching the editor this borrows the idea from.
+        if (e.Key == (VirtualKey)0xDC)
+        {
+            ToggleSplit();
+            e.Handled = true;
+            return;
+        }
+
+        if (shift && e.Key == VirtualKey.D)
+        {
+            ToggleStudyMode();
             e.Handled = true;
             return;
         }
@@ -378,6 +462,61 @@ public sealed partial class MainWindow : Window
             StatusBar.Visibility = Visibility.Visible;
             if (_sidebarWasVisible && !_sidebarVisible) ToggleSidebar();
             if (_inspectorWasVisible) SetInspectorVisible(true);
+        }
+    }
+
+    /// <summary>
+    /// Opens or closes the second pane. Splitting shows what is already open on both sides, so
+    /// the split itself never loses your place — you close one side when you know what belongs
+    /// there.
+    /// </summary>
+    public void ToggleSplit()
+    {
+        _splitOpen = !_splitOpen;
+
+        SecondFrame.Visibility = _splitOpen ? Visibility.Visible : Visibility.Collapsed;
+        PaneGrip.Visibility = SecondFrame.Visibility;
+        SecondPaneColumn.Width = new GridLength(_splitOpen ? _secondPaneWidth : 0);
+
+        if (_splitOpen && _tabs.Active is { } tab)
+        {
+            _secondPaneActive = true;
+            Show(tab);
+            _secondPaneActive = false;
+        }
+        else
+        {
+            SecondFrame.Content = null;
+            _secondPaneActive = false;
+        }
+    }
+
+    private void OnPaneResize(object? sender, double delta)
+    {
+        // The second pane grows leftwards, so dragging right makes it narrower.
+        _secondPaneWidth = Math.Clamp(_secondPaneWidth - delta, 320, 1200);
+        SecondPaneColumn.Width = new GridLength(_secondPaneWidth);
+    }
+
+    /// <summary>
+    /// Study mode: the window fills the screen and everything except what is being read gets out
+    /// of the way. Distinct from focus mode only in that it takes the whole display, which is the
+    /// difference between concentrating and revising.
+    /// </summary>
+    public void ToggleStudyMode()
+    {
+        _studyMode = !_studyMode;
+
+        if (_studyMode)
+        {
+            if (!_focusMode) ToggleFocusMode();
+            AppWindow.SetPresenter(Microsoft.UI.Windowing.AppWindowPresenterKind.FullScreen);
+            Notifications.Show("Study mode. Ctrl+Shift+D to leave.");
+        }
+        else
+        {
+            AppWindow.SetPresenter(Microsoft.UI.Windowing.AppWindowPresenterKind.Default);
+            if (_focusMode) ToggleFocusMode();
         }
     }
 

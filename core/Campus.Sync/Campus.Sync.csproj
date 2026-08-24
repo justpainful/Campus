@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>$(CampusLibraryTargetFramework)</TargetFramework>
+    <RootNamespace>Campus.Sync</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Campus.Domain\Campus.Domain.csproj" />
+    <ProjectReference Include="..\Campus.Vault\Campus.Vault.csproj" />
+    <ProjectReference Include="..\Campus.Storage\Campus.Storage.csproj" />
+  </ItemGroup>
+</Project>

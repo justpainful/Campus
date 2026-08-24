@@ -63,6 +63,8 @@ public sealed partial class ObjectDetailPage : Page
         Load();
         await _workspace.Objects.MarkOpenedAsync(id);
         await LoadHistoryAsync();
+        await LoadLinksAsync();
+        await LoadVersionsAsync();
     }
 
     protected override async void OnNavigatedFrom(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
@@ -488,6 +490,234 @@ public sealed partial class ObjectDetailPage : Page
         NewTagBox.Focus(FocusState.Programmatic);
     }
 
+    // -------------------------------------------------------------------------- links
+
+    /// <summary>
+    /// Shows what this object points at and what points back at it. Both directions come from
+    /// the same table read two ways, which is why a backlink can never be one-sided.
+    /// </summary>
+    private async Task LoadLinksAsync()
+    {
+        LinkList.Children.Clear();
+        if (_model is null) return;
+
+        var links = await _workspace.Relations.AllAsync(_model.Id);
+
+        if (links.Count == 0)
+        {
+            LinkList.Children.Add(new TextBlock
+            {
+                Text = "Nothing linked yet. Typing [[a title]] in the notes links to it too.",
+                Style = (Style)Application.Current.Resources["Text.Footnote"],
+            });
+            return;
+        }
+
+        foreach (var link in links.OrderBy(l => l.IsIncoming).ThenBy(l => l.Title))
+            LinkList.Children.Add(BuildLinkRow(link));
+    }
+
+    private FrameworkElement BuildLinkRow(Storage.RelatedObject link)
+    {
+        var row = new Grid { ColumnSpacing = 10 };
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+        // The arrow says which way the link runs: out of this object, or into it.
+        row.Children.Add(new CampusIcon
+        {
+            Symbol = link.IsIncoming ? CampusSymbols.ArrowLeft : CampusSymbols.ArrowRight,
+            IconSize = 14,
+            Foreground = (Brush)Application.Current.Resources[ThemeTokens.Label.Quaternary],
+            VerticalAlignment = VerticalAlignment.Center,
+        });
+
+        var text = new StackPanel { Spacing = 0, VerticalAlignment = VerticalAlignment.Center };
+        text.Children.Add(new TextBlock
+        {
+            Text = link.Title,
+            FontSize = 13.5,
+            Foreground = (Brush)Application.Current.Resources[ThemeTokens.Label.Primary],
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            TextWrapping = TextWrapping.NoWrap,
+        });
+        text.Children.Add(new TextBlock
+        {
+            Text = link.Relation.IsDerived
+                ? $"{link.Kind} - from the text"
+                : $"{link.Kind} - {link.Relation.Kind}",
+            Style = (Style)Application.Current.Resources["Text.Caption"],
+        });
+        Grid.SetColumn(text, 1);
+        row.Children.Add(text);
+
+        var unlink = new Button
+        {
+            Style = (Style)Application.Current.Resources["Button.Icon"],
+            Content = new CampusIcon
+            {
+                Symbol = CampusSymbols.Close,
+                IconSize = 13,
+                Foreground = (Brush)Application.Current.Resources[ThemeTokens.Label.Tertiary],
+            },
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        AutomationProperties.SetName(unlink, "Remove this link");
+        unlink.Click += async (_, _) =>
+        {
+            await _workspace.Relations.UnlinkAsync(link.Relation.Id);
+            await LoadLinksAsync();
+        };
+        Grid.SetColumn(unlink, 2);
+        row.Children.Add(unlink);
+
+        var button = new Button
+        {
+            Style = (Style)Application.Current.Resources["Button.Plain"],
+            Padding = new Thickness(8, 6, 4, 6),
+            HorizontalContentAlignment = HorizontalAlignment.Stretch,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            CornerRadius = (CornerRadius)Application.Current.Resources["Theme.Radius.S"],
+            Content = row,
+        };
+
+        AutomationProperties.SetName(button, link.Title);
+        button.Click += (_, _) => App.GetService<ShellRouter>().Open(link.OtherId);
+        return button;
+    }
+
+    /// <summary>
+    /// Links to something by name. Searching rather than listing everything: a workspace with a
+    /// thousand objects cannot offer a dropdown, and the title is what a person remembers.
+    /// </summary>
+    private async void OnAddLinkClick(object sender, RoutedEventArgs e)
+    {
+        if (_model is null || !_workspace.IsUnlocked) return;
+
+        var box = new AutoSuggestBox
+        {
+            PlaceholderText = "Start typing a title",
+            Width = 360,
+        };
+
+        CampusId? chosen = null;
+
+        box.TextChanged += async (_, args) =>
+        {
+            if (args.Reason != AutoSuggestionBoxTextChangeReason.UserInput) return;
+
+            var hits = await _workspace.Search.SearchAsync(box.Text, limit: 8);
+            box.ItemsSource = hits
+                .Where(h => h.Object.Id != _model.Id)
+                .Select(h => h.Object)
+                .ToList();
+            box.DisplayMemberPath = nameof(CampusObject.Title);
+        };
+
+        box.SuggestionChosen += (_, args) =>
+        {
+            if (args.SelectedItem is CampusObject match)
+            {
+                chosen = match.Id;
+                box.Text = match.Title;
+            }
+        };
+
+        var dialog = new ContentDialog
+        {
+            XamlRoot = XamlRoot,
+            Title = "Link to something",
+            Content = box,
+            PrimaryButtonText = "Link",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary,
+        };
+
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
+
+        // Falling back to an exact title match means typing the whole name and pressing Link
+        // works even without picking from the list.
+        chosen ??= await _workspace.Relations.FindByTitleAsync(box.Text.Trim());
+
+        if (chosen is not { } target)
+        {
+            Notifications.Show("Nothing here has that title.", NoticeKind.Warning);
+            return;
+        }
+
+        await _workspace.Relations.LinkAsync(_model.Id, target);
+        await _workspace.History.RecordAsync(_model.Id, "linked");
+        await LoadLinksAsync();
+    }
+
+    // ----------------------------------------------------------------------- versions
+
+    private async Task LoadVersionsAsync()
+    {
+        VersionList.Children.Clear();
+        if (_model is null) return;
+
+        var versions = await App.GetService<VersionService>().ListAsync(_model.Id);
+
+        VersionSection.Visibility = versions.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+        foreach (var version in versions.Take(12))
+            VersionList.Children.Add(BuildVersionRow(version));
+    }
+
+    private FrameworkElement BuildVersionRow(ObjectVersion version)
+    {
+        var row = new Grid { ColumnSpacing = 10, Padding = new Thickness(8, 6, 8, 6) };
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+        var text = new StackPanel { Spacing = 0 };
+        text.Children.Add(new TextBlock
+        {
+            Text = version.Label is { Length: > 0 } label
+                ? $"Version {version.VersionNumber} - {label}"
+                : $"Version {version.VersionNumber}",
+            FontSize = 13.5,
+            Foreground = (Brush)Application.Current.Resources[ThemeTokens.Label.Primary],
+        });
+        text.Children.Add(new TextBlock
+        {
+            Text = version.CreatedAt.ToLocalTime().ToString("d MMM, HH:mm")
+                 + "  " + ObjectItem.FormatSize(version.SizeBytes),
+            Style = (Style)Application.Current.Resources["Text.Caption"],
+        });
+        row.Children.Add(text);
+
+        var restore = new Button
+        {
+            Style = (Style)Application.Current.Resources["Button.Secondary"],
+            Content = "Restore",
+            MinWidth = 0,
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        restore.Click += async (_, _) =>
+        {
+            if (_model is null) return;
+
+            if (!await ObjectCommands.ConfirmAsync(XamlRoot,
+                $"Restore version {version.VersionNumber}?",
+                "The text as it is now is kept as a version first, so this can be undone.",
+                "Restore")) return;
+
+            if (await App.GetService<VersionService>().RestoreAsync(_model, version))
+            {
+                Load();
+                await LoadVersionsAsync();
+                Notifications.Show("Restored.", NoticeKind.Success);
+            }
+        };
+        Grid.SetColumn(restore, 1);
+        row.Children.Add(restore);
+
+        return row;
+    }
+
     // ------------------------------------------------------------------------ history
 
     private async Task LoadHistoryAsync()
@@ -597,9 +827,16 @@ public sealed partial class ObjectDetailPage : Page
 
         await _workspace.Objects.SaveAsync(_model);
 
+        // Keeping a copy of what the body used to be, and turning any [[title]] typed into it
+        // into a real link. Both are no-ops when the text has not changed.
+        await App.GetService<VersionService>().SnapshotAsync(_model);
+        await _workspace.Relations.SyncDerivedLinksAsync(_model.Id, BodyBox.Text);
+
         UpdateSubtitle();
         Flash("Saved");
         await LoadHistoryAsync();
+        await LoadLinksAsync();
+        await LoadVersionsAsync();
     }
 
     private void Flash(string message)

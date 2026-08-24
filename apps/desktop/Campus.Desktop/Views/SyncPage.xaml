@@ -1,0 +1,72 @@
+<Page
+    x:Class="Campus.Desktop.Views.SyncPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Campus.Desktop.Design.Controls"
+    xmlns:icons="using:Campus.Desktop.Design.Icons"
+    Background="{ThemeResource Theme.GroupedBackground.Primary}">
+
+    <!--
+        Sync without a server. Two devices exchange the part of the change log the other has not
+        seen — over a cable, a folder, or the local network. Nothing leaves the two machines, and
+        nothing announces either of them to anyone.
+    -->
+    <ScrollViewer>
+        <StackPanel Padding="28,24,28,48" Spacing="24" MaxWidth="760" HorizontalAlignment="Left">
+
+            <StackPanel Spacing="2">
+                <TextBlock Text="Sync" Style="{StaticResource Text.LargeTitle}" />
+                <TextBlock x:Name="Subtitle" Style="{StaticResource Text.Footnote}" />
+            </StackPanel>
+
+            <Border Style="{StaticResource Surface.Section}" Padding="18">
+                <StackPanel Spacing="10">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <icons:CampusIcon Symbol="cloud.off" IconSize="20"
+                                          Foreground="{ThemeResource Theme.Label.Secondary}"
+                                          VerticalAlignment="Center" />
+                        <TextBlock Text="No account, no server, no cloud"
+                                   Style="{StaticResource Text.Headline}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Style="{StaticResource Text.Footnote}" TextWrapping="Wrap"
+                               Text="Your devices exchange changes directly. A bundle carries only what the other device has not seen, encrypted with a key both sides work out from a code you type once. Campus never listens on the network unless you are on this page and have asked it to." />
+                </StackPanel>
+            </Border>
+
+            <StackPanel Spacing="10">
+                <Grid>
+                    <TextBlock Text="DEVICES" Style="{StaticResource Text.SectionHeader}"
+                               VerticalAlignment="Center" />
+                    <Button HorizontalAlignment="Right" Style="{StaticResource Button.Secondary}"
+                            Content="Pair a device" Click="OnPairClick" MinWidth="0" />
+                </Grid>
+                <Border Style="{StaticResource Surface.Section}" Padding="4">
+                    <StackPanel x:Name="DeviceList" />
+                </Border>
+            </StackPanel>
+
+            <StackPanel x:Name="ConflictSection" Spacing="10" Visibility="Collapsed">
+                <TextBlock Text="NEEDS A DECISION" Style="{StaticResource Text.SectionHeader}" />
+                <Border Style="{StaticResource Surface.Section}" Padding="4">
+                    <StackPanel x:Name="ConflictList" />
+                </Border>
+                <TextBlock Style="{StaticResource Text.Footnote}" TextWrapping="Wrap"
+                           Text="Both devices changed these since they last agreed. Campus will not guess which one you meant." />
+            </StackPanel>
+
+            <controls:SettingsSection x:Name="TransferSection" Header="TRANSFER"
+                                      Footer="A bundle is a file. Put it on a stick, drop it in a shared folder, or send it straight over the local network — the contents are the same either way." />
+
+            <Border x:Name="StatusPanel" Style="{StaticResource Surface.Section}"
+                    Padding="16" Visibility="Collapsed">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <ProgressRing x:Name="StatusRing" IsActive="True" Width="20" Height="20" />
+                    <TextBlock x:Name="StatusText" Style="{StaticResource Text.Callout}"
+                               VerticalAlignment="Center" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

@@ -58,16 +58,11 @@ public sealed class ObjectRepository(CampusDatabase database, string deviceId)
 
     // ----------------------------------------------------------------------- writes
 
-    /// <summary>Inserts or updates an object, keeping tags, search and the journal in step.</summary>
-    public async Task SaveAsync(CampusObject entity, CancellationToken ct = default)
-    {
-        entity.UpdatedAt = DateTimeOffset.UtcNow;
-
-        await _db.InTransactionAsync(async () =>
-        {
-            var existed = await ExistsAsync(entity.Id, ct).ConfigureAwait(false);
-
-            await using (var command = _db.CreateCommand("""
+    /// <summary>
+    /// The one statement that writes an object. Shared by local saves and by changes arriving
+    /// from another device, so the two can never drift apart in what they persist.
+    /// </summary>
+    private const string UpsertSql = """
                 INSERT INTO objects (
                     id, kind, title, summary, subject_id, parent_id, status, priority,
                     created_at, updated_at, due_at, completed_at, deleted_at, opened_at,
@@ -101,7 +96,18 @@ public sealed class ObjectRepository(CampusDatabase database, string deviceId)
                     sort_order = excluded.sort_order,
                     payload = excluded.payload,
                     metadata = excluded.metadata;
-                """))
+        """;
+
+    /// <summary>Inserts or updates an object, keeping tags, search and the journal in step.</summary>
+    public async Task SaveAsync(CampusObject entity, CancellationToken ct = default)
+    {
+        entity.UpdatedAt = DateTimeOffset.UtcNow;
+
+        await _db.InTransactionAsync(async () =>
+        {
+            var existed = await ExistsAsync(entity.Id, ct).ConfigureAwait(false);
+
+            await using (var command = _db.CreateCommand(UpsertSql))
             {
                 Bind(command, entity);
                 await command.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
@@ -112,6 +118,90 @@ public sealed class ObjectRepository(CampusDatabase database, string deviceId)
             await AppendJournalAsync(
                 existed ? ChangeOperation.Update : ChangeOperation.Create, entity, ct).ConfigureAwait(false);
         }, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>What happened when a change from another device was applied.</summary>
+    public enum ApplyOutcome
+    {
+        /// <summary>The object was new here, or the incoming version was newer.</summary>
+        Applied,
+
+        /// <summary>Our copy was already newer, so nothing changed.</summary>
+        Ignored,
+
+        /// <summary>Both sides changed since they last agreed. The caller decides.</summary>
+        Conflicted,
+    }
+
+    /// <summary>
+    /// Applies a change that arrived from another device.
+    ///
+    /// Last-writer-wins on the timestamp, with one exception that matters: if both sides changed
+    /// the same object since they last spoke, that is reported as a conflict rather than resolved
+    /// silently. Losing a paragraph you wrote on the train because the laptop happened to save a
+    /// second later is exactly the failure Campus must not have.
+    ///
+    /// The journal entry keeps the originating device's name, which is what stops the change
+    /// being sent back to the device it came from.
+    /// </summary>
+    public async Task<ApplyOutcome> ApplyRemoteAsync(
+        CampusObject incoming,
+        string fromDeviceId,
+        DateTimeOffset lastAgreedAt,
+        ChangeOperation operation = ChangeOperation.Update,
+        CancellationToken ct = default)
+    {
+        var existing = await GetAsync(incoming.Id, ct).ConfigureAwait(false);
+
+        if (existing is not null)
+        {
+            if (existing.UpdatedAt > incoming.UpdatedAt && existing.UpdatedAt > lastAgreedAt)
+                return ApplyOutcome.Conflicted;
+
+            if (existing.UpdatedAt >= incoming.UpdatedAt) return ApplyOutcome.Ignored;
+        }
+
+        await _db.InTransactionAsync(async () =>
+        {
+            if (operation == ChangeOperation.Delete)
+            {
+                await RemoveFromIndexAsync(incoming.Id, ct).ConfigureAwait(false);
+
+                await using var delete = _db.CreateCommand("DELETE FROM objects WHERE id = @id;");
+                delete.Parameters.AddWithValue("@id", incoming.Id.Value);
+                await delete.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+            }
+            else
+            {
+                await using (var command = _db.CreateCommand(UpsertSql))
+                {
+                    Bind(command, incoming);
+                    await command.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+                }
+
+                await ReplaceTagsAsync(incoming, ct).ConfigureAwait(false);
+
+                if (incoming.DeletedAt is null) await IndexAsync(incoming, ct).ConfigureAwait(false);
+                else await RemoveFromIndexAsync(incoming.Id, ct).ConfigureAwait(false);
+            }
+
+            await using var journal = _db.CreateCommand("""
+                INSERT INTO journal (operation, entity_type, entity_id, at, device_id, snapshot, content_hash)
+                VALUES (@op, 'object', @id, @at, @device, @snapshot, @hash);
+                """);
+
+            journal.Parameters.AddWithValue("@op", (int)operation);
+            journal.Parameters.AddWithValue("@id", incoming.Id.Value);
+            journal.Parameters.AddWithValue("@at", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            journal.Parameters.AddWithValue("@device", fromDeviceId);
+            journal.Parameters.AddWithValue("@snapshot", PayloadSerializer.SerializeSnapshot(incoming));
+            journal.Parameters.AddWithValue("@hash",
+                (object?)(incoming.PayloadAs<FilePayload>()?.ContentHash) ?? DBNull.Value);
+
+            await journal.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+        }, ct).ConfigureAwait(false);
+
+        return ApplyOutcome.Applied;
     }
 
     /// <summary>Moves an object to the trash. Nothing is destroyed until it is emptied.</summary>

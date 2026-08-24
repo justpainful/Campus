@@ -1,0 +1,54 @@
+<Page
+    x:Class="Campus.Desktop.Views.ExtensionsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Campus.Desktop.Design.Controls"
+    xmlns:icons="using:Campus.Desktop.Design.Icons"
+    Background="{ThemeResource Theme.GroupedBackground.Primary}">
+
+    <!--
+        Extensions, and what each one is allowed to do. The permissions are listed on the card
+        rather than hidden behind a dialog nobody opens twice.
+    -->
+    <ScrollViewer>
+        <StackPanel Padding="28,24,28,48" Spacing="24" MaxWidth="760" HorizontalAlignment="Left">
+
+            <Grid>
+                <StackPanel Spacing="2" VerticalAlignment="Center">
+                    <TextBlock Text="Extensions" Style="{StaticResource Text.LargeTitle}" />
+                    <TextBlock x:Name="Subtitle" Style="{StaticResource Text.Footnote}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="8"
+                            HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button Style="{StaticResource Button.Secondary}" Click="OnFolderClick"
+                            Content="From folder" MinWidth="0" />
+                    <Button Style="{StaticResource Button.Primary}" Click="OnInstallClick"
+                            Content="Install…" MinWidth="0" />
+                </StackPanel>
+            </Grid>
+
+            <Border Style="{StaticResource Surface.Section}" Padding="18">
+                <StackPanel Spacing="10">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <icons:CampusIcon Symbol="shield" IconSize="20"
+                                          Foreground="{ThemeResource Theme.Label.Secondary}"
+                                          VerticalAlignment="Center" />
+                        <TextBlock Text="Extensions run outside Campus"
+                                   Style="{StaticResource Text.Headline}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Style="{StaticResource Text.Footnote}" TextWrapping="Wrap"
+                               Text="Each one runs in a process of its own, with no access to your keys and nothing it did not ask for. If one stops working, it stops working — your workspace stays open." />
+                </StackPanel>
+            </Border>
+
+            <controls:SettingsSection x:Name="InstalledSection" Header="INSTALLED"
+                                      Visibility="Collapsed" />
+
+            <controls:SettingsSection x:Name="BuiltInSection" Header="BUILT INTO CAMPUS"
+                                      Footer="These are the readers and tools Campus ships with. They can be turned off, but not removed." />
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>
