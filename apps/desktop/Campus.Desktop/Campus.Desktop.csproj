@@ -18,6 +18,11 @@
     <SelfContained>true</SelfContained>
     <DefaultLanguage>en-US</DefaultLanguage>
     <ApplicationIcon>Assets\Campus.ico</ApplicationIcon>
+    <!--
+      English only. The Windows App SDK ships translations for ninety languages, which is ninety
+      folders and a hundred megabytes for strings Campus does not use — it draws its own text.
+    -->
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,16 +52,14 @@
   </ItemGroup>
 
   <!--
-    The plugin host ships beside the app in a folder of its own, so an extension's dependencies
-    can never be resolved out of Campus's own directory by accident.
-  -->
-  <!--
-    The indexer ships beside the app too. It is a separate program so that a malformed document
-    cannot take the workspace down with it.
-  -->
-  <!--
-    The background service ships beside the app. It is the only part of Campus allowed to be
-    running when Campus is not, and it holds no keys.
+    Campus ships with three small programs beside it, each in a folder of its own.
+
+      service      the only part allowed to run when Campus is not, and it holds no keys
+      indexer      reads documents in a process that can crash without taking the app down
+      pluginhost   runs one extension, isolated from everything
+
+    They are built through MSBuild rather than referenced: a self-contained application cannot
+    reference another executable, and these are separate programs rather than libraries.
   -->
   <Target Name="CopyService" AfterTargets="Build">
     <MSBuild Projects="$(MSBuildThisFileDirectory)..\..\host\Campus.Service\Campus.Service.csproj"
@@ -85,10 +88,6 @@
   </Target>
 
   <Target Name="CopyPluginHost" AfterTargets="Build">
-    <!--
-      Built through MSBuild rather than referenced: a self-contained app cannot reference another
-      executable, and the host is a separate program rather than a library this one links to.
-    -->
     <MSBuild Projects="$(MSBuildThisFileDirectory)..\..\host\Campus.PluginHost\Campus.PluginHost.csproj"
              Targets="Build"
              Properties="Configuration=$(Configuration)" />
@@ -99,6 +98,66 @@
           DestinationFolder="$(OutDir)pluginhost\%(RecursiveDir)"
           SkipUnchangedFiles="true"
           Condition="'@(PluginHostOutput)' != ''" />
+  </Target>
+
+  <!--
+    The emoji artwork pack, if one is installed.
+
+    Not listed as Content: a pack is nearly four thousand files, and enumerating them as items
+    makes every build slower for something that changes when a pack is installed and never again.
+    It is also optional — Campus draws no emoji at all without one, and says so.
+  -->
+  <Target Name="CopyEmojiPacks" AfterTargets="Build"
+          Condition="Exists('$(MSBuildThisFileDirectory)Assets\emoji-packs')">
+    <ItemGroup>
+      <EmojiPackFiles Include="$(MSBuildThisFileDirectory)Assets\emoji-packs\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(EmojiPackFiles)"
+          DestinationFolder="$(OutDir)Assets\emoji-packs\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <!--
+    Publishing copies the build's output but not what was put beside it afterwards, so everything
+    the three targets above produced is carried across here. Without this the published app is
+    missing its helpers and its emoji, which is exactly the difference between a build that runs
+    on this machine and one that runs on somebody else's.
+  -->
+  <Target Name="CopyCompanionsToPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <ServiceFiles Include="$(OutDir)service\**\*.*" />
+      <IndexerFiles Include="$(OutDir)indexer\**\*.*" />
+      <PluginHostFiles Include="$(OutDir)pluginhost\**\*.*" />
+      <PackFiles Include="$(OutDir)Assets\emoji-packs\**\*.*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(ServiceFiles)" SkipUnchangedFiles="true"
+          DestinationFolder="$(PublishDir)service\%(RecursiveDir)"
+          Condition="'@(ServiceFiles)' != ''" />
+    <Copy SourceFiles="@(IndexerFiles)" SkipUnchangedFiles="true"
+          DestinationFolder="$(PublishDir)indexer\%(RecursiveDir)"
+          Condition="'@(IndexerFiles)' != ''" />
+    <Copy SourceFiles="@(PluginHostFiles)" SkipUnchangedFiles="true"
+          DestinationFolder="$(PublishDir)pluginhost\%(RecursiveDir)"
+          Condition="'@(PluginHostFiles)' != ''" />
+    <Copy SourceFiles="@(PackFiles)" SkipUnchangedFiles="true"
+          DestinationFolder="$(PublishDir)Assets\emoji-packs\%(RecursiveDir)"
+          Condition="'@(PackFiles)' != ''" />
+  </Target>
+
+  <!--
+    Native debug symbols are not shipped.
+
+    SkiaSharp's own .pdb is eighty-five megabytes, twice over, and it is of no use to anybody who
+    is not debugging SkiaSharp. Campus's own symbols stay, because a stack trace without line
+    numbers is a stack trace nobody can act on.
+  -->
+  <Target Name="DropNativeSymbols" AfterTargets="CopyCompanionsToPublish">
+    <ItemGroup>
+      <NativeSymbols Include="$(PublishDir)**\libSkiaSharp.pdb" />
+      <NativeSymbols Include="$(PublishDir)**\pdfium.pdb" />
+    </ItemGroup>
+    <Delete Files="@(NativeSymbols)" ContinueOnError="true" />
   </Target>
 
 </Project>

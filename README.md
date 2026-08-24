@@ -57,6 +57,17 @@ To run it:
 dotnet run --project apps/desktop/Campus.Desktop/Campus.Desktop.csproj
 ```
 
+To build the thing you actually keep — one folder, no installer, no runtime to install first:
+
+```bash
+dotnet publish apps/desktop/Campus.Desktop/Campus.Desktop.csproj -c Release -r win-x64 --self-contained true -o publish/win-x64
+```
+
+That folder is about 590 MB, and most of it is four copies of the .NET runtime: Campus and its
+three helpers each carry their own, which is what makes the isolation real on a machine that has
+never had .NET installed. `Campus.exe` is at the top; `service`, `indexer` and `pluginhost` sit
+beside it, and `Assets/emoji-packs` holds the artwork if a pack has been built.
+
 A throwaway workspace full of invented content — six subjects, a week of homework — in its own
 directory, never touching the real one. The title bar says **SAMPLE DATA** the whole time it is
 open, so it cannot be mistaken for yours:
