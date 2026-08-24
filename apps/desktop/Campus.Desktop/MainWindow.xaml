@@ -52,6 +52,21 @@
                     IconSize="{StaticResource Theme.Icon.S}"
                     Foreground="{ThemeResource Theme.Label.Tertiary}"
                     VerticalAlignment="Center" />
+                <Border
+                    x:Name="SampleBadge"
+                    Visibility="Collapsed"
+                    Background="{ThemeResource Theme.Warning.Subtle}"
+                    CornerRadius="{StaticResource Theme.Radius.XS}"
+                    Padding="7,1,7,1"
+                    Margin="0,0,4,0">
+                    <TextBlock
+                        Text="SAMPLE DATA"
+                        FontFamily="{StaticResource Theme.Font.Small}"
+                        FontSize="{StaticResource Theme.Text.Caption2}"
+                        FontWeight="SemiBold"
+                        CharacterSpacing="40"
+                        Foreground="{ThemeResource Theme.Warning.Primary}" />
+                </Border>
                 <TextBlock
                     x:Name="WorkspaceLabel"
                     Text="Campus Workspace"

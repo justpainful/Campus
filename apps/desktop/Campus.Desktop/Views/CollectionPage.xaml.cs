@@ -53,6 +53,13 @@ public sealed partial class CollectionPage : Page
         await ReloadAsync();
     }
 
+    protected override async void OnNavigatingFrom(
+        Microsoft.UI.Xaml.Navigation.NavigatingCancelEventArgs e)
+    {
+        base.OnNavigatingFrom(e);
+        await Task.CompletedTask;
+    }
+
     protected override void OnNavigatedFrom(NavigationEventArgs e)
     {
         base.OnNavigatedFrom(e);
@@ -241,12 +248,10 @@ public sealed partial class CollectionPage : Page
         await ReloadAsync();
     }
 
-    private async void OnItemClick(object sender, ItemClickEventArgs e)
+    private void OnItemClick(object sender, ItemClickEventArgs e)
     {
-        if (e.ClickedItem is not ObjectItem item) return;
-        if (!_workspace.IsUnlocked) return;
-
-        await _workspace.Objects.MarkOpenedAsync(item.Id);
+        if (e.ClickedItem is not ObjectItem item || !_workspace.IsUnlocked) return;
+        Frame?.Navigate(typeof(ObjectDetailPage), item.Id);
     }
 
     // -------------------------------------------------- template helper functions

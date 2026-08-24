@@ -49,11 +49,16 @@ To run it:
 dotnet run --project apps/desktop/Campus.Desktop/Campus.Desktop.csproj
 ```
 
-A throwaway workspace with sample content, in its own directory, never touching the real one:
+A throwaway workspace full of invented content — six subjects, a week of homework — in its own
+directory, never touching the real one. The title bar says **SAMPLE DATA** the whole time it is
+open, so it cannot be mistaken for yours:
 
 ```bash
 dotnet run --project apps/desktop/Campus.Desktop/Campus.Desktop.csproj -- --dev-workspace
 ```
+
+To be rid of it, delete `%LOCALAPPDATA%\Campus\DevWorkspace`. Your real workspace lives in
+`%LOCALAPPDATA%\Campus\Vault` and is never touched by that flag.
 
 The iOS app builds on a macOS runner in CI; locally it needs Xcode 16 and XcodeGen:
 

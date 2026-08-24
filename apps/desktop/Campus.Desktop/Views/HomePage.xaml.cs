@@ -24,6 +24,10 @@ public sealed partial class HomePage : Page
     {
         InitializeComponent();
         SizeChanged += OnSizeChanged;
+
+        AttachRowClick(UpcomingList);
+        AttachRowClick(InboxList);
+        AttachRowClick(ContinueList);
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -131,6 +135,16 @@ public sealed partial class HomePage : Page
             Sort = SortField.OpenedAt,
             Limit = 4,
         });
+    }
+
+    /// <summary>Makes a Home row open its object, the same as a row in any list.</summary>
+    private void AttachRowClick(ItemsControl list)
+    {
+        list.Tapped += (sender, args) =>
+        {
+            if (args.OriginalSource is not FrameworkElement { DataContext: ObjectItem item }) return;
+            Frame?.Navigate(typeof(ObjectDetailPage), item.Id);
+        };
     }
 
     private async Task FillAsync(ItemsControl list, UIElement empty, CampusQuery query)

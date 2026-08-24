@@ -93,7 +93,7 @@
 - [x] U-02 Activity Bar (left rail) with all destinations
 - [x] U-03 Primary Sidebar (collapsible, resizable, per-destination content)
 - [ ] U-04 Workspace area with tab strip
-- [~] U-05 Inspector panel (right, collapsible)
+- [~] U-05 Inspector panel (right, collapsible) — detail page ships; inspector still empty
 - [x] U-06 Status Bar
 - [ ] U-07 Tabs: pin, preview mode, reopen closed, drag-reorder, overflow
 - [ ] U-08 Split view: right / down, nested, drag-to-split
@@ -104,15 +104,17 @@
 - [~] U-13 Context menus (full action set on every object)
 - [ ] U-14 Drag & drop from Explorer, between panes, onto destinations
 - [~] U-15 Toast / notification surface
-- [~] U-16 Empty states, loading states, error states
+- [x] U-16 Empty states, loading states, error states
 - [x] U-17 Focus Mode
 - [ ] U-18 Study / Presentation Mode with session timer
 
 ## P1 — Core Features
 
+- [x] C-00 Object detail page — every field editable in place, autosaving, with history
+
 - [x] C-01 Home dashboard (today, upcoming, continue, recent, quick capture, print queue)
 - [x] C-02 Inbox + triage → convert to any object type
-- [ ] C-03 Subjects (CRUD, colors, teachers, per-subject overview)
+- [~] C-03 Subjects (CRUD, colors, teachers, per-subject overview)
 - [x] C-04 Virtual Collections (query-backed, not folders)
 - [ ] C-05 Smart Collections with saved queries
 - [x] C-06 Library (textbooks, solved books, references, explanations)
@@ -123,16 +125,16 @@
 - [x] C-11 Print Center (To Print / Printed / Archive, queue, page counts, drag-in)
 - [x] C-12 Links (YouTube / Telegram / web, metadata fetch, thumbnails, collections)
 - [ ] C-13 Boards + Threads (Discord-forum-style academic objects)
-- [~] C-14 Tags + tag management
+- [x] C-14 Tags + tag management
 - [ ] C-15 Relations + Backlinks (`[[wiki-links]]`)
 - [ ] C-16 Academic Profile (About Me, school, year, term)
 - [ ] C-17 Goals + progress tracking
 - [ ] C-18 Planner (Day / Week / Month / Term) + School Timeline
 - [~] C-19 Files tree view (virtual, not disk-mirrored)
-- [~] C-20 History per object
+- [x] C-20 History per object
 - [ ] C-21 Versioning
-- [~] C-22 Trash + restore + permanent delete
-- [~] C-23 Favorites / pinning
+- [x] C-22 Trash + restore + permanent delete
+- [x] C-23 Favorites / pinning
 - [ ] C-24 School Year Archive
 - [x] C-25 Universal Search (content + metadata + annotations + captions)
 - [ ] C-26 Import pipeline (identify → hash → scan → metadata → thumbnail → index → encrypt → store)

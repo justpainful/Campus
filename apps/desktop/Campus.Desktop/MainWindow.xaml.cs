@@ -71,6 +71,13 @@ public sealed partial class MainWindow : Window
         _commands = CommandRegistry.CreateDefault(this, _workspace);
         Palette.Initialise(_commands, _workspace);
 
+        // A workspace full of invented content must never be mistaken for the real one.
+        if (DeveloperWorkspace.Requested)
+        {
+            SampleBadge.Visibility = Visibility.Visible;
+            WorkspaceLabel.Text = "Sample workspace";
+        }
+
         ApplyLockState(_workspace.IsUnlocked);
         UpdateStatusBar();
 
@@ -112,8 +119,27 @@ public sealed partial class MainWindow : Window
                 case "inspector": SetInspectorVisible(true); break;
                 case "focus": ToggleFocusMode(); break;
                 case "emoji": _ = ShowEmojiSheetAsync(); break;
+                case "detail": _ = OpenFirstObjectAsync(); break;
             }
         });
+    }
+#endif
+
+#if DEBUG
+    /// <summary>Opens whatever the current list holds first, for development screenshots.</summary>
+    private async Task OpenFirstObjectAsync()
+    {
+        if (!_workspace.IsUnlocked) return;
+
+        var first = (await _workspace.Objects.QueryAsync(new Campus.Domain.CampusQuery
+        {
+            Kinds = { ObjectKind.Assignment },
+            Sort = Campus.Domain.SortField.DueAt,
+            Descending = false,
+            Limit = 1,
+        })).FirstOrDefault();
+
+        if (first is not null) ContentFrame.Navigate(typeof(ObjectDetailPage), first.Id);
     }
 #endif
 
@@ -367,7 +393,9 @@ public sealed partial class MainWindow : Window
 
     private void UpdateStatusBar()
     {
-        VaultStatus.Text = _workspace.IsUnlocked ? "Vault unlocked"
+        VaultStatus.Text = DeveloperWorkspace.Requested
+            ? "Sample workspace — not your data"
+            : _workspace.IsUnlocked ? "Vault unlocked"
             : _workspace.IsInitialised ? "Vault locked" : "No vault yet";
 
         AppearanceStatus.Text = _theme.Appearance switch
