@@ -1,0 +1,119 @@
+<Page
+    x:Class="Campus.Desktop.Views.LockPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:brand="using:Campus.Desktop.Design.Brand"
+    xmlns:icons="using:Campus.Desktop.Design.Icons"
+    Background="{ThemeResource Theme.Background.Primary}">
+
+    <!--
+        The lock screen. Everything behind it is unreadable at this moment, so the screen says
+        so plainly and offers exactly two ways forward: the one that normally works, and the one
+        that always works.
+    -->
+    <Grid>
+        <StackPanel
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Spacing="0"
+            MaxWidth="420">
+
+            <brand:CampusLogo
+                Form="Mark"
+                LogoHeight="88"
+                HorizontalAlignment="Center"
+                Foreground="{ThemeResource Theme.Label.Primary}" />
+
+            <TextBlock
+                x:Name="HeadlineText"
+                Text="Campus is locked"
+                Style="{StaticResource Text.Title1}"
+                HorizontalAlignment="Center"
+                TextAlignment="Center"
+                Margin="0,28,0,0" />
+
+            <TextBlock
+                x:Name="SubtitleText"
+                Style="{StaticResource Text.Callout}"
+                HorizontalAlignment="Center"
+                TextAlignment="Center"
+                Margin="0,8,0,0" />
+
+            <Button
+                x:Name="PrimaryButton"
+                Style="{StaticResource Button.Primary}"
+                Click="OnPrimaryClick"
+                HorizontalAlignment="Center"
+                MinWidth="240"
+                Margin="0,28,0,0">
+                <StackPanel Orientation="Horizontal" Spacing="9">
+                    <icons:CampusIcon
+                        x:Name="PrimaryIcon"
+                        Symbol="unlock"
+                        IconSize="{StaticResource Theme.Icon.L}"
+                        Foreground="{ThemeResource Theme.Label.OnAccent}" />
+                    <TextBlock
+                        x:Name="PrimaryLabel"
+                        Text="Unlock with Windows Hello"
+                        Foreground="{ThemeResource Theme.Label.OnAccent}"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+
+            <HyperlinkButton
+                x:Name="RecoveryLink"
+                Content="Use recovery key instead"
+                Click="OnRecoveryClick"
+                HorizontalAlignment="Center"
+                Margin="0,10,0,0"
+                Foreground="{ThemeResource Theme.Accent.Primary}" />
+
+            <!-- Recovery entry, revealed only when asked for. -->
+            <StackPanel x:Name="RecoveryPanel" Visibility="Collapsed" Spacing="10" Margin="0,18,0,0">
+                <TextBox
+                    x:Name="RecoveryInput"
+                    Style="{StaticResource Input.Text}"
+                    PlaceholderText="XXXX-XXXX-XXXX-XXXX-XXXX-XXXX"
+                    FontFamily="{StaticResource Theme.Font.Mono}"
+                    TextAlignment="Center"
+                    MaxLength="40"
+                    TextChanged="OnRecoveryTextChanged"
+                    AutomationProperties.Name="Recovery key" />
+                <Button
+                    x:Name="RecoverySubmit"
+                    Style="{StaticResource Button.Secondary}"
+                    Content="Unlock"
+                    IsEnabled="False"
+                    Click="OnRecoverySubmitClick"
+                    HorizontalAlignment="Stretch" />
+            </StackPanel>
+
+            <TextBlock
+                x:Name="ErrorText"
+                Style="{StaticResource Text.Footnote}"
+                Foreground="{ThemeResource Theme.Destructive.Primary}"
+                HorizontalAlignment="Center"
+                TextAlignment="Center"
+                Visibility="Collapsed"
+                Margin="0,14,0,0" />
+
+            <ProgressRing
+                x:Name="Busy"
+                IsActive="False"
+                Visibility="Collapsed"
+                Width="20" Height="20"
+                Margin="0,14,0,0"
+                HorizontalAlignment="Center"
+                Foreground="{ThemeResource Theme.Accent.Primary}" />
+        </StackPanel>
+
+        <TextBlock
+            Style="{StaticResource Text.Caption}"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Bottom"
+            Margin="0,0,0,28"
+            TextAlignment="Center"
+            Text="Everything in this workspace stays on this device." />
+    </Grid>
+</Page>

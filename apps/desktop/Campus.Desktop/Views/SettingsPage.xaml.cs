@@ -1,6 +1,6 @@
 using Campus.Desktop.Design;
+using Campus.Desktop.Services;
 using Campus.Domain;
-using Campus.Vault;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -10,7 +10,7 @@ public sealed partial class SettingsPage : Page
 {
     private readonly ThemeService _theme = App.GetService<ThemeService>();
     private readonly WorkspaceSettings _settings = App.GetService<WorkspaceSettings>();
-    private readonly CampusVault _vault = App.GetService<CampusVault>();
+    private readonly WorkspaceService _workspace = App.GetService<WorkspaceService>();
     private bool _loading = true;
 
     public SettingsPage()
@@ -36,37 +36,32 @@ public sealed partial class SettingsPage : Page
         HitTargetToggle.IsOn = a11y.LargeHitTargets;
         FocusRingToggle.IsOn = a11y.AlwaysShowFocusRing;
 
-        // A preference the system already enforces cannot be turned off from here, so the
-        // switch is shown on and disabled rather than lying about the state.
+        // A preference the system already enforces cannot be turned off from here, so the switch
+        // is shown on and disabled rather than lying about the state.
         if (_theme.SystemHighContrast) { ContrastToggle.IsOn = true; ContrastToggle.IsEnabled = false; }
         if (!_theme.SystemAnimationsEnabled) { MotionToggle.IsOn = true; MotionToggle.IsEnabled = false; }
         if (!_theme.SystemTransparencyEnabled) { TransparencyToggle.IsOn = true; TransparencyToggle.IsEnabled = false; }
 
+        AutoLockChoice.SelectedIndex = _settings.AutoLock switch
+        {
+            AutoLockPolicy.After5Minutes => 1,
+            AutoLockPolicy.After10Minutes => 2,
+            AutoLockPolicy.After30Minutes => 3,
+            _ => 0,
+        };
+
         VersionText.Text = typeof(SettingsPage).Assembly.GetName().Version?.ToString(3) ?? "0.1.0";
-        VaultPathText.Text = _vault.Paths.Root;
-        UpdateVaultRow();
+        VaultPathText.Text = _workspace.Paths.Root;
+        _ = UpdateHelloRowAsync();
     }
 
-    private void UpdateVaultRow()
+    private async Task UpdateHelloRowAsync()
     {
-        if (!_vault.IsInitialised)
-        {
-            VaultRow.Subtitle = "Not created yet";
-            VaultButton.Content = "Create vault";
-            VaultButton.IsEnabled = true;
-        }
-        else if (_vault.IsUnlocked)
-        {
-            VaultRow.Subtitle = "Unlocked";
-            VaultButton.Content = "Locked";
-            VaultButton.IsEnabled = false;
-        }
-        else
-        {
-            VaultRow.Subtitle = "Locked";
-            VaultButton.Content = "Unlock";
-            VaultButton.IsEnabled = true;
-        }
+        var enrolled = await _workspace.IsHelloAvailableAsync();
+        HelloRow.Subtitle = enrolled
+            ? "Enrolled. Your face, fingerprint or PIN unlocks this workspace."
+            : "Not set up. This workspace opens with its recovery key.";
+        HelloButton.Content = enrolled ? "Re-enrol" : "Set up";
     }
 
     private void OnAppearanceChanged(object sender, RoutedEventArgs e)
@@ -99,54 +94,38 @@ public sealed partial class SettingsPage : Page
     private void OnOpenGalleryClick(object sender, RoutedEventArgs e)
         => Frame?.Navigate(typeof(ThemeGalleryPage));
 
-    private async void OnVaultButtonClick(object sender, RoutedEventArgs e)
+    private async void OnHelloClick(object sender, RoutedEventArgs e)
     {
-        if (!_vault.IsInitialised)
+        HelloButton.IsEnabled = false;
+        try
         {
-            var recoveryKey = await _vault.CreateAsync();
-            await ShowRecoveryKeyAsync(recoveryKey);
+            if (!await _workspace.EnrolHelloAsync())
+            {
+                HelloRow.Subtitle = "Windows Hello is not available on this PC.";
+                return;
+            }
+            await UpdateHelloRowAsync();
         }
-        UpdateVaultRow();
+        finally
+        {
+            HelloButton.IsEnabled = true;
+        }
     }
 
-    /// <summary>
-    /// The recovery key is shown exactly once, at creation. Campus never stores it, so this
-    /// dialog insists the user has written it down before it can be dismissed.
-    /// </summary>
-    private async Task ShowRecoveryKeyAsync(string recoveryKey)
+    private void OnAutoLockChanged(object sender, SelectionChangedEventArgs e)
     {
-        var body = new StackPanel { Spacing = 14 };
-        body.Children.Add(new TextBlock
-        {
-            Text = "Write this down and keep it somewhere safe. It is the only way back into "
-                 + "your workspace if Windows Hello stops working or you move to another PC. "
-                 + "Campus does not keep a copy.",
-            TextWrapping = TextWrapping.Wrap,
-        });
+        if (_loading) return;
+        if (AutoLockChoice.SelectedItem is not ComboBoxItem { Tag: string tag }) return;
 
-        var keyBox = new TextBox
+        _settings.AutoLock = tag switch
         {
-            Text = recoveryKey,
-            IsReadOnly = true,
-            FontFamily = (Microsoft.UI.Xaml.Media.FontFamily)Application.Current.Resources["Theme.Font.Mono"],
-            TextAlignment = TextAlignment.Center,
+            "5" => AutoLockPolicy.After5Minutes,
+            "10" => AutoLockPolicy.After10Minutes,
+            "30" => AutoLockPolicy.After30Minutes,
+            _ => AutoLockPolicy.Never,
         };
-        body.Children.Add(keyBox);
-
-        var dialog = new ContentDialog
-        {
-            XamlRoot = XamlRoot,
-            Title = "Your recovery key",
-            Content = body,
-            PrimaryButtonText = "I have written it down",
-            DefaultButton = ContentDialogButton.Primary,
-        };
-        await dialog.ShowAsync();
+        _workspace.StartAutoLock(DispatcherQueue);
     }
 
-    private void OnLockNowClick(object sender, RoutedEventArgs e)
-    {
-        _vault.Lock();
-        UpdateVaultRow();
-    }
+    private void OnLockNowClick(object sender, RoutedEventArgs e) => _workspace.Lock();
 }

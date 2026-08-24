@@ -102,13 +102,27 @@
                 Footer="Locking clears every key from memory. Files on disk stay unreadable until the next unlock.">
                 <StackPanel>
                     <controls:SettingsRow
-                        x:Name="VaultRow"
-                        Title="Vault"
-                        Subtitle="Not created yet"
+                        x:Name="HelloRow"
+                        Title="Windows Hello"
+                        Subtitle="Checking..."
                         Symbol="shield"
                         ShowSeparator="False">
-                        <Button x:Name="VaultButton" Style="{StaticResource Button.Primary}"
-                                Content="Create vault" Click="OnVaultButtonClick" />
+                        <Button x:Name="HelloButton" Style="{StaticResource Button.Secondary}"
+                                Content="Set up" Click="OnHelloClick" />
+                    </controls:SettingsRow>
+
+                    <controls:SettingsRow
+                        Title="Lock automatically"
+                        Subtitle="After this much time with no activity"
+                        Symbol="timer">
+                        <ComboBox x:Name="AutoLockChoice" MinWidth="150"
+                                  SelectionChanged="OnAutoLockChanged"
+                                  AutomationProperties.Name="Lock automatically">
+                            <ComboBoxItem Content="Never" Tag="0" />
+                            <ComboBoxItem Content="After 5 minutes" Tag="5" />
+                            <ComboBoxItem Content="After 10 minutes" Tag="10" />
+                            <ComboBoxItem Content="After 30 minutes" Tag="30" />
+                        </ComboBox>
                     </controls:SettingsRow>
 
                     <controls:SettingsRow

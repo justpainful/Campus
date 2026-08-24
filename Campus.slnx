@@ -5,6 +5,7 @@
   </Folder>
   <Folder Name="/core/">
     <Project Path="core/Campus.Domain/Campus.Domain.csproj" />
+    <Project Path="core/Campus.Platform.Windows/Campus.Platform.Windows.csproj" />
     <Project Path="core/Campus.Storage/Campus.Storage.csproj" />
     <Project Path="core/Campus.Vault/Campus.Vault.csproj" />
   </Folder>

@@ -1,6 +1,6 @@
 using Campus.Desktop.Design;
 using Campus.Domain;
-using Campus.Vault;
+using Campus.Desktop.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 
@@ -88,13 +88,11 @@ public partial class App : Application
         services.AddSingleton<ThemeService>();
         services.AddSingleton<ThemeResolver>();
 
-        // Vault. The platform protector is added once the Windows Hello implementation lands;
-        // until then the vault still works through its recovery key.
-        services.AddSingleton(_ => VaultPaths.Default());
-        services.AddSingleton(sp => new CampusVault(sp.GetRequiredService<VaultPaths>()));
-
         // Settings, replaced by the persisted copy once the workspace database is open.
         services.AddSingleton<WorkspaceSettings>();
+
+        // The vault, its database and the repositories on top, as one unit that locks together.
+        services.AddSingleton<WorkspaceService>();
 
         return services.BuildServiceProvider();
     }
@@ -104,7 +102,7 @@ public partial class App : Application
         Diagnostics.Log("unhandled", e.Exception);
 
         // A crash must never leave decrypted material in memory for a debugger to pick up.
-        try { Services?.GetService<CampusVault>()?.Lock(); }
+        try { Services?.GetService<WorkspaceService>()?.Lock(); }
         catch { /* the process is already going down */ }
     }
 }

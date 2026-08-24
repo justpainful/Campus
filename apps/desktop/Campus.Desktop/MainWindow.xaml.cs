@@ -1,5 +1,6 @@
 using Campus.Desktop.Design;
 using Microsoft.UI.Input;
+using Campus.Desktop.Services;
 using Campus.Desktop.Shell;
 using Campus.Desktop.Views;
 using Campus.Domain;
@@ -14,6 +15,7 @@ public sealed partial class MainWindow : Window
 {
     private readonly IReadOnlyList<ShellDestination> _destinations = ShellDestinations.CreateDefault();
     private readonly ThemeService _theme;
+    private readonly WorkspaceService _workspace;
     private double _sidebarWidth = 280;
     private double _inspectorWidth = 300;
 
@@ -23,6 +25,9 @@ public sealed partial class MainWindow : Window
 
         _theme = App.GetService<ThemeService>();
         _theme.ThemeChanged += (_, _) => UpdateStatusBar();
+
+        _workspace = App.GetService<WorkspaceService>();
+        _workspace.LockStateChanged += (_, unlocked) => ApplyLockState(unlocked);
 
         Title = "Campus";
         ExtendsContentIntoTitleBar = true;
@@ -46,6 +51,15 @@ public sealed partial class MainWindow : Window
         Navigate(startDestination == "gallery" || _destinations.Any(d => d.Id == startDestination)
             ? startDestination!
             : ShellDestinations.Home);
+
+        // Any pointer or key anywhere in the window counts as activity, which is what auto-lock
+        // measures idleness against.
+        RootLayout.PointerMoved += (_, _) => _workspace.NoteActivity();
+        RootLayout.PointerPressed += (_, _) => _workspace.NoteActivity();
+        RootLayout.KeyDown += (_, _) => _workspace.NoteActivity();
+        _workspace.StartAutoLock(DispatcherQueue);
+
+        ApplyLockState(_workspace.IsUnlocked);
         UpdateStatusBar();
     }
 
@@ -131,9 +145,26 @@ public sealed partial class MainWindow : Window
 
     private void OnLockClick(object sender, RoutedEventArgs e) => LockWorkspace();
 
-    private void LockWorkspace()
+    private void LockWorkspace() => _workspace.Lock();
+
+    /// <summary>Swaps between the workspace and the lock screen, and keeps the chrome honest.</summary>
+    private void ApplyLockState(bool unlocked)
     {
-        App.GetService<Vault.CampusVault>().Lock();
+        BodyLayout.Visibility = unlocked ? Visibility.Visible : Visibility.Collapsed;
+        LockFrame.Visibility = unlocked ? Visibility.Collapsed : Visibility.Visible;
+        TitleActions.Visibility = unlocked ? Visibility.Visible : Visibility.Collapsed;
+        TitleCentre.Visibility = unlocked ? Visibility.Visible : Visibility.Collapsed;
+
+        if (unlocked)
+        {
+            LockFrame.Content = null;
+            _workspace.StartAutoLock(DispatcherQueue);
+        }
+        else
+        {
+            LockFrame.Navigate(typeof(LockPage));
+        }
+
         UpdateStatusBar();
     }
 
@@ -162,9 +193,8 @@ public sealed partial class MainWindow : Window
 
     private void UpdateStatusBar()
     {
-        var vault = App.GetService<Vault.CampusVault>();
-        VaultStatus.Text = vault.IsUnlocked ? "Vault unlocked"
-            : vault.IsInitialised ? "Vault locked" : "No vault yet";
+        VaultStatus.Text = _workspace.IsUnlocked ? "Vault unlocked"
+            : _workspace.IsInitialised ? "Vault locked" : "No vault yet";
 
         AppearanceStatus.Text = _theme.Appearance switch
         {
