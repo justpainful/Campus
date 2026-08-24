@@ -7,44 +7,59 @@ an otherwise consistent set is precisely what packs exist to prevent.
 
 ## Getting Apple's emoji
 
-Campus does not include Apple Color Emoji and cannot. Apple licenses that font for use on
-Apple-branded hardware; a Windows application that shipped a copy would be redistributing it
-outside those terms. Copies circulate on the internet — Campus will not fetch one, and neither
-should you from a source you do not trust with a file that Windows will load into every process.
+Campus does not include Apple Color Emoji and cannot: Apple licenses that font for use on
+Apple-branded hardware, so a Windows application shipping a copy would be redistributing it
+outside those terms. The artwork has to come from you.
 
-The legitimate path is a device you own.
+Two routes work. Both end with the same command, because the extractor reads the font rather
+than caring where it came from.
 
 ### From a Mac
 
-The font is at:
-
-```
-/System/Library/Fonts/Apple Color Emoji.ttc
-```
-
-Copy it to your PC — a USB stick, AirDrop to a folder, whatever is convenient — then build the
-pack:
+The font is at `/System/Library/Fonts/Apple Color Emoji.ttc`. Copy it to your PC and build:
 
 ```bash
-python tools/emoji/build_pack.py --font "Apple Color Emoji.ttc" --name apple \
-    --license-note "Apple Color Emoji, from my own Mac"
+python tools/emoji/build_pack.py --font "Apple Color Emoji.ttc" --name apple
 ```
 
-That writes `apps/desktop/Campus.Desktop/Assets/emoji-packs/apple/`. Campus finds it on the next
-launch; pick it in **Settings → Emoji → Artwork**.
+### From a repackaged Windows build
 
-To make emoji look right in plain text fields as well — the note editor, a search box — install
-the same font into Windows (right-click → Install). Campus already lists `Apple Color Emoji`
-ahead of `Segoe UI Emoji` in its font stack, so text fields follow automatically.
+Projects such as **emoji-win** take Apple's font and convert it into a form Windows renders
+natively — `sbix` becomes `CBDT`, and AAT shaping becomes OpenType `GSUB`. Those builds work with
+the extractor unchanged:
+
+```bash
+python tools/emoji/build_pack.py     --font "AppleColorEmojiForWindows.ttf" --name apple     --license-note "Apple Color Emoji artwork, repackaged (emoji-win, iOS 18.4)"
+```
+
+Two things are worth knowing before you go this way.
+
+**It is still Apple's artwork.** The repackaging changes the container, not the licence. Whether
+that is a reasonable thing to do on your own machine is your call, not the app's.
+
+**The font renames itself.** These builds report their family as `Segoe UI Emoji` so that Windows
+substitutes them for the system emoji font everywhere. That is what makes them work in Notepad
+and the browser — and it also means installing one silently replaces Segoe system-wide.
+Building a pack avoids that entirely: Campus reads the file, extracts the images, and never loads
+the font into any process.
 
 ### From an iPhone
 
 Not directly. On a device that has not been jailbroken, `/System/Library/Fonts/` is not reachable
-by any app, by the Files app, or over USB — iOS does not expose the system font directory. There
-is no supported route from an iPhone to this file.
+by any app, by the Files app, or over USB. Which is why the repackaged builds exist.
 
-If a Mac is not available to you, Campus stays as it is: no emoji artwork, and the picker says so
-rather than substituting something.
+### After building
+
+The pack lands in `apps/desktop/Campus.Desktop/Assets/emoji-packs/apple/`. Campus finds it on the
+next launch; choose it under **Settings → Emoji → Artwork**.
+
+### About coverage
+
+A pack only has what its font had. A build from iOS 18.4 covers 3,781 of the 3,944 sequences in
+the catalogue — the missing 163 are emoji Unicode 16 and 17 added after that release, such as the
+fingerprint and the face with bags under the eyes. Campus leaves those out of the picker rather
+than offering a square it cannot fill, and Settings reports the shortfall instead of quoting a
+bare total.
 
 ## Building a pack from any colour font
 
@@ -86,8 +101,9 @@ python tools/emoji/test_build_pack.py
 The second survives updates and needs no administrator rights. **Settings → Emoji → Packs
 folder** opens it. Drop a pack folder in and Campus finds it.
 
-Packs are not committed to the repository — they are derived from a font, they are large, and in
-Apple's case the font is not ours to commit.
+Packs are not committed to the repository. They are derived from a font, they run to tens of
+megabytes, and Apple's artwork is not ours to publish — which matters rather more given this
+repository is public.
 
 ## The catalogue
 

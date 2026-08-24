@@ -38,6 +38,7 @@ public sealed class EmojiPackStore
 {
     private readonly Dictionary<string, BitmapImage?> _cache = new(StringComparer.Ordinal);
     private readonly Lock _gate = new();
+    private HashSet<string> _available = new(StringComparer.OrdinalIgnoreCase);
 
     private static readonly Lazy<EmojiPackStore> Instance = new(() => new EmojiPackStore());
     public static EmojiPackStore Current => Instance.Value;
@@ -127,7 +128,22 @@ public sealed class EmojiPackStore
         if (ReferenceEquals(chosen, Active)) return;
 
         Active = chosen;
-        lock (_gate) _cache.Clear();
+
+        // The file names are read once per pack rather than probed per emoji: switching group in
+        // the picker asks about two thousand of them, and two thousand File.Exists calls is a
+        // stutter the user can feel.
+        lock (_gate)
+        {
+            _cache.Clear();
+            _available = chosen is null
+                ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                : Directory.EnumerateFiles(chosen.Directory, "*.png")
+                    .Select(Path.GetFileName)
+                    .Where(f => f is not null)
+                    .Select(f => f!)
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        }
+
         ActivePackChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -170,8 +186,16 @@ public sealed class EmojiPackStore
         return image;
     }
 
+    /// <summary>
+    /// Whether the active pack can draw this emoji. A pack built from an older font legitimately
+    /// lacks whatever Unicode added since, and the picker hides those rather than offering a
+    /// square it cannot fill.
+    /// </summary>
     public bool Has(string codePoints)
-        => Active is not null && File.Exists(Path.Combine(Active.Directory, FileNameFor(codePoints)));
+    {
+        if (Active is null) return false;
+        lock (_gate) return _available.Contains(FileNameFor(codePoints));
+    }
 
     /// <summary>
     /// Copies a pack directory into the user's pack folder. The source is whatever

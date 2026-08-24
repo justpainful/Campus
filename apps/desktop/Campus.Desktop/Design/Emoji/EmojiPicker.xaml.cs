@@ -197,11 +197,24 @@ public sealed partial class EmojiPicker : UserControl
 
     private void Fill(IReadOnlyList<EmojiEntry> entries)
     {
+        var store = EmojiPackStore.Current;
+
         _cells.Clear();
         foreach (var entry in entries)
         {
             var tone = _preferences.ToneFor(entry.Key);
-            _cells.Add(new EmojiCell(entry, entry.KeyForTone(tone), entry.ForTone(tone)));
+            var sequence = entry.KeyForTone(tone);
+
+            // A pack built from an older font has none of the emoji Unicode added since. Those
+            // are left out rather than shown as squares that will not fill.
+            if (!store.Has(sequence))
+            {
+                // The chosen tone may be missing even though the base emoji is present.
+                sequence = entry.Key;
+                if (!store.Has(sequence)) continue;
+            }
+
+            _cells.Add(new EmojiCell(entry, sequence, entry.ForTone(tone)));
         }
 
         // With no artwork installed, the grid is not shown at all. Campus will not quietly fall

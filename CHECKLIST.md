@@ -67,7 +67,7 @@
 - [x] E-05 Custom ordering / pinning / favorites
 - [x] E-06 Emoji renderer abstraction (font-based today, asset-pack-swappable)
 - [x] E-07 Image-based emoji renderer + pack builder (sbix/CBDT, HarfBuzz shaping); no system-font fallback
-- [!] E-08 Apple emoji artwork itself — needs `Apple Color Emoji.ttc` from a Mac you own; see `docs/emoji.md`
+- [x] E-08 Apple emoji artwork installed — 3,781 of 3,944 sequences from an iOS 18.4 font; the 163 missing postdate it
 
 ---
 
@@ -215,6 +215,7 @@
 
 ## Open decisions / honest constraints
 
-1. **Apple emoji artwork** — Campus renders emoji from an artwork pack and never from a system font, with no fallback. The pack builder extracts any bitmap colour emoji font, Apple's `sbix` included, and is tested against a synthetic `sbix` font. The one thing Campus cannot supply is Apple's font file: it is licensed for Apple hardware, so it has to come from a Mac you own. `docs/emoji.md` has the exact path and command. Without it, the picker states that no artwork is installed rather than substituting anything.
+1. **Apple emoji artwork** — Campus renders emoji from an artwork pack and never from a system font, with no fallback. The pack builder extracts any bitmap colour emoji font and is tested against a synthetic `sbix` font. Apple's own file cannot ship with Campus — it is licensed to Apple hardware — so it has to be supplied from a Mac or a repackaged Windows build. The pack itself is never committed. `docs/emoji.md` has both routes.
+
 2. **Encryption reality** — an on-disk vault protects files from being read outside Campus. It cannot stop an Administrator on the same machine from reading process memory or screenshotting. Campus states this plainly rather than overpromising.
 3. **iOS USB sync** — Apple's AFC/house-arrest path is version-sensitive. Wi-Fi sync is the guaranteed path; USB is an accelerator.

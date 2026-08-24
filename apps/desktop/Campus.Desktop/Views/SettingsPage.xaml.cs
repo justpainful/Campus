@@ -85,10 +85,21 @@ public sealed partial class SettingsPage : Page
         EmojiPackChoice.SelectedIndex = Math.Max(0,
             store.Packs.ToList().FindIndex(p => p.Id == store.Active?.Id));
 
-        var active = store.Active;
-        EmojiPackRow.Subtitle = active is null
-            ? "No pack selected."
-            : $"{active.Manifest.Count} emoji · {active.Manifest.License}";
+        EmojiPackRow.Subtitle = DescribePack(store.Active);
+    }
+
+    /// <summary>
+    /// Says what a pack covers and what it does not. A pack built from an older font is missing
+    /// whatever Unicode has added since, and saying so is more useful than a bare total.
+    /// </summary>
+    private static string DescribePack(EmojiPack? pack)
+    {
+        if (pack is null) return "No pack selected.";
+
+        var missing = pack.Manifest.Missing;
+        return missing > 0
+            ? $"{pack.Manifest.Count} emoji · {missing} newer than this font"
+            : $"{pack.Manifest.Count} emoji";
     }
 
     private void OnEmojiPackChanged(object sender, SelectionChangedEventArgs e)
@@ -100,9 +111,7 @@ public sealed partial class SettingsPage : Page
         store.Select(id);
         _emojiPreferences.PackId = id;
 
-        var active = store.Active;
-        if (active is not null)
-            EmojiPackRow.Subtitle = $"{active.Manifest.Count} emoji · {active.Manifest.License}";
+        EmojiPackRow.Subtitle = DescribePack(store.Active);
     }
 
     private async void OnOpenPacksFolderClick(object sender, RoutedEventArgs e)
