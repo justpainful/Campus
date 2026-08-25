@@ -20,20 +20,28 @@ jobs:
   build:
     name: Build and test
     runs-on: macos-15
-    timeout-minutes: 30
+    timeout-minutes: 40
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Xcode
-        # Pinned rather than "latest": a toolchain that changes underneath you turns an unrelated
-        # push into a mystery failure.
-        run: sudo xcode-select -switch /Applications/Xcode_16.2.app
+      # Not pinned to a version any more. A pinned Xcode is only stable while its matching
+      # simulator runtime is still installed on the image, and when the image drops that runtime
+      # the pin turns an unrelated push into a mystery failure — which is exactly what it was
+      # meant to prevent. The newest one present is chosen, and printed, so a change in the
+      # toolchain is visible in the log rather than inferred from a stack trace.
+      - name: Select the newest Xcode on this runner
+        run: |
+          set -euo pipefail
+          latest=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          echo "Using $latest"
+          sudo xcode-select -switch "$latest"
 
       - name: Show versions
         run: |
           xcodebuild -version
           swift --version
+          xcrun simctl list runtimes available
 
       - name: Install XcodeGen
         run: brew install xcodegen
@@ -42,6 +50,25 @@ jobs:
         working-directory: apps/ios
         run: xcodegen generate
 
+      # Created from whatever runtime and device type the image actually has, rather than named
+      # and hoped for.
+      - name: Make a simulator
+        id: simulator
+        run: |
+          set -euo pipefail
+
+          runtime=$(xcrun simctl list runtimes --json \
+            | jq -r '[.runtimes[] | select(.isAvailable and (.identifier | contains("iOS")))] | last.identifier')
+
+          devicetype=$(xcrun simctl list devicetypes --json \
+            | jq -r '[.devicetypes[] | select(.identifier | test("iPhone-1[5-9]"))] | last.identifier')
+
+          echo "runtime=$runtime"
+          echo "devicetype=$devicetype"
+
+          device=$(xcrun simctl create "Campus CI" "$devicetype" "$runtime")
+          echo "device=$device" >> "$GITHUB_OUTPUT"
+
       - name: Build and test on the simulator
         working-directory: apps/ios
         run: |
@@ -49,7 +76,7 @@ jobs:
           xcodebuild test \
             -project CampusPocket.xcodeproj \
             -scheme CampusPocket \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -destination "id=${{ steps.simulator.outputs.device }}" \
             -resultBundlePath TestResults.xcresult \
             CODE_SIGNING_ALLOWED=NO \
             | xcbeautify --renderer github-actions
@@ -74,9 +101,11 @@ jobs:
       - name: Package the app bundle
         working-directory: apps/ios
         run: |
+          set -euo pipefail
           mkdir -p build/Payload
           cp -R build/CampusPocket.xcarchive/Products/Applications/CampusPocket.app build/Payload/
           cd build && zip -qry CampusPocket-unsigned.ipa Payload
+          ls -la CampusPocket-unsigned.ipa
 
       - name: Upload the build
         uses: actions/upload-artifact@v4
@@ -98,13 +127,17 @@ jobs:
   screenshots:
     name: Screenshots
     runs-on: macos-15
-    timeout-minutes: 30
+    timeout-minutes: 40
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Xcode
-        run: sudo xcode-select -switch /Applications/Xcode_16.2.app
+      - name: Select the newest Xcode on this runner
+        run: |
+          set -euo pipefail
+          latest=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          echo "Using $latest"
+          sudo xcode-select -switch "$latest"
 
       - name: Install XcodeGen
         run: brew install xcodegen
@@ -112,6 +145,29 @@ jobs:
       - name: Generate the Xcode project
         working-directory: apps/ios
         run: xcodegen generate
+
+      - name: Make a simulator
+        id: simulator
+        run: |
+          set -euo pipefail
+
+          runtime=$(xcrun simctl list runtimes --json \
+            | jq -r '[.runtimes[] | select(.isAvailable and (.identifier | contains("iOS")))] | last.identifier')
+
+          # A Pro model, because that is the shape most of these pictures will be looked at in.
+          devicetype=$(xcrun simctl list devicetypes --json \
+            | jq -r '[.devicetypes[] | select(.identifier | test("iPhone-1[5-9]-Pro$"))] | last.identifier')
+
+          if [ "$devicetype" = "null" ] || [ -z "$devicetype" ]; then
+            devicetype=$(xcrun simctl list devicetypes --json \
+              | jq -r '[.devicetypes[] | select(.identifier | test("iPhone-1[5-9]"))] | last.identifier')
+          fi
+
+          echo "runtime=$runtime"
+          echo "devicetype=$devicetype"
+
+          device=$(xcrun simctl create "Campus screenshots" "$devicetype" "$runtime")
+          echo "device=$device" >> "$GITHUB_OUTPUT"
 
       - name: Build for the simulator
         working-directory: apps/ios
@@ -121,60 +177,58 @@ jobs:
             -project CampusPocket.xcodeproj \
             -scheme CampusPocket \
             -configuration Debug \
-            -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' \
+            -destination "id=${{ steps.simulator.outputs.device }}" \
             -derivedDataPath build/simulator \
             CODE_SIGNING_ALLOWED=NO \
             | xcbeautify --renderer github-actions
 
-      # Screenshots are taken from the running app rather than posed, so they cannot drift away
-      # from what the app actually does. The sample content is seeded through the same outbox the
-      # app uses, and the screen to open is named on the command line.
+      # Taken from the running app rather than posed, so they cannot drift away from what the app
+      # actually does. The sample content is seeded through the same outbox the app uses, and the
+      # screen to open is named on the command line.
       - name: Take the screenshots
         working-directory: apps/ios
+        env:
+          DEVICE: ${{ steps.simulator.outputs.device }}
         run: |
           set -euo pipefail
 
-          device=$(xcrun simctl create "Campus screenshots" "iPhone 16 Pro")
-          xcrun simctl boot "$device"
-          xcrun simctl bootstatus "$device" -b
+          xcrun simctl boot "$DEVICE"
+          xcrun simctl bootstatus "$DEVICE" -b
 
-          # Dark, because the app is dark-first, and a clean status bar because a screenshot of
-          # a runner's battery percentage tells the reader nothing.
-          xcrun simctl ui "$device" appearance dark
-          xcrun simctl status_bar "$device" override \
+          # A clean status bar, because a screenshot of a runner's battery percentage tells the
+          # reader nothing.
+          xcrun simctl status_bar "$DEVICE" override \
             --time "09:41" \
             --batteryState charged --batteryLevel 100 \
             --cellularMode active --cellularBars 4 \
             --dataNetwork wifi --wifiMode active --wifiBars 3
 
-          app=build/simulator/Build/Products/Debug-iphonesimulator/CampusPocket.app
-          xcrun simctl install "$device" "$app"
+          app=$(find build/simulator/Build/Products -name 'CampusPocket.app' -maxdepth 3 | head -1)
+          echo "Installing $app"
+          xcrun simctl install "$DEVICE" "$app"
 
           mkdir -p screenshots
 
-          for screen in capture outbox settings compose; do
-            xcrun simctl launch "$device" com.campus.pocket --sample-data --screen "$screen"
-            sleep 6
-            xcrun simctl io "$device" screenshot "screenshots/$screen.png"
-            xcrun simctl terminate "$device" com.campus.pocket || true
-            sleep 1
-          done
+          shoot() {
+            appearance="$1"
+            suffix="$2"
+            xcrun simctl ui "$DEVICE" appearance "$appearance"
 
-          # The same four in light, because half the world runs their phone that way and a
-          # dark-first app still has to be legible in it.
-          xcrun simctl ui "$device" appearance light
-          for screen in capture outbox; do
-            xcrun simctl launch "$device" com.campus.pocket --sample-data --screen "$screen"
-            sleep 6
-            xcrun simctl io "$device" screenshot "screenshots/$screen-light.png"
-            xcrun simctl terminate "$device" com.campus.pocket || true
-            sleep 1
-          done
+            for screen in capture outbox settings compose; do
+              xcrun simctl launch "$DEVICE" com.campus.pocket --sample-data --screen "$screen"
+              sleep 6
+              xcrun simctl io "$DEVICE" screenshot "screenshots/${screen}${suffix}.png"
+              xcrun simctl terminate "$DEVICE" com.campus.pocket || true
+              sleep 1
+            done
+          }
 
-          xcrun simctl shutdown "$device"
-          xcrun simctl delete "$device"
+          # Dark first, because the app is. Light as well, because half the world runs their
+          # phone that way and a dark-first app still has to be legible in it.
+          shoot dark ""
+          shoot light "-light"
 
+          xcrun simctl shutdown "$DEVICE" || true
           ls -la screenshots
 
       - name: Upload the screenshots
