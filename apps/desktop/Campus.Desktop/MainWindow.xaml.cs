@@ -155,6 +155,7 @@ public sealed partial class MainWindow : Window
                 case "thread": _ = OpenFirstFileAsync(ObjectKind.Thread); break;
                 case "conversation": _ = OpenFirstFileAsync(ObjectKind.Conversation); break;
                 case "conversation.teacher": _ = OpenConversationAsync(ConversationKind.Teacher); break;
+                case "qr": _ = ShowSampleQrAsync(); break;
             }
         });
     }
@@ -190,6 +191,35 @@ public sealed partial class MainWindow : Window
         var first = (await _workspace.Objects.QueryAsync(query)).FirstOrDefault();
 
         if (first is not null) _router.Open(first.Id);
+    }
+
+    /// <summary>
+    /// Shows a pairing code on its own, so the QR can be photographed without typing a phone
+    /// name into a dialog first. The payload is the shape of a real one, not a real one.
+    /// </summary>
+    private async Task ShowSampleQrAsync()
+    {
+        if (RootLayout.XamlRoot is not { } root) return;
+
+        var key = Convert.ToBase64String(Campus.Sync.PhoneSync.NewSharedKey());
+        var payload = $"campus-pair:v1:{Campus.Domain.CampusId.New().Value}:Kuroi%27s%20PC:{key}";
+
+        var plate = new Border
+        {
+            Padding = new Thickness(16),
+            CornerRadius = new CornerRadius(12),
+            Background = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources[Design.ThemeTokens.Machine.Paper],
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Child = new Design.Controls.QrCode { Payload = payload, ModuleSize = 5 },
+        };
+
+        await new ContentDialog
+        {
+            XamlRoot = root,
+            Title = "Pairing code",
+            Content = plate,
+            CloseButtonText = "Close",
+        }.ShowAsync();
     }
 
     /// <summary>Opens a conversation of a given kind, so both layouts can be photographed.</summary>

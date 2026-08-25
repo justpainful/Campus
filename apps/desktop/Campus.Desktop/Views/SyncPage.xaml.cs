@@ -483,7 +483,9 @@ public sealed partial class SyncPage : Page
         {
             Padding = new Thickness(16),
             CornerRadius = (CornerRadius)Application.Current.Resources["Theme.Radius.Card"],
-            Background = (Brush)Application.Current.Resources[ThemeTokens.Label.OnAccent],
+            // The white plate the code sits on. Label.OnAccent happened to be white in dark mode
+            // and black in light mode, which put a black border around a black-on-white code.
+            Background = (Brush)Application.Current.Resources[ThemeTokens.Machine.Paper],
             HorizontalAlignment = HorizontalAlignment.Center,
             Child = new QrCode { Payload = code, ModuleSize = 5 },
         });

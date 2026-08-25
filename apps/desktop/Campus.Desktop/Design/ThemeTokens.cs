@@ -45,6 +45,16 @@ public static class ThemeTokens
         public const string Quaternary = "Theme.Fill.Quaternary";
     }
 
+    /// <summary>
+    /// The two colours that do not follow the theme, for things a camera reads rather than a
+    /// person: dark modules on a light field, in that order, in every appearance.
+    /// </summary>
+    public static class Machine
+    {
+        public const string Ink = "Theme.Machine.Ink";
+        public const string Paper = "Theme.Machine.Paper";
+    }
+
     public static class Separator
     {
         public const string Standard = "Theme.Separator.Standard";

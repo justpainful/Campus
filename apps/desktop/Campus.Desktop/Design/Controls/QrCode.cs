@@ -9,11 +9,12 @@ using QRCoder;
 namespace Campus.Desktop.Design.Controls;
 
 /// <summary>
-/// A QR code, drawn as shapes rather than rasterised.
+/// A QR code, drawn as shapes rather than rasterised, so it stays crisp at any size.
 ///
-/// Drawn because Campus has one theme and a bitmap does not follow it: a code generated as a PNG
-/// is black on white in a dark room, and a phone camera reading a bright rectangle at midnight is
-/// a small cruelty. Vector modules take the theme's own colours and stay crisp at any size.
+/// Deliberately black on white in both themes. This is the one control in Campus that is not for
+/// a person to look at — a camera reads it, and a camera wants dark modules on a light field.
+/// Following the theme here is not restraint, it is a bug: the modules were drawn in
+/// Label.Primary on Label.OnAccent, and in dark mode both of those are white.
 /// </summary>
 public sealed class QrCode : Grid
 {
@@ -60,12 +61,13 @@ public sealed class QrCode : Grid
 
         Width = size * ModuleSize;
         Height = size * ModuleSize;
+        CornerRadius = new CornerRadius(4);
 
-        // A quiet zone is part of the specification, and a code without one is a code some
-        // scanners simply will not see.
-        Background = (Brush)Application.Current.Resources[ThemeTokens.Label.OnAccent];
+        // The light field the code sits on, which doubles as the quiet zone around it — part of
+        // the specification, and a code without one is a code some scanners will not see.
+        Background = (Brush)Application.Current.Resources[ThemeTokens.Machine.Paper];
 
-        var dark = (Brush)Application.Current.Resources[ThemeTokens.Label.Primary];
+        var dark = (Brush)Application.Current.Resources[ThemeTokens.Machine.Ink];
         var canvas = new Canvas { Width = Width, Height = Height };
 
         for (var y = 0; y < size; y++)

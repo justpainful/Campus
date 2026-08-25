@@ -631,6 +631,22 @@
         without every call site changing.
     -->
     <!--
+        Ink and paper for something a machine reads rather than a person.
+
+        These are the two roles in the design system that must not follow the theme. A QR code is
+        not decoration: a camera looking at it needs dark modules on a light field, in that order,
+        and plenty of scanners will not read the inverse at all. Drawing one in Label.Primary on
+        Label.OnAccent looked reasonable and produced white on white in dark mode — a blank square,
+        which is exactly what it was reported as.
+
+        They are literal values rather than theme colours for the same reason they are here at all:
+        black is black in every theme, and giving them a per-theme definition would be inviting
+        somebody to change one.
+    -->
+    <SolidColorBrush x:Key="Theme.Machine.Ink" Color="#FF000000" />
+    <SolidColorBrush x:Key="Theme.Machine.Paper" Color="#FFFFFFFF" />
+
+    <!--
         The role brushes are defined once per theme, in the dictionaries above, rather than here.
 
         A brush declared at this level with Color="{ThemeResource ...}" resolves its colour the
