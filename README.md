@@ -42,6 +42,31 @@ docs/emoji.md                   emoji artwork, and how to build an Apple pack
 CHECKLIST.md                    every feature, and where it stands
 ```
 
+## Installing
+
+```powershell
+pwsh tools/install/Install-Campus.ps1
+```
+
+That builds a release copy and puts it in `%LOCALAPPDATA%\Programs\Campus`, with a Start Menu
+entry, a desktop shortcut and a line in Windows' Apps list. No administrator rights, nothing
+written outside your own profile.
+
+Run the same command again to update. It is safe to do that as often as you like, because the
+program and the workspace are two different things in two different places:
+
+| | |
+|---|---|
+| `%LOCALAPPDATA%\Programs\Campus` | the program — replaced wholesale on every update |
+| `%LOCALAPPDATA%\Campus` | the vault, database, search index, settings — never touched |
+
+An update is "delete the program, put a new one there", which is only safe because none of your
+work is in there. The new build is published to a staging folder and only swapped in once it has
+built successfully, so an update that fails leaves the working copy alone rather than half of it.
+
+`-Uninstall` removes the program and leaves the workspace where it is; installing again finds it.
+`-Uninstall -PurgeData` deletes the vault as well, and there is no copy of it anywhere else.
+
 ## Building
 
 Windows 11, .NET 10 SDK. No workloads to install — the Windows App SDK arrives through NuGet.
