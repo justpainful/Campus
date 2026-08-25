@@ -166,6 +166,64 @@ public sealed class ThreadPayload : IObjectPayload
     public DateTimeOffset? LastActivityAt { get; set; }
 }
 
+/// <summary>
+/// A conversation worth keeping: with a teacher, or with an assistant.
+///
+/// The distinction from a thread is who is talking. A thread is a question the student is working
+/// on and everything they have worked out since, all of it theirs. A conversation has two sides,
+/// one of which is not in this workspace and cannot be asked again — which is the whole reason to
+/// write it down.
+/// </summary>
+public sealed class ConversationPayload : IObjectPayload
+{
+    public ObjectKind Kind => ObjectKind.Conversation;
+
+    public ConversationKind ConversationKind { get; set; } = ConversationKind.Teacher;
+
+    /// <summary>Who the other side is: a teacher's name, or "ChatGPT".</summary>
+    public string? With { get; set; }
+
+    /// <summary>Anything the student wants to remember about the conversation as a whole.</summary>
+    public string? Note { get; set; }
+
+    public int MessageCount { get; set; }
+    public DateTimeOffset? LastActivityAt { get; set; }
+
+    /// <summary>A finished conversation, kept but out of the way.</summary>
+    public bool Closed { get; set; }
+}
+
+/// <summary>
+/// One message in a conversation.
+///
+/// <see cref="IsMarkdown"/> is the difference between the two sides. What the student typed is
+/// what they typed — asterisks in it are asterisks. What an assistant replied arrives with
+/// markdown in it and is meaningless unless it is rendered, so it is.
+/// </summary>
+public sealed class MessagePayload : IObjectPayload
+{
+    public ObjectKind Kind => ObjectKind.Message;
+
+    public Speaker From { get; set; } = Speaker.Me;
+
+    public string Body { get; set; } = string.Empty;
+
+    /// <summary>True when the body carries markdown that should be drawn rather than shown.</summary>
+    public bool IsMarkdown { get; set; }
+
+    /// <summary>When it was said, which is not always when it was written down.</summary>
+    public DateTimeOffset SentAt { get; set; } = DateTimeOffset.UtcNow;
+
+    /// <summary>
+    /// Pictures sent with this message, in the order they were attached.
+    ///
+    /// These are ids of real File objects in the workspace, not bytes held here: a photograph of
+    /// a whiteboard is a file like any other, and belongs in the library, in search, and in the
+    /// backup, rather than buried inside a chat log.
+    /// </summary>
+    public List<CampusId> Attachments { get; init; } = [];
+}
+
 public sealed class CollectionPayload : IObjectPayload
 {
     public ObjectKind Kind => ObjectKind.Collection;

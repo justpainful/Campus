@@ -19,6 +19,7 @@ public static class CampusSymbols
     public const string PrintCenter = "print";
     public const string Links = "links";
     public const string Boards = "boards";
+    public const string Conversations = "conversations";
     public const string Search = "search";
     public const string Sync = "sync";
     public const string Extensions = "extensions";
@@ -42,6 +43,8 @@ public static class CampusSymbols
     public const string Question = "question";
     public const string Collection = "collection";
     public const string Thread = "thread";
+    public const string Conversation = "conversation";
+    public const string Assistant = "assistant";
     public const string Person = "person";
     public const string Teacher = "teacher";
     public const string Event = "event";
@@ -181,6 +184,7 @@ public static class CampusSymbols
     public const string TextSize = "text.size";
     public const string Accessibility = "accessibility";
     public const string Emoji = "emoji";
+    public const string Send = "send";
 
     // ------------------------------------------------------------------- Academic
     public const string Graduation = "graduation";

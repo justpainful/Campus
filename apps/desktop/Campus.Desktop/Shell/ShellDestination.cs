@@ -50,6 +50,7 @@ public static class ShellDestinations
     public const string PrintCenter = "print";
     public const string Links = "links";
     public const string Boards = "boards";
+    public const string Conversations = "conversations";
     public const string Search = "search";
     public const string Sync = "sync";
     public const string Extensions = "extensions";
@@ -74,6 +75,7 @@ public static class ShellDestinations
         new() { Id = PrintCenter, Title = "Print Center", Symbol = CampusSymbols.PrintCenter },
         new() { Id = Links, Title = "Links", Symbol = CampusSymbols.Links },
         new() { Id = Boards, Title = "Boards", Symbol = CampusSymbols.Boards },
+        new() { Id = Conversations, Title = "Conversations", Symbol = CampusSymbols.Conversations },
         new() { Id = Search, Title = "Search", Symbol = CampusSymbols.Search, Shortcut = "Ctrl+Shift+F" },
 
         new() { Id = Archive, Title = "Archive", Symbol = CampusSymbols.Archive, Placement = DestinationPlacement.Bottom },

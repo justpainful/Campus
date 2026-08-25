@@ -1,0 +1,82 @@
+<Page
+    x:Class="Campus.Desktop.Views.ConversationsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:icons="using:Campus.Desktop.Design.Icons"
+    Background="{ThemeResource Theme.Background.Primary}">
+
+    <!--
+        Everything that was said to you and is worth keeping: lessons explained in a corridor,
+        answers from an assistant at one in the morning. Ordered by when it was last touched,
+        because the one you are still in the middle of is the one you want.
+    -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Padding="32,26,32,16" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Spacing="3">
+                <TextBlock Text="Conversations" Style="{StaticResource Text.LargeTitle}" />
+                <TextBlock x:Name="Summary" Style="{StaticResource Text.Subheadline}" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"
+                        VerticalAlignment="Center">
+                <Button Style="{StaticResource Button.Secondary}" Click="OnNewTeacherClick"
+                        MinWidth="0">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <icons:CampusIcon Symbol="teacher" IconSize="15"
+                                          Foreground="{ThemeResource Theme.Label.Primary}" />
+                        <TextBlock Text="With a teacher" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource Button.Primary}" Click="OnNewAssistantClick"
+                        MinWidth="0">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <icons:CampusIcon Symbol="assistant" IconSize="15"
+                                          Foreground="{ThemeResource Theme.Label.OnAccent}" />
+                        <TextBlock Text="With an assistant" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <ScrollViewer Grid.Row="1" Padding="32,4,32,32">
+            <!--
+                A star column with a maximum, rather than a panel with MaxWidth: the rows have to
+                stretch to the column so their cards are the same width, and a panel that is
+                narrower than its parent sizes itself to its content instead.
+            -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MaxWidth="900" />
+                    <ColumnDefinition Width="0*" />
+                </Grid.ColumnDefinitions>
+
+            <StackPanel Spacing="10">
+                <StackPanel x:Name="Rows" Spacing="8" />
+
+                <StackPanel x:Name="EmptyState" Spacing="8" Visibility="Collapsed"
+                            Margin="0,60,0,0" HorizontalAlignment="Center">
+                    <icons:CampusIcon Symbol="conversations" IconSize="34"
+                                      Foreground="{ThemeResource Theme.Label.Quaternary}"
+                                      HorizontalAlignment="Center" />
+                    <TextBlock Text="No conversations yet"
+                               Style="{StaticResource Text.Headline}"
+                               HorizontalAlignment="Center" />
+                    <TextBlock TextWrapping="Wrap" MaxWidth="440" TextAlignment="Center"
+                               Style="{StaticResource Text.Footnote}"
+                               Text="Write down what a teacher explained before you forget it, or keep an answer you were given so you can find it again in May." />
+                </StackPanel>
+            </StackPanel>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Page>

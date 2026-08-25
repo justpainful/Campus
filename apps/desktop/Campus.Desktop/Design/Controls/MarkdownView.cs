@@ -267,24 +267,90 @@ public sealed partial class MarkdownView : StackPanel
             HorizontalScrollMode = ScrollMode.Auto,
         };
 
-        var stack = new StackPanel { Spacing = 6 };
-        if (!string.IsNullOrWhiteSpace(language))
+        // A bar across the top naming the language, with a copy button on the right.
+        //
+        // This is the one part of a rendered answer that exists to be taken away and used
+        // somewhere else, and selecting fourteen lines of Python with a mouse without catching
+        // the paragraph above it is a small misery. Everything that shows code has settled on
+        // the same bar for the same reason.
+        var header = new Grid
         {
-            stack.Children.Add(new TextBlock
-            {
-                Text = language,
-                FontFamily = Font("Theme.Font.Small"),
-                FontSize = 11,
-                Foreground = Brush(ThemeTokens.Label.Quaternary),
-            });
-        }
-        stack.Children.Add(scroller);
+            Padding = new Thickness(14, 6, 6, 6),
+            Background = Brush(ThemeTokens.Fill.Tertiary),
+        };
+        header.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+        header.Children.Add(new TextBlock
+        {
+            Text = string.IsNullOrWhiteSpace(language) ? "code" : language.Trim(),
+            FontFamily = Font("Theme.Font.Small"),
+            FontSize = 11,
+            Foreground = Brush(ThemeTokens.Label.Tertiary),
+            VerticalAlignment = VerticalAlignment.Center,
+        });
+
+        var copyLabel = new TextBlock
+        {
+            Text = "Copy",
+            FontFamily = Font("Theme.Font.Small"),
+            FontSize = 11,
+            Foreground = Brush(ThemeTokens.Label.Secondary),
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+
+        var copyContent = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 5 };
+        copyContent.Children.Add(new CampusIcon
+        {
+            Symbol = CampusSymbols.Copy,
+            IconSize = 13,
+            Foreground = Brush(ThemeTokens.Label.Secondary),
+            VerticalAlignment = VerticalAlignment.Center,
+        });
+        copyContent.Children.Add(copyLabel);
+
+        var copy = new Button
+        {
+            Content = copyContent,
+            Style = (Style)Application.Current.Resources["Button.Plain"],
+            Padding = new Thickness(8, 3, 8, 3),
+            MinWidth = 0,
+            MinHeight = 0,
+        };
+
+        AutomationProperties.SetName(copy, "Copy this code");
+
+        copy.Click += (_, _) =>
+        {
+            var package = new Windows.ApplicationModel.DataTransfer.DataPackage();
+            package.SetText(text);
+            Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(package);
+
+            // Says so on the button rather than in a notification: the reader is looking at the
+            // button, and a banner for something this small is an interruption.
+            copyLabel.Text = "Copied";
+            var revert = DispatcherQueue.CreateTimer();
+            revert.Interval = TimeSpan.FromSeconds(2);
+            revert.IsRepeating = false;
+            revert.Tick += (t, _) => { copyLabel.Text = "Copy"; t.Stop(); };
+            revert.Start();
+        };
+
+        Grid.SetColumn(copy, 1);
+        header.Children.Add(copy);
+
+        var stack = new StackPanel { Spacing = 0 };
+        stack.Children.Add(header);
+        stack.Children.Add(new Border
+        {
+            Padding = new Thickness(14, 12, 14, 12),
+            Child = scroller,
+        });
 
         host.Children.Add(new Border
         {
             Background = Brush(ThemeTokens.Fill.Quaternary),
             CornerRadius = (CornerRadius)Application.Current.Resources["Theme.Radius.Card"],
-            Padding = new Thickness(14, 12, 14, 12),
             Margin = new Thickness(0, 8, 0, 8),
             Child = stack,
         });

@@ -62,6 +62,33 @@ public static class DeveloperWorkspace
         async Task Add(CampusObject entity) =>
             await repository.SaveAsync(entity, ct).ConfigureAwait(false);
 
+        // Adds one message. The times run backwards from now so the runs group the way they
+        // would in life: two sentences from a teacher a minute apart are one run, an answer an
+        // hour later is not.
+        async Task AddMessage(
+            CampusObject conversation, Speaker from, string body, int minutesAgo,
+            bool markdown = false)
+        {
+            var at = DateTimeOffset.UtcNow.AddMinutes(-minutesAgo);
+            var line = body.Split('\n')[0].Trim();
+
+            await Add(new CampusObject
+            {
+                Kind = ObjectKind.Message,
+                Title = line.Length > 90 ? line[..90] + "…" : line,
+                ParentId = conversation.Id,
+                SubjectId = conversation.SubjectId,
+                CreatedAt = at,
+                Payload = new MessagePayload
+                {
+                    From = from,
+                    Body = body,
+                    IsMarkdown = markdown,
+                    SentAt = at,
+                },
+            });
+        }
+
         await Add(new CampusObject
         {
             Kind = ObjectKind.Assignment,
@@ -292,6 +319,103 @@ public static class DeveloperWorkspace
                      + "- Negative charge: force against it\n",
             },
         });
+
+        // ---- two recorded conversations: one with a teacher, one with an assistant. Both are
+        // here because the whole point of the feature is that the two sides are drawn
+        // differently, and one of each is the only way to see whether that is true.
+        var corridor = new CampusObject
+        {
+            Kind = ObjectKind.Conversation,
+            Title = "Whether the physics test moved",
+            SubjectId = Subject("Physics"),
+            Payload = new ConversationPayload
+            {
+                ConversationKind = ConversationKind.Teacher,
+                With = "Mr Faisal",
+                MessageCount = 4,
+                LastActivityAt = DateTimeOffset.UtcNow.AddHours(-3),
+            },
+        };
+        await Add(corridor);
+
+        await AddMessage(corridor, Speaker.Me,
+            "Sir, is the test still on Sunday?", 200);
+        await AddMessage(corridor, Speaker.Them,
+            "It moved to Tuesday. The lab is being used on Sunday.", 198);
+        await AddMessage(corridor, Speaker.Them,
+            "Chapters 4 and 5 only. Nothing from 6.", 197);
+        await AddMessage(corridor, Speaker.Me,
+            "Does that include the derivations?", 190);
+
+        var asked = new CampusObject
+        {
+            Kind = ObjectKind.Conversation,
+            Title = "Balancing redox equations",
+            SubjectId = Subject("Chemistry"),
+            Payload = new ConversationPayload
+            {
+                ConversationKind = ConversationKind.Assistant,
+                With = "ChatGPT",
+                MessageCount = 3,
+                LastActivityAt = DateTimeOffset.UtcNow.AddMinutes(-40),
+            },
+        };
+        await Add(asked);
+
+        await AddMessage(asked, Speaker.Me,
+            "How do I balance a redox equation in acidic solution? I keep getting the electrons "
+            + "wrong.", 60);
+
+        // Joined lines rather than a raw string literal, because this whole file sits inside
+        // `#if DEBUG` and a release build still scans the region for preprocessor directives —
+        // where a line starting with `#` is one, string or not. A markdown heading is such a line.
+        await AddMessage(asked, Speaker.Them, string.Join('\n',
+        [
+            "## The half-reaction method",
+            "",
+            "Split the reaction into two halves, balance each one on its own, then put them back "
+            + "together. The order matters:",
+            "",
+            "1. Balance every atom **except** oxygen and hydrogen.",
+            "2. Balance oxygen by adding `H2O`.",
+            "3. Balance hydrogen by adding `H+`.",
+            "4. Balance charge by adding electrons.",
+            "",
+            "### Worked example",
+            "",
+            "For the oxidation half:",
+            "",
+            "```text",
+            "Fe2+  ->  Fe3+  +  e-",
+            "```",
+            "",
+            "And the reduction half, which is where the water and the protons appear:",
+            "",
+            "```text",
+            "MnO4-  +  8 H+  +  5 e-  ->  Mn2+  +  4 H2O",
+            "```",
+            "",
+            "| Step | What you add | Why |",
+            "|------|--------------|-----|",
+            "| 2    | Water        | Oxygen has nowhere else to go |",
+            "| 3    | Protons      | The solution is acidic |",
+            "| 4    | Electrons    | The charges have to match |",
+            "",
+            "> The electrons have to cancel exactly when the halves are added. If they do not, "
+            + "multiply one half through until they do.",
+            "",
+            "So multiply the iron half by five and add:",
+            "",
+            "```text",
+            "5 Fe2+  +  MnO4-  +  8 H+  ->  5 Fe3+  +  Mn2+  +  4 H2O",
+            "```",
+            "",
+            "- [x] Atoms balanced",
+            "- [x] Charge balanced",
+            "- [ ] Try it on dichromate",
+        ]), 58, markdown: true);
+
+        await AddMessage(asked, Speaker.Me, "And in basic solution?", 40);
 
         // ---- goals, which are the slow things
         await Add(new CampusObject

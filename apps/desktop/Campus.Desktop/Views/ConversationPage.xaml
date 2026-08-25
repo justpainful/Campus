@@ -1,0 +1,166 @@
+<Page
+    x:Class="Campus.Desktop.Views.ConversationPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:icons="using:Campus.Desktop.Design.Icons"
+    Background="{ThemeResource Theme.Background.Primary}">
+
+    <!--
+        A conversation, written down.
+
+        Not a chat client: nothing here is being sent anywhere. It is a record of something that
+        was said — by a teacher between two lessons, or by an assistant that answered at one in
+        the morning — kept because in three weeks nobody remembers it. So both sides are typed by
+        the same person, and which side is speaking is a control, not a network event.
+    -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Padding="28,18,28,14" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Border VerticalAlignment="Bottom" Height="1" Grid.ColumnSpan="4"
+                    Background="{ThemeResource Theme.Separator.Standard}" />
+
+            <Button Style="{StaticResource Button.Icon}" Click="OnBackClick"
+                    VerticalAlignment="Center"
+                    AutomationProperties.Name="Back" ToolTipService.ToolTip="Back">
+                <icons:CampusIcon Symbol="chevron.left" IconSize="{StaticResource Theme.Icon.L}"
+                                  Foreground="{ThemeResource Theme.Label.Secondary}" />
+            </Button>
+
+            <Border Grid.Column="1" Width="34" Height="34" CornerRadius="17"
+                    VerticalAlignment="Center"
+                    Background="{ThemeResource Theme.Fill.Tertiary}">
+                <icons:CampusIcon x:Name="PartyIcon" Symbol="teacher" IconSize="18"
+                                  Foreground="{ThemeResource Theme.Label.Secondary}"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+
+            <StackPanel Grid.Column="2" Spacing="2" VerticalAlignment="Center">
+                <TextBlock x:Name="TitleText" Style="{StaticResource Text.Title2}"
+                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+                <TextBlock x:Name="Subtitle" Style="{StaticResource Text.Footnote}" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Button x:Name="CloseButton" Style="{StaticResource Button.Secondary}"
+                        Click="OnCloseClick" Content="Close" MinWidth="0" />
+                <Button Style="{StaticResource Button.Icon}" Click="OnMoreClick"
+                        AutomationProperties.Name="More" ToolTipService.ToolTip="More">
+                    <icons:CampusIcon Symbol="more" IconSize="{StaticResource Theme.Icon.L}"
+                                      Foreground="{ThemeResource Theme.Label.Secondary}" />
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <ScrollViewer x:Name="Scroller" Grid.Row="1" Padding="28,20,28,20">
+            <!--
+                A star column with a maximum rather than a panel with MaxWidth. The messages have
+                to know how wide the column is — a bubble aligns to its right edge and an
+                assistant’s answer wraps to it — and a panel narrower than its parent measures
+                itself against its content instead, which pushes the right-hand bubbles off the
+                side of the window.
+            -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MaxWidth="860" />
+                    <ColumnDefinition Width="0*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel x:Name="Messages" Spacing="4" />
+            </Grid>
+        </ScrollViewer>
+
+        <Grid Grid.Row="2" Padding="28,12,28,18"
+              Background="{ThemeResource Theme.Background.Primary}">
+            <Border VerticalAlignment="Top" Height="1"
+                    Background="{ThemeResource Theme.Separator.Standard}" />
+
+            <Grid Margin="0,12,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MaxWidth="860" />
+                    <ColumnDefinition Width="0*" />
+                </Grid.ColumnDefinitions>
+
+            <StackPanel Spacing="10">
+
+                <!--
+                    Who is speaking. The single most important control on the page: a record of a
+                    conversation with only one voice in it is a note, and the point of this is
+                    that it has two.
+                -->
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <StackPanel x:Name="SpeakerPicker" Orientation="Horizontal" Spacing="0" />
+
+                    <ToggleButton x:Name="MarkdownToggle" Style="{StaticResource Toggle.Chip}"
+                                  Click="OnMarkdownToggled"
+                                  AutomationProperties.Name="Render markdown"
+                                  ToolTipService.ToolTip="Draw markdown in this message rather than showing the characters">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <icons:CampusIcon Symbol="file.markdown" IconSize="14"
+                                              Foreground="{ThemeResource Theme.Label.Secondary}" />
+                            <TextBlock Text="Markdown" Style="{StaticResource Text.Caption}" />
+                        </StackPanel>
+                    </ToggleButton>
+                </StackPanel>
+
+                <ItemsControl x:Name="Attachments" Visibility="Collapsed">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="8" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+
+                <Grid ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox x:Name="Composer" Style="{StaticResource Input.Text}"
+                             PlaceholderText="What was said…"
+                             AcceptsReturn="True" TextWrapping="Wrap"
+                             MinHeight="44" MaxHeight="220"
+                             KeyDown="OnComposerKeyDown"
+                             Paste="OnComposerPaste"
+                             AutomationProperties.Name="Write a message" />
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6"
+                                VerticalAlignment="Bottom">
+                        <Button Style="{StaticResource Button.Icon}" Click="OnAttachClick"
+                                AutomationProperties.Name="Attach a picture"
+                                ToolTipService.ToolTip="Attach a picture">
+                            <icons:CampusIcon Symbol="attachment" IconSize="{StaticResource Theme.Icon.L}"
+                                              Foreground="{ThemeResource Theme.Label.Secondary}" />
+                        </Button>
+                        <Button x:Name="EmojiButton" Style="{StaticResource Button.Icon}"
+                                AutomationProperties.Name="Emoji" ToolTipService.ToolTip="Emoji">
+                            <icons:CampusIcon Symbol="emoji" IconSize="{StaticResource Theme.Icon.L}"
+                                              Foreground="{ThemeResource Theme.Label.Secondary}" />
+                        </Button>
+                        <Button Style="{StaticResource Button.Primary}" Click="OnSendClick"
+                                MinWidth="0" AutomationProperties.Name="Add this message">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <icons:CampusIcon Symbol="send" IconSize="15"
+                                                  Foreground="{ThemeResource Theme.Label.OnAccent}" />
+                                <TextBlock Text="Add" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

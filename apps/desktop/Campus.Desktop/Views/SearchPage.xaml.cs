@@ -38,6 +38,7 @@ public sealed partial class SearchPage : Page
         ("Notes", [ObjectKind.Note, ObjectKind.Lesson]),
         ("Work", [ObjectKind.Assignment, ObjectKind.Task, ObjectKind.Requirement, ObjectKind.Exam]),
         ("Threads", [ObjectKind.Thread, ObjectKind.Board]),
+        ("Conversations", [ObjectKind.Conversation, ObjectKind.Message]),
     ];
 
     public SearchPage()

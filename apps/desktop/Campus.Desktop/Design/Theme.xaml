@@ -130,6 +130,98 @@
             <SolidColorBrush x:Key="TextOnAccentFillColorDisabledBrush" Color="#4DFFFFFF" />
             <SolidColorBrush x:Key="TextOnAccentFillColorSelectedTextBrush" Color="#FFFFFFFF" />
 
+
+            <!--
+                Role brushes. Components bind to these and never to the colours above, so a role
+                can later gain state behaviour without every call site changing.
+            -->
+            <SolidColorBrush x:Key="Theme.Background.Primary" Color="{StaticResource Theme.Color.Background.Primary}" />
+            <SolidColorBrush x:Key="Theme.Background.Secondary" Color="{StaticResource Theme.Color.Background.Secondary}" />
+            <SolidColorBrush x:Key="Theme.Background.Tertiary" Color="{StaticResource Theme.Color.Background.Tertiary}" />
+            <SolidColorBrush x:Key="Theme.GroupedBackground.Primary" Color="{StaticResource Theme.Color.GroupedBackground.Primary}" />
+            <SolidColorBrush x:Key="Theme.GroupedBackground.Secondary" Color="{StaticResource Theme.Color.GroupedBackground.Secondary}" />
+            <SolidColorBrush x:Key="Theme.GroupedBackground.Tertiary" Color="{StaticResource Theme.Color.GroupedBackground.Tertiary}" />
+            <SolidColorBrush x:Key="Theme.Surface.Primary" Color="{StaticResource Theme.Color.Surface.Primary}" />
+            <SolidColorBrush x:Key="Theme.Surface.Secondary" Color="{StaticResource Theme.Color.Surface.Secondary}" />
+            <SolidColorBrush x:Key="Theme.Surface.Tertiary" Color="{StaticResource Theme.Color.Surface.Tertiary}" />
+            <SolidColorBrush x:Key="Theme.Surface.Elevated" Color="{StaticResource Theme.Color.Surface.Elevated}" />
+            <SolidColorBrush x:Key="Theme.Label.Primary" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="Theme.Label.Secondary" Color="{StaticResource Theme.Color.Label.Secondary}" />
+            <SolidColorBrush x:Key="Theme.Label.Tertiary" Color="{StaticResource Theme.Color.Label.Tertiary}" />
+            <SolidColorBrush x:Key="Theme.Label.Quaternary" Color="{StaticResource Theme.Color.Label.Quaternary}" />
+            <SolidColorBrush x:Key="Theme.Label.OnAccent" Color="{StaticResource Theme.Color.Label.OnAccent}" />
+            <SolidColorBrush x:Key="Theme.Fill.Primary" Color="{StaticResource Theme.Color.Fill.Primary}" />
+            <SolidColorBrush x:Key="Theme.Fill.Secondary" Color="{StaticResource Theme.Color.Fill.Secondary}" />
+            <SolidColorBrush x:Key="Theme.Fill.Tertiary" Color="{StaticResource Theme.Color.Fill.Tertiary}" />
+            <SolidColorBrush x:Key="Theme.Fill.Quaternary" Color="{StaticResource Theme.Color.Fill.Quaternary}" />
+            <SolidColorBrush x:Key="TextControlBackground" Color="{StaticResource Theme.Color.Fill.Tertiary}" />
+            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="{StaticResource Theme.Color.Fill.Secondary}" />
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="{StaticResource Theme.Color.Fill.Secondary}" />
+            <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="{StaticResource Theme.Color.Fill.Quaternary}" />
+            <SolidColorBrush x:Key="TextControlForeground" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="TextControlForegroundFocused" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="TextControlForegroundDisabled" Color="{StaticResource Theme.Color.Label.Quaternary}" />
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="{StaticResource Theme.Color.Separator.Standard}" />
+            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="{StaticResource Theme.Color.Separator.Standard}" />
+            <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="{StaticResource Theme.Color.Accent.Primary}" />
+            <SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="{StaticResource Theme.Color.Separator.Standard}" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="{StaticResource Theme.Color.Label.Tertiary}" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="{StaticResource Theme.Color.Label.Tertiary}" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="{StaticResource Theme.Color.Label.Tertiary}" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundDisabled" Color="{StaticResource Theme.Color.Label.Quaternary}" />
+            <SolidColorBrush x:Key="TextControlHeaderForeground" Color="{StaticResource Theme.Color.Label.Secondary}" />
+            <SolidColorBrush x:Key="TextControlHeaderForegroundDisabled" Color="{StaticResource Theme.Color.Label.Quaternary}" />
+            <SolidColorBrush x:Key="TextControlButtonForeground" Color="{StaticResource Theme.Color.Label.Secondary}" />
+            <SolidColorBrush x:Key="TextControlButtonForegroundPointerOver" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="TextControlButtonForegroundPressed" Color="{StaticResource Theme.Color.Label.OnAccent}" />
+            <SolidColorBrush x:Key="TextControlButtonBackgroundPointerOver" Color="{StaticResource Theme.Color.Fill.Tertiary}" />
+            <SolidColorBrush x:Key="TextControlButtonBackgroundPressed" Color="{StaticResource Theme.Color.Accent.Primary}" />
+            <SolidColorBrush x:Key="ComboBoxBackground" Color="{StaticResource Theme.Color.Fill.Tertiary}" />
+            <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="{StaticResource Theme.Color.Fill.Secondary}" />
+            <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="{StaticResource Theme.Color.Fill.Secondary}" />
+            <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="{StaticResource Theme.Color.Fill.Quaternary}" />
+            <SolidColorBrush x:Key="ComboBoxForeground" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="ComboBoxForegroundPointerOver" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="ComboBoxForegroundPressed" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="ComboBoxForegroundDisabled" Color="{StaticResource Theme.Color.Label.Quaternary}" />
+            <SolidColorBrush x:Key="Theme.Separator.Standard" Color="{StaticResource Theme.Color.Separator.Standard}" />
+            <SolidColorBrush x:Key="Theme.Separator.Opaque" Color="{StaticResource Theme.Color.Separator.Opaque}" />
+            <SolidColorBrush x:Key="Theme.Accent.Primary" Color="{StaticResource Theme.Color.Accent.Primary}" />
+            <SolidColorBrush x:Key="Theme.Accent.Hover" Color="{StaticResource Theme.Color.Accent.Hover}" />
+            <SolidColorBrush x:Key="Theme.Accent.Pressed" Color="{StaticResource Theme.Color.Accent.Pressed}" />
+            <SolidColorBrush x:Key="Theme.Accent.Disabled" Color="{StaticResource Theme.Color.Accent.Disabled}" />
+            <SolidColorBrush x:Key="Theme.Accent.Subtle" Color="{StaticResource Theme.Color.Accent.Subtle}" />
+            <SolidColorBrush x:Key="Theme.Destructive.Primary" Color="{StaticResource Theme.Color.Destructive.Primary}" />
+            <SolidColorBrush x:Key="Theme.Destructive.Hover" Color="{StaticResource Theme.Color.Destructive.Hover}" />
+            <SolidColorBrush x:Key="Theme.Destructive.Pressed" Color="{StaticResource Theme.Color.Destructive.Pressed}" />
+            <SolidColorBrush x:Key="Theme.Destructive.Subtle" Color="{StaticResource Theme.Color.Destructive.Subtle}" />
+            <SolidColorBrush x:Key="Theme.Success.Primary" Color="{StaticResource Theme.Color.Success.Primary}" />
+            <SolidColorBrush x:Key="Theme.Success.Subtle" Color="{StaticResource Theme.Color.Success.Subtle}" />
+            <SolidColorBrush x:Key="Theme.Warning.Primary" Color="{StaticResource Theme.Color.Warning.Primary}" />
+            <SolidColorBrush x:Key="Theme.Warning.Subtle" Color="{StaticResource Theme.Color.Warning.Subtle}" />
+            <SolidColorBrush x:Key="Theme.Info.Primary" Color="{StaticResource Theme.Color.Info.Primary}" />
+            <SolidColorBrush x:Key="Theme.Info.Subtle" Color="{StaticResource Theme.Color.Info.Subtle}" />
+            <SolidColorBrush x:Key="Theme.Disabled.Label" Color="{StaticResource Theme.Color.Disabled.Label}" />
+            <SolidColorBrush x:Key="Theme.Disabled.Fill" Color="{StaticResource Theme.Color.Disabled.Fill}" />
+            <SolidColorBrush x:Key="Theme.Selected.Fill" Color="{StaticResource Theme.Color.Selected.Fill}" />
+            <SolidColorBrush x:Key="Theme.Selected.Rail" Color="{StaticResource Theme.Color.Selected.Rail}" />
+            <SolidColorBrush x:Key="Theme.Focused.Ring" Color="{StaticResource Theme.Color.Focused.Ring}" />
+            <SolidColorBrush x:Key="Theme.Focused.RingOuter" Color="{StaticResource Theme.Color.Focused.RingOuter}" />
+            <SolidColorBrush x:Key="Theme.Scrim" Color="{StaticResource Theme.Color.Scrim}" />
+            <SolidColorBrush x:Key="Theme.Subject.Blue" Color="{StaticResource Theme.Color.Subject.Blue}" />
+            <SolidColorBrush x:Key="Theme.Subject.Teal" Color="{StaticResource Theme.Color.Subject.Teal}" />
+            <SolidColorBrush x:Key="Theme.Subject.Green" Color="{StaticResource Theme.Color.Subject.Green}" />
+            <SolidColorBrush x:Key="Theme.Subject.Indigo" Color="{StaticResource Theme.Color.Subject.Indigo}" />
+            <SolidColorBrush x:Key="Theme.Subject.Orange" Color="{StaticResource Theme.Color.Subject.Orange}" />
+            <SolidColorBrush x:Key="Theme.Subject.Pink" Color="{StaticResource Theme.Color.Subject.Pink}" />
+            <SolidColorBrush x:Key="Theme.Subject.Purple" Color="{StaticResource Theme.Color.Subject.Purple}" />
+            <SolidColorBrush x:Key="Theme.Subject.Graphite" Color="{StaticResource Theme.Color.Subject.Graphite}" />
+            <SolidColorBrush x:Key="Theme.Highlight.Yellow" Color="{StaticResource Theme.Color.Highlight.Yellow}" />
+            <SolidColorBrush x:Key="Theme.Highlight.Green" Color="{StaticResource Theme.Color.Highlight.Green}" />
+            <SolidColorBrush x:Key="Theme.Highlight.Blue" Color="{StaticResource Theme.Color.Highlight.Blue}" />
+            <SolidColorBrush x:Key="Theme.Highlight.Pink" Color="{StaticResource Theme.Color.Highlight.Pink}" />
+            <SolidColorBrush x:Key="Theme.Highlight.Purple" Color="{StaticResource Theme.Color.Highlight.Purple}" />
         </ResourceDictionary>
 
         <!-- ================================================================ LIGHT -->
@@ -235,6 +327,98 @@
             <SolidColorBrush x:Key="TextOnAccentFillColorDisabledBrush" Color="#4D000000" />
             <SolidColorBrush x:Key="TextOnAccentFillColorSelectedTextBrush" Color="#FFFFFFFF" />
 
+
+            <!--
+                Role brushes. Components bind to these and never to the colours above, so a role
+                can later gain state behaviour without every call site changing.
+            -->
+            <SolidColorBrush x:Key="Theme.Background.Primary" Color="{StaticResource Theme.Color.Background.Primary}" />
+            <SolidColorBrush x:Key="Theme.Background.Secondary" Color="{StaticResource Theme.Color.Background.Secondary}" />
+            <SolidColorBrush x:Key="Theme.Background.Tertiary" Color="{StaticResource Theme.Color.Background.Tertiary}" />
+            <SolidColorBrush x:Key="Theme.GroupedBackground.Primary" Color="{StaticResource Theme.Color.GroupedBackground.Primary}" />
+            <SolidColorBrush x:Key="Theme.GroupedBackground.Secondary" Color="{StaticResource Theme.Color.GroupedBackground.Secondary}" />
+            <SolidColorBrush x:Key="Theme.GroupedBackground.Tertiary" Color="{StaticResource Theme.Color.GroupedBackground.Tertiary}" />
+            <SolidColorBrush x:Key="Theme.Surface.Primary" Color="{StaticResource Theme.Color.Surface.Primary}" />
+            <SolidColorBrush x:Key="Theme.Surface.Secondary" Color="{StaticResource Theme.Color.Surface.Secondary}" />
+            <SolidColorBrush x:Key="Theme.Surface.Tertiary" Color="{StaticResource Theme.Color.Surface.Tertiary}" />
+            <SolidColorBrush x:Key="Theme.Surface.Elevated" Color="{StaticResource Theme.Color.Surface.Elevated}" />
+            <SolidColorBrush x:Key="Theme.Label.Primary" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="Theme.Label.Secondary" Color="{StaticResource Theme.Color.Label.Secondary}" />
+            <SolidColorBrush x:Key="Theme.Label.Tertiary" Color="{StaticResource Theme.Color.Label.Tertiary}" />
+            <SolidColorBrush x:Key="Theme.Label.Quaternary" Color="{StaticResource Theme.Color.Label.Quaternary}" />
+            <SolidColorBrush x:Key="Theme.Label.OnAccent" Color="{StaticResource Theme.Color.Label.OnAccent}" />
+            <SolidColorBrush x:Key="Theme.Fill.Primary" Color="{StaticResource Theme.Color.Fill.Primary}" />
+            <SolidColorBrush x:Key="Theme.Fill.Secondary" Color="{StaticResource Theme.Color.Fill.Secondary}" />
+            <SolidColorBrush x:Key="Theme.Fill.Tertiary" Color="{StaticResource Theme.Color.Fill.Tertiary}" />
+            <SolidColorBrush x:Key="Theme.Fill.Quaternary" Color="{StaticResource Theme.Color.Fill.Quaternary}" />
+            <SolidColorBrush x:Key="TextControlBackground" Color="{StaticResource Theme.Color.Fill.Tertiary}" />
+            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="{StaticResource Theme.Color.Fill.Secondary}" />
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="{StaticResource Theme.Color.Fill.Secondary}" />
+            <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="{StaticResource Theme.Color.Fill.Quaternary}" />
+            <SolidColorBrush x:Key="TextControlForeground" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="TextControlForegroundFocused" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="TextControlForegroundDisabled" Color="{StaticResource Theme.Color.Label.Quaternary}" />
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="{StaticResource Theme.Color.Separator.Standard}" />
+            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="{StaticResource Theme.Color.Separator.Standard}" />
+            <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="{StaticResource Theme.Color.Accent.Primary}" />
+            <SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="{StaticResource Theme.Color.Separator.Standard}" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="{StaticResource Theme.Color.Label.Tertiary}" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="{StaticResource Theme.Color.Label.Tertiary}" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="{StaticResource Theme.Color.Label.Tertiary}" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundDisabled" Color="{StaticResource Theme.Color.Label.Quaternary}" />
+            <SolidColorBrush x:Key="TextControlHeaderForeground" Color="{StaticResource Theme.Color.Label.Secondary}" />
+            <SolidColorBrush x:Key="TextControlHeaderForegroundDisabled" Color="{StaticResource Theme.Color.Label.Quaternary}" />
+            <SolidColorBrush x:Key="TextControlButtonForeground" Color="{StaticResource Theme.Color.Label.Secondary}" />
+            <SolidColorBrush x:Key="TextControlButtonForegroundPointerOver" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="TextControlButtonForegroundPressed" Color="{StaticResource Theme.Color.Label.OnAccent}" />
+            <SolidColorBrush x:Key="TextControlButtonBackgroundPointerOver" Color="{StaticResource Theme.Color.Fill.Tertiary}" />
+            <SolidColorBrush x:Key="TextControlButtonBackgroundPressed" Color="{StaticResource Theme.Color.Accent.Primary}" />
+            <SolidColorBrush x:Key="ComboBoxBackground" Color="{StaticResource Theme.Color.Fill.Tertiary}" />
+            <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="{StaticResource Theme.Color.Fill.Secondary}" />
+            <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="{StaticResource Theme.Color.Fill.Secondary}" />
+            <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="{StaticResource Theme.Color.Fill.Quaternary}" />
+            <SolidColorBrush x:Key="ComboBoxForeground" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="ComboBoxForegroundPointerOver" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="ComboBoxForegroundPressed" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="ComboBoxForegroundDisabled" Color="{StaticResource Theme.Color.Label.Quaternary}" />
+            <SolidColorBrush x:Key="Theme.Separator.Standard" Color="{StaticResource Theme.Color.Separator.Standard}" />
+            <SolidColorBrush x:Key="Theme.Separator.Opaque" Color="{StaticResource Theme.Color.Separator.Opaque}" />
+            <SolidColorBrush x:Key="Theme.Accent.Primary" Color="{StaticResource Theme.Color.Accent.Primary}" />
+            <SolidColorBrush x:Key="Theme.Accent.Hover" Color="{StaticResource Theme.Color.Accent.Hover}" />
+            <SolidColorBrush x:Key="Theme.Accent.Pressed" Color="{StaticResource Theme.Color.Accent.Pressed}" />
+            <SolidColorBrush x:Key="Theme.Accent.Disabled" Color="{StaticResource Theme.Color.Accent.Disabled}" />
+            <SolidColorBrush x:Key="Theme.Accent.Subtle" Color="{StaticResource Theme.Color.Accent.Subtle}" />
+            <SolidColorBrush x:Key="Theme.Destructive.Primary" Color="{StaticResource Theme.Color.Destructive.Primary}" />
+            <SolidColorBrush x:Key="Theme.Destructive.Hover" Color="{StaticResource Theme.Color.Destructive.Hover}" />
+            <SolidColorBrush x:Key="Theme.Destructive.Pressed" Color="{StaticResource Theme.Color.Destructive.Pressed}" />
+            <SolidColorBrush x:Key="Theme.Destructive.Subtle" Color="{StaticResource Theme.Color.Destructive.Subtle}" />
+            <SolidColorBrush x:Key="Theme.Success.Primary" Color="{StaticResource Theme.Color.Success.Primary}" />
+            <SolidColorBrush x:Key="Theme.Success.Subtle" Color="{StaticResource Theme.Color.Success.Subtle}" />
+            <SolidColorBrush x:Key="Theme.Warning.Primary" Color="{StaticResource Theme.Color.Warning.Primary}" />
+            <SolidColorBrush x:Key="Theme.Warning.Subtle" Color="{StaticResource Theme.Color.Warning.Subtle}" />
+            <SolidColorBrush x:Key="Theme.Info.Primary" Color="{StaticResource Theme.Color.Info.Primary}" />
+            <SolidColorBrush x:Key="Theme.Info.Subtle" Color="{StaticResource Theme.Color.Info.Subtle}" />
+            <SolidColorBrush x:Key="Theme.Disabled.Label" Color="{StaticResource Theme.Color.Disabled.Label}" />
+            <SolidColorBrush x:Key="Theme.Disabled.Fill" Color="{StaticResource Theme.Color.Disabled.Fill}" />
+            <SolidColorBrush x:Key="Theme.Selected.Fill" Color="{StaticResource Theme.Color.Selected.Fill}" />
+            <SolidColorBrush x:Key="Theme.Selected.Rail" Color="{StaticResource Theme.Color.Selected.Rail}" />
+            <SolidColorBrush x:Key="Theme.Focused.Ring" Color="{StaticResource Theme.Color.Focused.Ring}" />
+            <SolidColorBrush x:Key="Theme.Focused.RingOuter" Color="{StaticResource Theme.Color.Focused.RingOuter}" />
+            <SolidColorBrush x:Key="Theme.Scrim" Color="{StaticResource Theme.Color.Scrim}" />
+            <SolidColorBrush x:Key="Theme.Subject.Blue" Color="{StaticResource Theme.Color.Subject.Blue}" />
+            <SolidColorBrush x:Key="Theme.Subject.Teal" Color="{StaticResource Theme.Color.Subject.Teal}" />
+            <SolidColorBrush x:Key="Theme.Subject.Green" Color="{StaticResource Theme.Color.Subject.Green}" />
+            <SolidColorBrush x:Key="Theme.Subject.Indigo" Color="{StaticResource Theme.Color.Subject.Indigo}" />
+            <SolidColorBrush x:Key="Theme.Subject.Orange" Color="{StaticResource Theme.Color.Subject.Orange}" />
+            <SolidColorBrush x:Key="Theme.Subject.Pink" Color="{StaticResource Theme.Color.Subject.Pink}" />
+            <SolidColorBrush x:Key="Theme.Subject.Purple" Color="{StaticResource Theme.Color.Subject.Purple}" />
+            <SolidColorBrush x:Key="Theme.Subject.Graphite" Color="{StaticResource Theme.Color.Subject.Graphite}" />
+            <SolidColorBrush x:Key="Theme.Highlight.Yellow" Color="{StaticResource Theme.Color.Highlight.Yellow}" />
+            <SolidColorBrush x:Key="Theme.Highlight.Green" Color="{StaticResource Theme.Color.Highlight.Green}" />
+            <SolidColorBrush x:Key="Theme.Highlight.Blue" Color="{StaticResource Theme.Color.Highlight.Blue}" />
+            <SolidColorBrush x:Key="Theme.Highlight.Pink" Color="{StaticResource Theme.Color.Highlight.Pink}" />
+            <SolidColorBrush x:Key="Theme.Highlight.Purple" Color="{StaticResource Theme.Color.Highlight.Purple}" />
         </ResourceDictionary>
 
         <!-- ======================================================== HIGH CONTRAST -->
@@ -345,6 +529,98 @@
             <SolidColorBrush x:Key="TextOnAccentFillColorDisabledBrush" Color="#FF9A9A9A" />
             <SolidColorBrush x:Key="TextOnAccentFillColorSelectedTextBrush" Color="#FF000000" />
 
+
+            <!--
+                Role brushes. Components bind to these and never to the colours above, so a role
+                can later gain state behaviour without every call site changing.
+            -->
+            <SolidColorBrush x:Key="Theme.Background.Primary" Color="{StaticResource Theme.Color.Background.Primary}" />
+            <SolidColorBrush x:Key="Theme.Background.Secondary" Color="{StaticResource Theme.Color.Background.Secondary}" />
+            <SolidColorBrush x:Key="Theme.Background.Tertiary" Color="{StaticResource Theme.Color.Background.Tertiary}" />
+            <SolidColorBrush x:Key="Theme.GroupedBackground.Primary" Color="{StaticResource Theme.Color.GroupedBackground.Primary}" />
+            <SolidColorBrush x:Key="Theme.GroupedBackground.Secondary" Color="{StaticResource Theme.Color.GroupedBackground.Secondary}" />
+            <SolidColorBrush x:Key="Theme.GroupedBackground.Tertiary" Color="{StaticResource Theme.Color.GroupedBackground.Tertiary}" />
+            <SolidColorBrush x:Key="Theme.Surface.Primary" Color="{StaticResource Theme.Color.Surface.Primary}" />
+            <SolidColorBrush x:Key="Theme.Surface.Secondary" Color="{StaticResource Theme.Color.Surface.Secondary}" />
+            <SolidColorBrush x:Key="Theme.Surface.Tertiary" Color="{StaticResource Theme.Color.Surface.Tertiary}" />
+            <SolidColorBrush x:Key="Theme.Surface.Elevated" Color="{StaticResource Theme.Color.Surface.Elevated}" />
+            <SolidColorBrush x:Key="Theme.Label.Primary" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="Theme.Label.Secondary" Color="{StaticResource Theme.Color.Label.Secondary}" />
+            <SolidColorBrush x:Key="Theme.Label.Tertiary" Color="{StaticResource Theme.Color.Label.Tertiary}" />
+            <SolidColorBrush x:Key="Theme.Label.Quaternary" Color="{StaticResource Theme.Color.Label.Quaternary}" />
+            <SolidColorBrush x:Key="Theme.Label.OnAccent" Color="{StaticResource Theme.Color.Label.OnAccent}" />
+            <SolidColorBrush x:Key="Theme.Fill.Primary" Color="{StaticResource Theme.Color.Fill.Primary}" />
+            <SolidColorBrush x:Key="Theme.Fill.Secondary" Color="{StaticResource Theme.Color.Fill.Secondary}" />
+            <SolidColorBrush x:Key="Theme.Fill.Tertiary" Color="{StaticResource Theme.Color.Fill.Tertiary}" />
+            <SolidColorBrush x:Key="Theme.Fill.Quaternary" Color="{StaticResource Theme.Color.Fill.Quaternary}" />
+            <SolidColorBrush x:Key="TextControlBackground" Color="{StaticResource Theme.Color.Fill.Tertiary}" />
+            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="{StaticResource Theme.Color.Fill.Secondary}" />
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="{StaticResource Theme.Color.Fill.Secondary}" />
+            <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="{StaticResource Theme.Color.Fill.Quaternary}" />
+            <SolidColorBrush x:Key="TextControlForeground" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="TextControlForegroundFocused" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="TextControlForegroundDisabled" Color="{StaticResource Theme.Color.Label.Quaternary}" />
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="{StaticResource Theme.Color.Separator.Standard}" />
+            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="{StaticResource Theme.Color.Separator.Standard}" />
+            <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="{StaticResource Theme.Color.Accent.Primary}" />
+            <SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="{StaticResource Theme.Color.Separator.Standard}" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="{StaticResource Theme.Color.Label.Tertiary}" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="{StaticResource Theme.Color.Label.Tertiary}" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="{StaticResource Theme.Color.Label.Tertiary}" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundDisabled" Color="{StaticResource Theme.Color.Label.Quaternary}" />
+            <SolidColorBrush x:Key="TextControlHeaderForeground" Color="{StaticResource Theme.Color.Label.Secondary}" />
+            <SolidColorBrush x:Key="TextControlHeaderForegroundDisabled" Color="{StaticResource Theme.Color.Label.Quaternary}" />
+            <SolidColorBrush x:Key="TextControlButtonForeground" Color="{StaticResource Theme.Color.Label.Secondary}" />
+            <SolidColorBrush x:Key="TextControlButtonForegroundPointerOver" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="TextControlButtonForegroundPressed" Color="{StaticResource Theme.Color.Label.OnAccent}" />
+            <SolidColorBrush x:Key="TextControlButtonBackgroundPointerOver" Color="{StaticResource Theme.Color.Fill.Tertiary}" />
+            <SolidColorBrush x:Key="TextControlButtonBackgroundPressed" Color="{StaticResource Theme.Color.Accent.Primary}" />
+            <SolidColorBrush x:Key="ComboBoxBackground" Color="{StaticResource Theme.Color.Fill.Tertiary}" />
+            <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="{StaticResource Theme.Color.Fill.Secondary}" />
+            <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="{StaticResource Theme.Color.Fill.Secondary}" />
+            <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="{StaticResource Theme.Color.Fill.Quaternary}" />
+            <SolidColorBrush x:Key="ComboBoxForeground" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="ComboBoxForegroundPointerOver" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="ComboBoxForegroundPressed" Color="{StaticResource Theme.Color.Label.Primary}" />
+            <SolidColorBrush x:Key="ComboBoxForegroundDisabled" Color="{StaticResource Theme.Color.Label.Quaternary}" />
+            <SolidColorBrush x:Key="Theme.Separator.Standard" Color="{StaticResource Theme.Color.Separator.Standard}" />
+            <SolidColorBrush x:Key="Theme.Separator.Opaque" Color="{StaticResource Theme.Color.Separator.Opaque}" />
+            <SolidColorBrush x:Key="Theme.Accent.Primary" Color="{StaticResource Theme.Color.Accent.Primary}" />
+            <SolidColorBrush x:Key="Theme.Accent.Hover" Color="{StaticResource Theme.Color.Accent.Hover}" />
+            <SolidColorBrush x:Key="Theme.Accent.Pressed" Color="{StaticResource Theme.Color.Accent.Pressed}" />
+            <SolidColorBrush x:Key="Theme.Accent.Disabled" Color="{StaticResource Theme.Color.Accent.Disabled}" />
+            <SolidColorBrush x:Key="Theme.Accent.Subtle" Color="{StaticResource Theme.Color.Accent.Subtle}" />
+            <SolidColorBrush x:Key="Theme.Destructive.Primary" Color="{StaticResource Theme.Color.Destructive.Primary}" />
+            <SolidColorBrush x:Key="Theme.Destructive.Hover" Color="{StaticResource Theme.Color.Destructive.Hover}" />
+            <SolidColorBrush x:Key="Theme.Destructive.Pressed" Color="{StaticResource Theme.Color.Destructive.Pressed}" />
+            <SolidColorBrush x:Key="Theme.Destructive.Subtle" Color="{StaticResource Theme.Color.Destructive.Subtle}" />
+            <SolidColorBrush x:Key="Theme.Success.Primary" Color="{StaticResource Theme.Color.Success.Primary}" />
+            <SolidColorBrush x:Key="Theme.Success.Subtle" Color="{StaticResource Theme.Color.Success.Subtle}" />
+            <SolidColorBrush x:Key="Theme.Warning.Primary" Color="{StaticResource Theme.Color.Warning.Primary}" />
+            <SolidColorBrush x:Key="Theme.Warning.Subtle" Color="{StaticResource Theme.Color.Warning.Subtle}" />
+            <SolidColorBrush x:Key="Theme.Info.Primary" Color="{StaticResource Theme.Color.Info.Primary}" />
+            <SolidColorBrush x:Key="Theme.Info.Subtle" Color="{StaticResource Theme.Color.Info.Subtle}" />
+            <SolidColorBrush x:Key="Theme.Disabled.Label" Color="{StaticResource Theme.Color.Disabled.Label}" />
+            <SolidColorBrush x:Key="Theme.Disabled.Fill" Color="{StaticResource Theme.Color.Disabled.Fill}" />
+            <SolidColorBrush x:Key="Theme.Selected.Fill" Color="{StaticResource Theme.Color.Selected.Fill}" />
+            <SolidColorBrush x:Key="Theme.Selected.Rail" Color="{StaticResource Theme.Color.Selected.Rail}" />
+            <SolidColorBrush x:Key="Theme.Focused.Ring" Color="{StaticResource Theme.Color.Focused.Ring}" />
+            <SolidColorBrush x:Key="Theme.Focused.RingOuter" Color="{StaticResource Theme.Color.Focused.RingOuter}" />
+            <SolidColorBrush x:Key="Theme.Scrim" Color="{StaticResource Theme.Color.Scrim}" />
+            <SolidColorBrush x:Key="Theme.Subject.Blue" Color="{StaticResource Theme.Color.Subject.Blue}" />
+            <SolidColorBrush x:Key="Theme.Subject.Teal" Color="{StaticResource Theme.Color.Subject.Teal}" />
+            <SolidColorBrush x:Key="Theme.Subject.Green" Color="{StaticResource Theme.Color.Subject.Green}" />
+            <SolidColorBrush x:Key="Theme.Subject.Indigo" Color="{StaticResource Theme.Color.Subject.Indigo}" />
+            <SolidColorBrush x:Key="Theme.Subject.Orange" Color="{StaticResource Theme.Color.Subject.Orange}" />
+            <SolidColorBrush x:Key="Theme.Subject.Pink" Color="{StaticResource Theme.Color.Subject.Pink}" />
+            <SolidColorBrush x:Key="Theme.Subject.Purple" Color="{StaticResource Theme.Color.Subject.Purple}" />
+            <SolidColorBrush x:Key="Theme.Subject.Graphite" Color="{StaticResource Theme.Color.Subject.Graphite}" />
+            <SolidColorBrush x:Key="Theme.Highlight.Yellow" Color="{StaticResource Theme.Color.Highlight.Yellow}" />
+            <SolidColorBrush x:Key="Theme.Highlight.Green" Color="{StaticResource Theme.Color.Highlight.Green}" />
+            <SolidColorBrush x:Key="Theme.Highlight.Blue" Color="{StaticResource Theme.Color.Highlight.Blue}" />
+            <SolidColorBrush x:Key="Theme.Highlight.Pink" Color="{StaticResource Theme.Color.Highlight.Pink}" />
+            <SolidColorBrush x:Key="Theme.Highlight.Purple" Color="{StaticResource Theme.Color.Highlight.Purple}" />
         </ResourceDictionary>
 
     </ResourceDictionary.ThemeDictionaries>
@@ -354,29 +630,20 @@
         Each brush is a thin role wrapper so a role can later gain state behaviour
         without every call site changing.
     -->
-    <SolidColorBrush x:Key="Theme.Background.Primary" Color="{ThemeResource Theme.Color.Background.Primary}" />
-    <SolidColorBrush x:Key="Theme.Background.Secondary" Color="{ThemeResource Theme.Color.Background.Secondary}" />
-    <SolidColorBrush x:Key="Theme.Background.Tertiary" Color="{ThemeResource Theme.Color.Background.Tertiary}" />
+    <!--
+        The role brushes are defined once per theme, in the dictionaries above, rather than here.
 
-    <SolidColorBrush x:Key="Theme.GroupedBackground.Primary" Color="{ThemeResource Theme.Color.GroupedBackground.Primary}" />
-    <SolidColorBrush x:Key="Theme.GroupedBackground.Secondary" Color="{ThemeResource Theme.Color.GroupedBackground.Secondary}" />
-    <SolidColorBrush x:Key="Theme.GroupedBackground.Tertiary" Color="{ThemeResource Theme.Color.GroupedBackground.Tertiary}" />
+        A brush declared at this level with Color="{ThemeResource ...}" resolves its colour the
+        first time anything asks for the brush, against whatever theme was current then, and
+        holds that value for the life of the process. In an app whose window is set to dark after
+        startup, that makes every brush a race: the ones touched early keep light values. It is a
+        quiet failure — black text on a black page, no error anywhere — so the pattern is not used
+        at all rather than used carefully.
+    -->
 
-    <SolidColorBrush x:Key="Theme.Surface.Primary" Color="{ThemeResource Theme.Color.Surface.Primary}" />
-    <SolidColorBrush x:Key="Theme.Surface.Secondary" Color="{ThemeResource Theme.Color.Surface.Secondary}" />
-    <SolidColorBrush x:Key="Theme.Surface.Tertiary" Color="{ThemeResource Theme.Color.Surface.Tertiary}" />
-    <SolidColorBrush x:Key="Theme.Surface.Elevated" Color="{ThemeResource Theme.Color.Surface.Elevated}" />
 
-    <SolidColorBrush x:Key="Theme.Label.Primary" Color="{ThemeResource Theme.Color.Label.Primary}" />
-    <SolidColorBrush x:Key="Theme.Label.Secondary" Color="{ThemeResource Theme.Color.Label.Secondary}" />
-    <SolidColorBrush x:Key="Theme.Label.Tertiary" Color="{ThemeResource Theme.Color.Label.Tertiary}" />
-    <SolidColorBrush x:Key="Theme.Label.Quaternary" Color="{ThemeResource Theme.Color.Label.Quaternary}" />
-    <SolidColorBrush x:Key="Theme.Label.OnAccent" Color="{ThemeResource Theme.Color.Label.OnAccent}" />
 
-    <SolidColorBrush x:Key="Theme.Fill.Primary" Color="{ThemeResource Theme.Color.Fill.Primary}" />
-    <SolidColorBrush x:Key="Theme.Fill.Secondary" Color="{ThemeResource Theme.Color.Fill.Secondary}" />
-    <SolidColorBrush x:Key="Theme.Fill.Tertiary" Color="{ThemeResource Theme.Color.Fill.Tertiary}" />
-    <SolidColorBrush x:Key="Theme.Fill.Quaternary" Color="{ThemeResource Theme.Color.Fill.Quaternary}" />
+
 
     <!--
         WinUI's own text-box brushes, overridden.
@@ -388,88 +655,20 @@
         here is the only way; the values are the app's own, so this is a redirection rather than a
         new palette.
     -->
-    <SolidColorBrush x:Key="TextControlBackground" Color="{ThemeResource Theme.Color.Fill.Tertiary}" />
-    <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="{ThemeResource Theme.Color.Fill.Secondary}" />
-    <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="{ThemeResource Theme.Color.Fill.Secondary}" />
-    <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="{ThemeResource Theme.Color.Fill.Quaternary}" />
 
-    <SolidColorBrush x:Key="TextControlForeground" Color="{ThemeResource Theme.Color.Label.Primary}" />
-    <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="{ThemeResource Theme.Color.Label.Primary}" />
-    <SolidColorBrush x:Key="TextControlForegroundFocused" Color="{ThemeResource Theme.Color.Label.Primary}" />
-    <SolidColorBrush x:Key="TextControlForegroundDisabled" Color="{ThemeResource Theme.Color.Label.Quaternary}" />
 
-    <SolidColorBrush x:Key="TextControlBorderBrush" Color="{ThemeResource Theme.Color.Separator.Standard}" />
-    <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="{ThemeResource Theme.Color.Separator.Standard}" />
-    <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="{ThemeResource Theme.Color.Accent.Primary}" />
-    <SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="{ThemeResource Theme.Color.Separator.Standard}" />
 
-    <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="{ThemeResource Theme.Color.Label.Tertiary}" />
-    <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="{ThemeResource Theme.Color.Label.Tertiary}" />
-    <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="{ThemeResource Theme.Color.Label.Tertiary}" />
-    <SolidColorBrush x:Key="TextControlPlaceholderForegroundDisabled" Color="{ThemeResource Theme.Color.Label.Quaternary}" />
 
-    <SolidColorBrush x:Key="TextControlHeaderForeground" Color="{ThemeResource Theme.Color.Label.Secondary}" />
-    <SolidColorBrush x:Key="TextControlHeaderForegroundDisabled" Color="{ThemeResource Theme.Color.Label.Quaternary}" />
 
-    <SolidColorBrush x:Key="TextControlButtonForeground" Color="{ThemeResource Theme.Color.Label.Secondary}" />
-    <SolidColorBrush x:Key="TextControlButtonForegroundPointerOver" Color="{ThemeResource Theme.Color.Label.Primary}" />
-    <SolidColorBrush x:Key="TextControlButtonForegroundPressed" Color="{ThemeResource Theme.Color.Label.OnAccent}" />
     <SolidColorBrush x:Key="TextControlButtonBackground" Color="Transparent" />
-    <SolidColorBrush x:Key="TextControlButtonBackgroundPointerOver" Color="{ThemeResource Theme.Color.Fill.Tertiary}" />
-    <SolidColorBrush x:Key="TextControlButtonBackgroundPressed" Color="{ThemeResource Theme.Color.Accent.Primary}" />
 
     <!-- The same story for combo boxes, which share the pattern and the white flash. -->
-    <SolidColorBrush x:Key="ComboBoxBackground" Color="{ThemeResource Theme.Color.Fill.Tertiary}" />
-    <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="{ThemeResource Theme.Color.Fill.Secondary}" />
-    <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="{ThemeResource Theme.Color.Fill.Secondary}" />
-    <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="{ThemeResource Theme.Color.Fill.Quaternary}" />
-    <SolidColorBrush x:Key="ComboBoxForeground" Color="{ThemeResource Theme.Color.Label.Primary}" />
-    <SolidColorBrush x:Key="ComboBoxForegroundPointerOver" Color="{ThemeResource Theme.Color.Label.Primary}" />
-    <SolidColorBrush x:Key="ComboBoxForegroundPressed" Color="{ThemeResource Theme.Color.Label.Primary}" />
-    <SolidColorBrush x:Key="ComboBoxForegroundDisabled" Color="{ThemeResource Theme.Color.Label.Quaternary}" />
 
-    <SolidColorBrush x:Key="Theme.Separator.Standard" Color="{ThemeResource Theme.Color.Separator.Standard}" />
-    <SolidColorBrush x:Key="Theme.Separator.Opaque" Color="{ThemeResource Theme.Color.Separator.Opaque}" />
 
-    <SolidColorBrush x:Key="Theme.Accent.Primary" Color="{ThemeResource Theme.Color.Accent.Primary}" />
-    <SolidColorBrush x:Key="Theme.Accent.Hover" Color="{ThemeResource Theme.Color.Accent.Hover}" />
-    <SolidColorBrush x:Key="Theme.Accent.Pressed" Color="{ThemeResource Theme.Color.Accent.Pressed}" />
-    <SolidColorBrush x:Key="Theme.Accent.Disabled" Color="{ThemeResource Theme.Color.Accent.Disabled}" />
-    <SolidColorBrush x:Key="Theme.Accent.Subtle" Color="{ThemeResource Theme.Color.Accent.Subtle}" />
 
-    <SolidColorBrush x:Key="Theme.Destructive.Primary" Color="{ThemeResource Theme.Color.Destructive.Primary}" />
-    <SolidColorBrush x:Key="Theme.Destructive.Hover" Color="{ThemeResource Theme.Color.Destructive.Hover}" />
-    <SolidColorBrush x:Key="Theme.Destructive.Pressed" Color="{ThemeResource Theme.Color.Destructive.Pressed}" />
-    <SolidColorBrush x:Key="Theme.Destructive.Subtle" Color="{ThemeResource Theme.Color.Destructive.Subtle}" />
 
-    <SolidColorBrush x:Key="Theme.Success.Primary" Color="{ThemeResource Theme.Color.Success.Primary}" />
-    <SolidColorBrush x:Key="Theme.Success.Subtle" Color="{ThemeResource Theme.Color.Success.Subtle}" />
-    <SolidColorBrush x:Key="Theme.Warning.Primary" Color="{ThemeResource Theme.Color.Warning.Primary}" />
-    <SolidColorBrush x:Key="Theme.Warning.Subtle" Color="{ThemeResource Theme.Color.Warning.Subtle}" />
-    <SolidColorBrush x:Key="Theme.Info.Primary" Color="{ThemeResource Theme.Color.Info.Primary}" />
-    <SolidColorBrush x:Key="Theme.Info.Subtle" Color="{ThemeResource Theme.Color.Info.Subtle}" />
 
-    <SolidColorBrush x:Key="Theme.Disabled.Label" Color="{ThemeResource Theme.Color.Disabled.Label}" />
-    <SolidColorBrush x:Key="Theme.Disabled.Fill" Color="{ThemeResource Theme.Color.Disabled.Fill}" />
-    <SolidColorBrush x:Key="Theme.Selected.Fill" Color="{ThemeResource Theme.Color.Selected.Fill}" />
-    <SolidColorBrush x:Key="Theme.Selected.Rail" Color="{ThemeResource Theme.Color.Selected.Rail}" />
-    <SolidColorBrush x:Key="Theme.Focused.Ring" Color="{ThemeResource Theme.Color.Focused.Ring}" />
-    <SolidColorBrush x:Key="Theme.Focused.RingOuter" Color="{ThemeResource Theme.Color.Focused.RingOuter}" />
-    <SolidColorBrush x:Key="Theme.Scrim" Color="{ThemeResource Theme.Color.Scrim}" />
 
-    <SolidColorBrush x:Key="Theme.Subject.Blue" Color="{ThemeResource Theme.Color.Subject.Blue}" />
-    <SolidColorBrush x:Key="Theme.Subject.Teal" Color="{ThemeResource Theme.Color.Subject.Teal}" />
-    <SolidColorBrush x:Key="Theme.Subject.Green" Color="{ThemeResource Theme.Color.Subject.Green}" />
-    <SolidColorBrush x:Key="Theme.Subject.Indigo" Color="{ThemeResource Theme.Color.Subject.Indigo}" />
-    <SolidColorBrush x:Key="Theme.Subject.Orange" Color="{ThemeResource Theme.Color.Subject.Orange}" />
-    <SolidColorBrush x:Key="Theme.Subject.Pink" Color="{ThemeResource Theme.Color.Subject.Pink}" />
-    <SolidColorBrush x:Key="Theme.Subject.Purple" Color="{ThemeResource Theme.Color.Subject.Purple}" />
-    <SolidColorBrush x:Key="Theme.Subject.Graphite" Color="{ThemeResource Theme.Color.Subject.Graphite}" />
 
-    <SolidColorBrush x:Key="Theme.Highlight.Yellow" Color="{ThemeResource Theme.Color.Highlight.Yellow}" />
-    <SolidColorBrush x:Key="Theme.Highlight.Green" Color="{ThemeResource Theme.Color.Highlight.Green}" />
-    <SolidColorBrush x:Key="Theme.Highlight.Blue" Color="{ThemeResource Theme.Color.Highlight.Blue}" />
-    <SolidColorBrush x:Key="Theme.Highlight.Pink" Color="{ThemeResource Theme.Color.Highlight.Pink}" />
-    <SolidColorBrush x:Key="Theme.Highlight.Purple" Color="{ThemeResource Theme.Color.Highlight.Purple}" />
 
 </ResourceDictionary>

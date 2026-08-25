@@ -50,6 +50,8 @@ public static class PayloadSerializer
         ObjectKind.Goal => typeof(GoalPayload),
         ObjectKind.Board => typeof(BoardPayload),
         ObjectKind.Thread => typeof(ThreadPayload),
+        ObjectKind.Conversation => typeof(ConversationPayload),
+        ObjectKind.Message => typeof(MessagePayload),
         ObjectKind.Collection => typeof(CollectionPayload),
         ObjectKind.Event => typeof(EventPayload),
         ObjectKind.Person => typeof(PersonPayload),

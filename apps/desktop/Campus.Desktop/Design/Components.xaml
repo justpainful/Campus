@@ -121,7 +121,7 @@
     <ControlTemplate x:Key="Template.Button.Primary" TargetType="Button">
         <Grid>
             <Border x:Name="Root"
-                    Background="{ThemeResource Theme.Accent.Primary}"
+                    Background="{TemplateBinding Background}"
                     CornerRadius="{TemplateBinding CornerRadius}" />
             <ContentPresenter x:Name="Presenter"
                               Padding="{TemplateBinding Padding}"
@@ -158,7 +158,7 @@
     <ControlTemplate x:Key="Template.Button.Secondary" TargetType="Button">
         <Grid>
             <Border x:Name="Root"
-                    Background="{ThemeResource Theme.Fill.Tertiary}"
+                    Background="{TemplateBinding Background}"
                     CornerRadius="{TemplateBinding CornerRadius}" />
             <ContentPresenter x:Name="Presenter"
                               Padding="{TemplateBinding Padding}"
@@ -195,7 +195,7 @@
     <ControlTemplate x:Key="Template.Button.Plain" TargetType="Button">
         <Grid>
             <Border x:Name="Root"
-                    Background="Transparent"
+                    Background="{TemplateBinding Background}"
                     CornerRadius="{TemplateBinding CornerRadius}" />
             <ContentPresenter x:Name="Presenter"
                               Padding="{TemplateBinding Padding}"
@@ -231,7 +231,7 @@
     <ControlTemplate x:Key="Template.Button.Destructive" TargetType="Button">
         <Grid>
             <Border x:Name="Root"
-                    Background="{ThemeResource Theme.Destructive.Primary}"
+                    Background="{TemplateBinding Background}"
                     CornerRadius="{TemplateBinding CornerRadius}" />
             <ContentPresenter x:Name="Presenter"
                               Padding="{TemplateBinding Padding}"
@@ -431,6 +431,19 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!--
+        A toggle that carries a word rather than only a glyph: a pill that sits down when it is
+        on. Same states as Toggle.Icon, sized by its content — used where the thing being switched
+        needs naming and a lone icon would be a guess.
+    -->
+    <Style x:Key="Toggle.Chip" TargetType="ToggleButton" BasedOn="{StaticResource Toggle.Icon}">
+        <Setter Property="Width" Value="NaN" />
+        <Setter Property="Height" Value="NaN" />
+        <Setter Property="MinHeight" Value="{StaticResource Theme.Size.ControlHeightCompact}" />
+        <Setter Property="Padding" Value="10,5,10,5" />
+        <Setter Property="CornerRadius" Value="{StaticResource Theme.Radius.Pill}" />
     </Style>
 
     <!-- =============================================================== SURFACES -->

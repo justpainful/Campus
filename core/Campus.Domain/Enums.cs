@@ -25,6 +25,33 @@ public enum ObjectKind
     Subject = 19,
     Event = 20,
     Person = 21,
+    Conversation = 22,
+    Message = 23,
+}
+
+/// <summary>Who a recorded conversation was with. Decides how the other side's words are drawn.</summary>
+public enum ConversationKind
+{
+    /// <summary>A teacher, in a lesson or afterwards. Written down so it is not lost by Thursday.</summary>
+    Teacher = 0,
+
+    /// <summary>ChatGPT or another assistant. Its answers arrive as markdown and are drawn as markdown.</summary>
+    Assistant = 1,
+
+    /// <summary>A classmate, a study group, anyone else who explained something.</summary>
+    Classmate = 2,
+
+    Other = 3,
+}
+
+/// <summary>Which side of a conversation a message came from.</summary>
+public enum Speaker
+{
+    /// <summary>The person whose workspace this is.</summary>
+    Me = 0,
+
+    /// <summary>Whoever the conversation is with.</summary>
+    Them = 1,
 }
 
 /// <summary>Workflow state shared across kinds. Not every kind uses every value.</summary>

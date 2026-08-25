@@ -41,6 +41,8 @@ public sealed partial class ObjectItem(CampusObject model) : ObservableObject
         ObjectKind.Project => CampusSymbols.Project,
         ObjectKind.Board => CampusSymbols.Boards,
         ObjectKind.Thread => CampusSymbols.Thread,
+        ObjectKind.Conversation => CampusSymbols.Conversation,
+        ObjectKind.Message => CampusSymbols.Comment,
         ObjectKind.PrintJob => CampusSymbols.PrintCenter,
         ObjectKind.Goal => CampusSymbols.Goals,
         ObjectKind.Collection => CampusSymbols.Collection,

@@ -148,6 +148,8 @@ public sealed partial class MainWindow : Window
                 case "markdown": _ = OpenFirstFileAsync(ObjectKind.File, MediaKind.Markdown); break;
                 case "viewer": _ = OpenFirstFileAsync(ObjectKind.File); break;
                 case "thread": _ = OpenFirstFileAsync(ObjectKind.Thread); break;
+                case "conversation": _ = OpenFirstFileAsync(ObjectKind.Conversation); break;
+                case "conversation.teacher": _ = OpenConversationAsync(ConversationKind.Teacher); break;
             }
         });
     }
@@ -183,6 +185,20 @@ public sealed partial class MainWindow : Window
         var first = (await _workspace.Objects.QueryAsync(query)).FirstOrDefault();
 
         if (first is not null) _router.Open(first.Id);
+    }
+
+    /// <summary>Opens a conversation of a given kind, so both layouts can be photographed.</summary>
+    private async Task OpenConversationAsync(ConversationKind kind)
+    {
+        if (!_workspace.IsUnlocked) return;
+
+        var all = await _workspace.Objects.QueryAsync(
+            new Campus.Domain.CampusQuery { Kinds = { ObjectKind.Conversation } });
+
+        var match = all.FirstOrDefault(
+            c => c.PayloadAs<ConversationPayload>()?.ConversationKind == kind);
+
+        if (match is not null) _router.Open(match.Id);
     }
 #endif
 
@@ -250,6 +266,7 @@ public sealed partial class MainWindow : Window
             {
                 ObjectKind.File => typeof(Views.Viewers.ViewerHost),
                 ObjectKind.Thread => typeof(ThreadPage),
+                ObjectKind.Conversation => typeof(ConversationPage),
                 ObjectKind.Board => typeof(BoardPage),
                 ObjectKind.Subject => typeof(SubjectPage),
                 _ => typeof(ObjectDetailPage),
@@ -339,6 +356,7 @@ public sealed partial class MainWindow : Window
         ShellDestinations.Files => typeof(FilesPage),
         ShellDestinations.Goals => typeof(GoalsPage),
         ShellDestinations.Boards => typeof(BoardsPage),
+        ShellDestinations.Conversations => typeof(ConversationsPage),
         ShellDestinations.Profile => typeof(ProfilePage),
         ShellDestinations.Search => typeof(SearchPage),
         ShellDestinations.Sync => typeof(SyncPage),
