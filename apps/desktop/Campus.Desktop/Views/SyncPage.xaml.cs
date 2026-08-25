@@ -1,6 +1,5 @@
 using Campus.Desktop.Design;
 using Campus.Desktop.Design.Controls;
-using Campus.Sync;
 using Campus.Desktop.Design.Icons;
 using Campus.Desktop.Services;
 using Campus.Domain;
@@ -25,13 +24,32 @@ public sealed partial class SyncPage : Page
     private readonly WorkspaceService _workspace = App.GetService<WorkspaceService>();
     private readonly SyncService _sync = App.GetService<SyncService>();
 
+    /// <summary>Watches for a phone being plugged in while this page is open.</summary>
+    private readonly DispatcherTimer _cableWatch = new() { Interval = TimeSpan.FromSeconds(2) };
+
+    private UsbDevice? _attached;
+    private bool _cableBusy;
+
+    /// <summary>
+    /// Phones already synced this time they were plugged in.
+    ///
+    /// Plugging a phone in syncs it once, on its own. Doing it again every two seconds because
+    /// the phone is still plugged in would be a loop, so a device is remembered until it is
+    /// unplugged — after which plugging it back in means the same thing again.
+    /// </summary>
+    private readonly HashSet<string> _syncedWhileAttached = [];
+
     public SyncPage()
     {
         InitializeComponent();
         _sync.Progress += OnProgress;
+
+        _cableWatch.Tick += async (_, _) => await LookForPhoneAsync();
+
         Unloaded += (_, _) =>
         {
             _sync.Progress -= OnProgress;
+            _cableWatch.Stop();
             // Nothing keeps a socket open once you have left the page.
             _sync.StopListening();
         };
@@ -47,6 +65,98 @@ public sealed partial class SyncPage : Page
 
         BuildTransfer();
         await ReloadAsync();
+
+        await LookForPhoneAsync();
+        _cableWatch.Start();
+    }
+
+    // ------------------------------------------------------------------------ the cable
+
+    /// <summary>
+    /// Looks for a phone on the wire and keeps the card honest about what it finds.
+    ///
+    /// Polling rather than a device-arrival notification: registering for WM_DEVICECHANGE means a
+    /// window subclass and a message loop hook for something that costs a loopback connection
+    /// every two seconds while one page is open.
+    /// </summary>
+    private async Task LookForPhoneAsync()
+    {
+        if (_cableBusy) return;
+
+        if (!await _sync.CableSupportAsync())
+        {
+            _attached = null;
+            SetCable(L.T("cable.no.service"), L.T("cable.no.service.detail"), canSync: false);
+            return;
+        }
+
+        var phones = await _sync.AttachedPhonesAsync();
+        var phone = phones.FirstOrDefault();
+
+        if (phone is null)
+        {
+            _attached = null;
+            _syncedWhileAttached.Clear();
+            SetCable(L.T("cable.nothing"), L.T("cable.nothing.detail"), canSync: false);
+            return;
+        }
+
+        _attached = phone;
+        SetCable(L.T("cable.attached"), L.T("cable.attached.detail", phone.ShortSerial),
+            canSync: true);
+
+        // The whole point of the cable is that plugging it in is the gesture. Pressing a button
+        // afterwards is the thing the user asked not to have to do.
+        if (_syncedWhileAttached.Add(phone.SerialNumber)) await SyncOverCableAsync(phone);
+    }
+
+    private void SetCable(string title, string detail, bool canSync)
+    {
+        CableTitle.Text = title;
+        CableDetail.Text = detail;
+        CableButton.IsEnabled = canSync && !_cableBusy;
+        CableIcon.Symbol = canSync ? CampusSymbols.Phone : CampusSymbols.Usb;
+    }
+
+    private async Task SyncOverCableAsync(UsbDevice phone)
+    {
+        _cableBusy = true;
+        CableButton.IsEnabled = false;
+
+        try
+        {
+            var result = await _sync.ReceiveOverCableAsync(phone);
+
+            if (result is null)
+            {
+                Status(L.T("cable.nothing.came"));
+            }
+            else
+            {
+                Status(L.T("cable.took", result.Accepted, result.DeviceName));
+                await ReloadAsync();
+            }
+        }
+        catch (IOException ex)
+        {
+            // The most common one by far is "nothing is listening", which means the app is not
+            // open on the phone. UsbMux already words these for a person to act on.
+            Status(ex.Message);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            Status(ex.Message);
+        }
+        finally
+        {
+            _cableBusy = false;
+            CableButton.IsEnabled = _attached is not null;
+        }
+    }
+
+    private async void OnCableSyncClick(object sender, RoutedEventArgs e)
+    {
+        if (_attached is { } phone) await SyncOverCableAsync(phone);
     }
 
     private async Task ReloadAsync()

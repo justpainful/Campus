@@ -65,6 +65,22 @@ public sealed class PhoneReceiver(
         }
     }
 
+    /// <summary>
+    /// Takes what a phone has, over a connection that already exists.
+    ///
+    /// Used for the cable, where the tunnel Windows opens through Apple's device service is a
+    /// stream rather than something accepted from a listener. The conversation over it is
+    /// identical — the phone still greets first and still has to prove it holds the pairing
+    /// secret, because which end dialled says nothing about who is on it.
+    /// </summary>
+    public async Task<PhoneSyncResult?> ReceiveOverAsync(Stream stream, CancellationToken ct = default)
+    {
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        deadline.CancelAfter(TimeSpan.FromMinutes(10));
+
+        return await ConverseAsync(stream, deadline.Token).ConfigureAwait(false);
+    }
+
     private async Task<PhoneSyncResult?> ConverseAsync(Stream stream, CancellationToken ct)
     {
         var hello = await PhoneSync.ReadJsonAsync<PhoneSync.Hello>(stream, ct).ConfigureAwait(false);

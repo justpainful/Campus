@@ -35,6 +35,44 @@
                 </StackPanel>
             </Border>
 
+            <!--
+                The cable, first, because it is the easy one: plug the phone in and there is
+                nothing to type. The card is always here rather than appearing when a phone is
+                attached — a control that materialises is a control nobody finds.
+            -->
+            <StackPanel Spacing="10">
+                <TextBlock Text="{l:T Key=over.the.cable}" Style="{StaticResource Text.SectionHeader}" />
+                <Border Style="{StaticResource Surface.Section}" Padding="16,14,16,14">
+                    <Grid ColumnSpacing="14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Width="40" Height="40" CornerRadius="20"
+                                VerticalAlignment="Center"
+                                Background="{ThemeResource Theme.Fill.Quaternary}">
+                            <icons:CampusIcon x:Name="CableIcon" Symbol="usb" IconSize="19"
+                                              Foreground="{ThemeResource Theme.Label.Secondary}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+
+                        <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                            <TextBlock x:Name="CableTitle" Style="{StaticResource Text.Headline}" />
+                            <TextBlock x:Name="CableDetail" Style="{StaticResource Text.Footnote}"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <Button x:Name="CableButton" Grid.Column="2"
+                                Style="{StaticResource Button.Primary}"
+                                VerticalAlignment="Center" MinWidth="0"
+                                Content="{l:T Key=sync.now}" Click="OnCableSyncClick" />
+                    </Grid>
+                </Border>
+            </StackPanel>
+
             <StackPanel Spacing="10">
                 <Grid>
                     <TextBlock Text="{l:T Key=devices}" Style="{StaticResource Text.SectionHeader}"

@@ -17,6 +17,7 @@
     <ProjectReference Include="..\..\core\Campus.Vault\Campus.Vault.csproj" />
     <ProjectReference Include="..\..\core\Campus.Storage\Campus.Storage.csproj" />
     <ProjectReference Include="..\..\core\Campus.Documents\Campus.Documents.csproj" />
+    <ProjectReference Include="..\..\core\Campus.Sync\Campus.Sync.csproj" />
   </ItemGroup>
 
 </Project>

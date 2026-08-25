@@ -37,6 +37,32 @@ final class SyncClient {
         port: UInt16 = SyncProtocol.port,
         outbox: Outbox = .shared
     ) async {
+        status = .connecting(host)
+
+        do {
+            let channel = try await Channel.connect(host: host, port: port)
+            await exchange(over: channel, outbox: outbox, closing: true)
+        } catch let failure as Channel.Failure {
+            status = .failed(failure.message)
+        } catch {
+            status = .failed(error.localizedDescription)
+        }
+    }
+
+    /// Runs the exchange over a connection that already exists.
+    ///
+    /// Split out from `send(to:)` because over the cable the PC dials the phone rather than the
+    /// other way round — usbmux only carries connections in that direction. Who opened the socket
+    /// makes no difference to what is said over it: the phone still greets first, still proves it
+    /// holds the pairing secret, and still encrypts everything after the greeting. The cable is a
+    /// wire, not a permission.
+    func exchange(
+        over channel: Channel,
+        outbox: Outbox = .shared,
+        closing: Bool = true
+    ) async {
+        defer { if closing { channel.close() } }
+
         guard let computer = Pairing.load() else {
             status = .failed("This phone is not paired with a computer yet.")
             return
@@ -55,12 +81,8 @@ final class SyncClient {
 
         let key = SymmetricKey(data: keyData)
         let deviceId = Device.identifier
-        status = .connecting(host)
 
         do {
-            let channel = try await Channel.connect(host: host, port: port)
-            defer { channel.close() }
-
             // ---- the greeting, in the clear: it carries no content, only proof of pairing
             let nonce = Pairing.makeNonce()
             guard let signature = Pairing.sign(nonce: nonce, key: computer.key) else {
@@ -162,6 +184,11 @@ final class Channel: @unchecked Sendable {
 
     private init(connection: NWConnection) {
         self.connection = connection
+    }
+
+    /// Wraps a connection that arrived rather than one that was dialled.
+    static func accepted(_ connection: NWConnection) -> Channel {
+        Channel(connection: connection)
     }
 
     static func connect(host: String, port: UInt16) async throws -> Channel {
@@ -339,7 +366,10 @@ final class Channel: @unchecked Sendable {
 ///
 /// Needed because a connection reports several states on the way to being ready, and a checked
 /// continuation resumed twice takes the process with it.
-private final class Once: @unchecked Sendable {
+/// A latch, so a continuation is resumed exactly once. Shared with the cable listener, which has
+/// the same problem: a connection reports several states on its way to being usable, and resuming
+/// twice is a crash rather than a warning.
+final class Once: @unchecked Sendable {
     private let lock = NSLock()
     private var done = false
 

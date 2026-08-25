@@ -201,7 +201,7 @@
 - [x] M-05 Share Extension (share sheet → app group → outbox on next launch)
 - [x] M-06 Pairing via QR
 - [x] M-07 Local Wi-Fi encrypted sync
-- [~] M-08 USB sync path — the outbox is in Documents and readable over USB; Campus does not drive AFC itself, so the file is copied by hand or synced over Wi-Fi
+- [x] M-08 USB sync path — Campus opens a tunnel to the phone through Apple's device service (usbmux) and runs the ordinary encrypted exchange over it; plugging the phone in with Campus Pocket open syncs on its own, with no address to type and no Wi-Fi
 - [x] M-09 Sync journal + incremental deltas
 - [x] M-10 Conflict resolution UI (both sides)
 - [x] M-11 CI/CD on GitHub Actions macOS runner → build + archive

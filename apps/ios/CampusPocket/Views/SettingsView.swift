@@ -3,6 +3,7 @@ import SwiftUI
 /// Pairing, storage, and an honest description of where things actually are.
 struct SettingsView: View {
     @Environment(Outbox.self) private var outbox
+    @Environment(CableListener.self) private var cable
     @Environment(\.dismiss) private var dismiss
 
     @State private var paired = Pairing.load()
@@ -41,6 +42,38 @@ struct SettingsView: View {
                 } footer: {
                     Text("Open Campus on your PC, go to Sync, and scan the code it shows. "
                          + "Pairing happens once and does not involve any server.")
+                }
+
+                Section {
+                    LabeledContent("Over the cable") {
+                        switch cable.state {
+                        case .listening:
+                            Label("Ready", systemImage: "cable.connector")
+                                .labelStyle(.titleAndIcon)
+                                .foregroundStyle(.green)
+                        case .talking:
+                            Label("Sending", systemImage: "arrow.up.circle")
+                                .foregroundStyle(CampusTheme.accent)
+                        case .failed(let reason):
+                            Text(reason).foregroundStyle(.red)
+                        case .off:
+                            Text(paired == nil ? "Pair first" : "Not ready")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    if let message = cable.lastResult {
+                        Text(message)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                } header: {
+                    Text("Cable")
+                } footer: {
+                    Text("Plug the phone into your PC with a cable and leave this app open. "
+                         + "Campus picks it up on its own — there is no address to type and no "
+                         + "Wi-Fi to be on. Everything sent is encrypted with the pairing key, "
+                         + "exactly as it is over Wi-Fi.")
                 }
 
                 Section {

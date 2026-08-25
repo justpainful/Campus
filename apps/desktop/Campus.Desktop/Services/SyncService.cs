@@ -245,6 +245,42 @@ public sealed class SyncService(WorkspaceService workspace)
         return await receiver.ReceiveAsync(PhoneSync.Port, ct);
     }
 
+    // ------------------------------------------------------------------------ over the cable
+
+    /// <summary>Whether Windows has Apple's device service, which is what carries the cable.</summary>
+    public Task<bool> CableSupportAsync(CancellationToken ct = default)
+        => UsbMux.IsAvailableAsync(ct);
+
+    /// <summary>Phones plugged into this machine right now.</summary>
+    public async Task<IReadOnlyList<UsbDevice>> AttachedPhonesAsync(CancellationToken ct = default)
+    {
+        var devices = await UsbMux.ListAsync(ct);
+        return devices.Where(d => d.OverCable).ToList();
+    }
+
+    /// <summary>
+    /// Takes what a plugged-in phone has, without either device needing to be on a network.
+    ///
+    /// The tunnel is opened from this side because that is the only direction Apple's service
+    /// carries; everything after that is the same conversation as over Wi-Fi, encrypted with the
+    /// same pairing secret. Campus Pocket has to be open on the phone — iOS gives a foreground
+    /// app a socket and takes it away again when the app is put down.
+    /// </summary>
+    public async Task<PhoneSyncResult?> ReceiveOverCableAsync(
+        UsbDevice device, CancellationToken ct = default)
+    {
+        Progress?.Invoke(this, $"Reaching the phone over the cable…");
+
+        await using var tunnel = await UsbMux.ConnectAsync(device.DeviceId, PhoneSync.Port, ct);
+
+        var receiver = new PhoneReceiver(
+            _workspace.Database, _workspace.Vault, _workspace.DeviceId, "Campus");
+
+        receiver.Progress += (_, message) => Progress?.Invoke(this, message);
+
+        return await receiver.ReceiveOverAsync(tunnel, ct);
+    }
+
     // ------------------------------------------------------------------------ pairing
 
     /// <summary>
