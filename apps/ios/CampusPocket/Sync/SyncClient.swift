@@ -68,11 +68,13 @@ final class SyncClient {
             return
         }
 
+        // An empty outbox still greets.
+        //
+        // Returning here without saying anything is what the first version did, and over the
+        // cable it left the PC holding an open tunnel waiting for a greeting that never came —
+        // for as long as its timeout allowed, with a disabled button and no explanation. "There
+        // is nothing waiting" is an answer, and it costs one round trip to give it.
         let pending = outbox.pending
-        guard !pending.isEmpty else {
-            status = .finished("Nothing to send.")
-            return
-        }
 
         guard let keyData = Data(base64Encoded: computer.key), keyData.count == 32 else {
             status = .failed("The pairing key on this phone is not usable. Pair again.")
@@ -129,7 +131,10 @@ final class SyncClient {
 
             outbox.markSynced(ids: Set(result.acceptedIds))
 
-            var message = "Sent \(result.acceptedIds.count) to \(ack.workspaceName ?? "Campus")."
+            var message = pending.isEmpty
+                ? "Nothing was waiting to send."
+                : "Sent \(result.acceptedIds.count) to \(ack.workspaceName ?? "Campus")."
+
             if !result.rejected.isEmpty {
                 message += " \(result.rejected.count) could not be stored and are still here."
             }

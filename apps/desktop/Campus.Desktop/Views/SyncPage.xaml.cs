@@ -106,7 +106,11 @@ public sealed partial class SyncPage : Page
             canSync: true);
 
         // The whole point of the cable is that plugging it in is the gesture. Pressing a button
-        // afterwards is the thing the user asked not to have to do.
+        // afterwards is the thing this was meant to remove.
+        //
+        // Tried once per attachment. If that attempt fails — the app was not open yet, most
+        // likely — the button is still there and still works, which is why the automatic try
+        // records that it happened rather than whether it succeeded.
         if (_syncedWhileAttached.Add(phone.SerialNumber)) await SyncOverCableAsync(phone);
     }
 
@@ -129,7 +133,13 @@ public sealed partial class SyncPage : Page
 
             if (result is null)
             {
-                Status(L.T("cable.nothing.came"));
+                Status(L.T("cable.no.answer"));
+            }
+            else if (result.Accepted == 0 && result.Rejected == 0)
+            {
+                // A real answer, not a failure: the phone greeted, proved itself, and had
+                // nothing in its outbox.
+                Status(L.T("cable.nothing.waiting", result.DeviceName));
             }
             else
             {
@@ -137,10 +147,20 @@ public sealed partial class SyncPage : Page
                 await ReloadAsync();
             }
         }
+        catch (PhoneSyncRefusedException ex)
+        {
+            // The phone reached us and was turned away. This used to be reported as "nothing was
+            // waiting", which sent people looking in the wrong place entirely.
+            Status(ex.Message);
+        }
+        catch (TimeoutException ex)
+        {
+            Status(ex.Message);
+        }
         catch (IOException ex)
         {
-            // The most common one by far is "nothing is listening", which means the app is not
-            // open on the phone. UsbMux already words these for a person to act on.
+            // Most often "nothing is listening", which means the app is not open on the phone.
+            // UsbMux already words these for a person to act on.
             Status(ex.Message);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)

@@ -6,6 +6,15 @@ using Campus.Storage;
 namespace Campus.Sync;
 
 /// <summary>What arrived from the phone.</summary>
+/// <summary>
+/// The phone connected and was turned away, with the reason it was told.
+///
+/// Thrown rather than returned as an empty result, because "the phone had nothing waiting" and
+/// "that phone is not paired with this workspace" are opposite situations and the caller was
+/// reporting both as the first one.
+/// </summary>
+public sealed class PhoneSyncRefusedException(string reason) : Exception(reason);
+
 public sealed record PhoneSyncResult(
     string DeviceName,
     int Accepted,
@@ -76,45 +85,60 @@ public sealed class PhoneReceiver(
     public async Task<PhoneSyncResult?> ReceiveOverAsync(Stream stream, CancellationToken ct = default)
     {
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(ct);
-        deadline.CancelAfter(TimeSpan.FromMinutes(10));
 
-        return await ConverseAsync(stream, deadline.Token).ConfigureAwait(false);
+        // Much shorter than the wait for a phone to appear on Wi-Fi. The connection already
+        // exists here: if the app on the other end is not going to greet us, it is not going to,
+        // and ten minutes of a disabled button is indistinguishable from the feature not working.
+        deadline.CancelAfter(TimeSpan.FromSeconds(45));
+
+        try
+        {
+            return await ConverseAsync(stream, deadline.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            throw new TimeoutException(
+                "The phone did not answer. Open Campus Pocket and leave it on screen.");
+        }
     }
 
     private async Task<PhoneSyncResult?> ConverseAsync(Stream stream, CancellationToken ct)
     {
+        Progress?.Invoke(this, "Connected. Waiting for the phone to say hello…");
+
         var hello = await PhoneSync.ReadJsonAsync<PhoneSync.Hello>(stream, ct).ConfigureAwait(false);
 
         if (hello is null || hello.Version != PhoneSync.Version)
         {
-            await Refuse(stream, "This version of Campus does not understand that phone.", ct)
+            throw await Refuse(stream, "This version of Campus does not understand that phone.", ct)
                 .ConfigureAwait(false);
-            return null;
         }
 
         var device = await _devices.GetAsync(hello.DeviceId, ct).ConfigureAwait(false);
 
         if (device?.SharedKey is not { Length: > 0 } secret)
         {
-            await Refuse(stream, "That device has not been paired with this workspace.", ct)
-                .ConfigureAwait(false);
-            return null;
+            throw await Refuse(stream,
+                "That phone is not paired with this workspace. Pair it again — the code is on "
+                + "the Sync page.", ct).ConfigureAwait(false);
         }
 
         if (!device.Trusted)
         {
-            await Refuse(stream, "That device is no longer trusted.", ct).ConfigureAwait(false);
-            return null;
+            throw await Refuse(stream, "That phone is no longer trusted by this workspace.", ct)
+                .ConfigureAwait(false);
         }
 
         if (!PhoneSync.Verify(hello, secret))
         {
             // Being on the same network is not proof of anything, and this is where that is
             // enforced rather than assumed.
-            await Refuse(stream, "That device could not prove it holds the pairing secret.", ct)
+            throw await Refuse(stream,
+                "That phone could not prove it holds the pairing secret. Pair it again.", ct)
                 .ConfigureAwait(false);
-            return null;
         }
+
+        Progress?.Invoke(this, $"{hello.DeviceName} is paired. Reading what it has…");
 
         await PhoneSync.WriteJsonAsync(stream, new PhoneSync.HelloAck
         {
@@ -187,12 +211,25 @@ public sealed class PhoneReceiver(
         return new PhoneSyncResult(hello.DeviceName, accepted.Count, rejected.Count, attachments);
     }
 
-    private static Task Refuse(Stream stream, string reason, CancellationToken ct)
-        => PhoneSync.WriteJsonAsync(stream, new PhoneSync.HelloAck
+    /// <summary>
+    /// Tells the phone why it is being turned away, then tells this side too.
+    ///
+    /// The phone is told first: it is waiting on the acknowledgement and would otherwise sit
+    /// there until its own timeout rather than showing the reason to the person holding it.
+    /// </summary>
+    private static async Task<PhoneSyncRefusedException> Refuse(
+        Stream stream, string reason, CancellationToken ct)
+    {
+        await PhoneSync.WriteJsonAsync(stream, new PhoneSync.HelloAck
         {
             Accepted = false,
             Reason = reason,
-        }, ct);
+        }, ct).ConfigureAwait(false);
+
+        // Handed back to be thrown by the caller rather than thrown here, so the compiler can see
+        // that the path ends — an awaited call that always throws looks like one that returns.
+        return new PhoneSyncRefusedException(reason);
+    }
 
     /// <summary>
     /// Turns one capture into an object in the workspace.
