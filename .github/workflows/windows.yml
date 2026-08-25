@@ -65,6 +65,12 @@ jobs:
       - name: Check that no colour is written outside the theme
         run: python tools/dev/check-theme.py
 
+      # A string exists in one language and not the other. That is the localisation failure that
+      # actually happens, and it is silent — the interface simply falls back to English in one
+      # place and nobody notices for a release.
+      - name: Check that every string is translated
+        run: python tools/dev/localize.py --check
+
       - name: Build
         run: dotnet build Campus.slnx -c Release --no-restore
 

@@ -1,3 +1,4 @@
+using Campus.Documents;
 using Campus.Domain;
 
 namespace Campus.Desktop.Services;
@@ -561,11 +562,61 @@ public static class DeveloperWorkspace
             "sufficient   enough",
         ]), ct).ConfigureAwait(false);
 
+        // A picture, made by rendering a page of the sample PDF: a photograph of a board is what
+        // a student actually attaches to a message, and writing a PNG encoder to produce one
+        // would be a lot of work to end up with a coloured rectangle.
+        var photo = Path.Combine(staging, "Board — the reduction half.png");
+        await using (var source = File.OpenRead(pdf))
+        {
+            var png = PdfRenderer.RenderPage(source, 1, 900);
+            if (png is not null) await File.WriteAllBytesAsync(photo, png, ct).ConfigureAwait(false);
+        }
+
         var import = App.GetService<ImportService>();
 
         await import.ImportAsync([pdf], subject("Physics"), ["textbook"], ct).ConfigureAwait(false);
         await import.ImportAsync([notes], subject("Chemistry"), ["notes"], ct).ConfigureAwait(false);
         await import.ImportAsync([vocabulary], subject("English"), ["vocabulary"], ct).ConfigureAwait(false);
+
+        if (File.Exists(photo))
+        {
+            var imported = await import.ImportAsync([photo], subject("Chemistry"), ["board"], ct)
+                .ConfigureAwait(false);
+
+            if (imported.FirstOrDefault()?.Created is { } picture)
+                await AttachToLastMessageAsync(workspace, picture, ct).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// Hangs a picture on the first message in the assistant conversation.
+    ///
+    /// Done here rather than when the message was written because the file has to exist in the
+    /// workspace first, and importing it is the last thing that happens.
+    /// </summary>
+    private static async Task AttachToLastMessageAsync(
+        WorkspaceService workspace, CampusObject picture, CancellationToken ct)
+    {
+        var messages = await workspace.Objects.QueryAsync(new CampusQuery
+        {
+            Kinds = { ObjectKind.Message },
+            Sort = SortField.CreatedAt,
+            Descending = false,
+        }, ct).ConfigureAwait(false);
+
+        var last = messages.FirstOrDefault(m =>
+            m.PayloadAs<MessagePayload>() is { From: Speaker.Me, IsMarkdown: false }
+            && m.Title.StartsWith("How do I balance", StringComparison.Ordinal));
+        if (last is null) return;
+
+        var payload = last.PayloadAs<MessagePayload>()!;
+        payload.Attachments.Add(picture.Id);
+        last.Payload = payload;
+
+        await workspace.Objects.SaveAsync(last, ct).ConfigureAwait(false);
+        await workspace.Relations
+            .LinkAsync(last.Id, picture.Id, RelationKind.Attachment, ct: ct)
+            .ConfigureAwait(false);
     }
 
 #else

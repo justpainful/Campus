@@ -125,6 +125,7 @@
 - [x] C-11 Print Center (To Print / Printed / Archive, queue, page counts, drag-in)
 - [x] C-12 Links (YouTube / Telegram / web, metadata fetch, thumbnails, collections)
 - [x] C-13 Boards + Threads (Discord-forum-style academic objects)
+- [x] C-31 Conversations — recorded conversations with a teacher or an assistant; the other side's markdown is drawn, yours is not; consecutive messages group into runs; images attach by picker or paste
 - [x] C-14 Tags + tag management
 - [x] C-15 Relations + Backlinks (`[[wiki-links]]`)
 - [x] C-16 Academic Profile (About Me, school, year, term)
@@ -189,6 +190,7 @@
 - [x] A-08 Large hit targets (large cursor opens the Windows setting that owns it)
 - [x] A-09 Shortcut map, discoverable through the command palette
 - [x] A-10 Command palette coverage for every action
+- [x] A-11 Arabic interface — 570 strings, right-to-left layout, Arabic typography, Arabic plural rules; `tools/dev/localize.py --check` fails CI on an untranslated string
 
 ## P3 — iOS (Campus Pocket) + Sync
 
