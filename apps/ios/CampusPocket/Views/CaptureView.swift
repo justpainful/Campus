@@ -55,7 +55,26 @@ struct CaptureView: View {
             .sheet(isPresented: $showingOutbox) { OutboxView() }
             .sheet(isPresented: $showingSettings) { SettingsView() }
             .sheet(isPresented: $showingScanner) { ScannerView() }
+            .task { openRequestedScreen() }
         }
+    }
+
+    /// Seeds the sample content and opens the screen named on the command line, for the
+    /// screenshot build. Does nothing in a release build, where the type it reads does not exist.
+    ///
+    /// Done here rather than in the app's initialiser because the outbox belongs to the main
+    /// actor, and this is the first place the app is reliably on it.
+    private func openRequestedScreen() {
+        #if DEBUG
+        ScreenshotMode.prepare(outbox)
+
+        switch ScreenshotMode.screen {
+        case .outbox: showingOutbox = true
+        case .settings: showingSettings = true
+        case .compose: composing = .assignment
+        case .capture, .none: break
+        }
+        #endif
     }
 
     private var header: some View {

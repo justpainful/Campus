@@ -94,3 +94,93 @@ jobs:
           path: apps/ios/TestResults.xcresult
           if-no-files-found: ignore
           retention-days: 7
+
+  screenshots:
+    name: Screenshots
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode_16.2.app
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate the Xcode project
+        working-directory: apps/ios
+        run: xcodegen generate
+
+      - name: Build for the simulator
+        working-directory: apps/ios
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project CampusPocket.xcodeproj \
+            -scheme CampusPocket \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest' \
+            -derivedDataPath build/simulator \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcbeautify --renderer github-actions
+
+      # Screenshots are taken from the running app rather than posed, so they cannot drift away
+      # from what the app actually does. The sample content is seeded through the same outbox the
+      # app uses, and the screen to open is named on the command line.
+      - name: Take the screenshots
+        working-directory: apps/ios
+        run: |
+          set -euo pipefail
+
+          device=$(xcrun simctl create "Campus screenshots" "iPhone 16 Pro")
+          xcrun simctl boot "$device"
+          xcrun simctl bootstatus "$device" -b
+
+          # Dark, because the app is dark-first, and a clean status bar because a screenshot of
+          # a runner's battery percentage tells the reader nothing.
+          xcrun simctl ui "$device" appearance dark
+          xcrun simctl status_bar "$device" override \
+            --time "09:41" \
+            --batteryState charged --batteryLevel 100 \
+            --cellularMode active --cellularBars 4 \
+            --dataNetwork wifi --wifiMode active --wifiBars 3
+
+          app=build/simulator/Build/Products/Debug-iphonesimulator/CampusPocket.app
+          xcrun simctl install "$device" "$app"
+
+          mkdir -p screenshots
+
+          for screen in capture outbox settings compose; do
+            xcrun simctl launch "$device" com.campus.pocket --sample-data --screen "$screen"
+            sleep 6
+            xcrun simctl io "$device" screenshot "screenshots/$screen.png"
+            xcrun simctl terminate "$device" com.campus.pocket || true
+            sleep 1
+          done
+
+          # The same four in light, because half the world runs their phone that way and a
+          # dark-first app still has to be legible in it.
+          xcrun simctl ui "$device" appearance light
+          for screen in capture outbox; do
+            xcrun simctl launch "$device" com.campus.pocket --sample-data --screen "$screen"
+            sleep 6
+            xcrun simctl io "$device" screenshot "screenshots/$screen-light.png"
+            xcrun simctl terminate "$device" com.campus.pocket || true
+            sleep 1
+          done
+
+          xcrun simctl shutdown "$device"
+          xcrun simctl delete "$device"
+
+          ls -la screenshots
+
+      - name: Upload the screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: CampusPocket-screenshots
+          path: apps/ios/screenshots
+          if-no-files-found: error
+          retention-days: 30

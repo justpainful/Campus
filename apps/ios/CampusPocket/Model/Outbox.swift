@@ -96,6 +96,22 @@ final class Outbox {
         save()
     }
 
+    /// Empties the outbox completely, attachments included.
+    ///
+    /// Only reached from the screenshot build, which needs a known starting point — a real one
+    /// would be a way to lose everything captured and not yet delivered.
+    func removeAll() {
+        for item in items {
+            if let attachment = item.attachment {
+                try? FileManager.default.removeItem(
+                    at: attachmentsURL.appendingPathComponent(attachment))
+            }
+        }
+
+        items.removeAll()
+        save()
+    }
+
     /// Drops delivered items and their attachments. The PC has them; the phone does not need them.
     func clearSynced() {
         let delivered = items.filter(\.isSynced)
