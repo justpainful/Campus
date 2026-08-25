@@ -38,7 +38,7 @@ public sealed class MediaViewer : Grid, IContentViewer
         _player.AreTransportControlsEnabled = true;
         _player.HorizontalAlignment = HorizontalAlignment.Stretch;
         _player.VerticalAlignment = VerticalAlignment.Stretch;
-        AutomationProperties.SetName(_player, "Player");
+        AutomationProperties.SetName(_player, L.T("player"));
 
         Children.Add(_player);
 
@@ -159,7 +159,7 @@ public sealed class MediaViewer : Grid, IContentViewer
 
         var input = new TextBox
         {
-            PlaceholderText = "What happens here?",
+            PlaceholderText = L.T("what.happens.here"),
             AcceptsReturn = true,
             TextWrapping = TextWrapping.Wrap,
             Height = 120,
@@ -171,8 +171,8 @@ public sealed class MediaViewer : Grid, IContentViewer
             XamlRoot = XamlRoot,
             Title = $"Note at {Format(at)}",
             Content = input,
-            PrimaryButtonText = "Add",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = L.T("add"),
+            CloseButtonText = L.T("cancel"),
             DefaultButton = ContentDialogButton.Primary,
             RequestedTheme = ActualTheme,
         };

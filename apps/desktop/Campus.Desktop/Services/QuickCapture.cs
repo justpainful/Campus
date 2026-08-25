@@ -42,7 +42,7 @@ public static class QuickCapture
 
         var text = new TextBox
         {
-            PlaceholderText = "What is it?",
+            PlaceholderText = L.T("what.is.it"),
             Text = initialText ?? string.Empty,
             AcceptsReturn = true,
             TextWrapping = TextWrapping.Wrap,
@@ -69,14 +69,14 @@ public static class QuickCapture
         foreach (var (value, label, _) in Kinds)
             kindChoice.Items.Add(new ComboBoxItem { Content = label, Tag = value });
         kindChoice.SelectedIndex = Math.Max(0, Array.FindIndex(Kinds, k => k.Kind == kind));
-        AutomationProperties.SetName(kindChoice, "Kind");
+        AutomationProperties.SetName(kindChoice, L.T("kind"));
 
         var subjectChoice = new ComboBox { MinWidth = 170, HorizontalAlignment = HorizontalAlignment.Stretch };
-        subjectChoice.Items.Add(new ComboBoxItem { Content = "No subject", Tag = null });
+        subjectChoice.Items.Add(new ComboBoxItem { Content = L.T("no.subject"), Tag = null });
         foreach (var subject in subjects)
             subjectChoice.Items.Add(new ComboBoxItem { Content = subject.Title, Tag = subject.Id });
         subjectChoice.SelectedIndex = 0;
-        AutomationProperties.SetName(subjectChoice, "Subject");
+        AutomationProperties.SetName(subjectChoice, L.T("subject"));
 
         var row = new Grid { ColumnSpacing = 10 };
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -89,19 +89,19 @@ public static class QuickCapture
 
         var due = new CalendarDatePicker
         {
-            PlaceholderText = "No date",
+            PlaceholderText = L.T("no.date"),
             HorizontalAlignment = HorizontalAlignment.Stretch,
         };
-        AutomationProperties.SetName(due, "Due date");
+        AutomationProperties.SetName(due, L.T("due.date"));
         body.Children.Add(due);
 
         var dialog = new ContentDialog
         {
             XamlRoot = root,
-            Title = "Quick capture",
+            Title = L.T("quick.capture"),
             Content = body,
-            PrimaryButtonText = "Save",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = L.T("save"),
+            CloseButtonText = L.T("cancel"),
             DefaultButton = ContentDialogButton.Primary,
         };
 

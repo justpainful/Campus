@@ -228,8 +228,8 @@ public sealed partial class ExtensionsPage : Page
             XamlRoot = XamlRoot,
             Title = $"Allow {manifest.Name} to…",
             Content = body,
-            PrimaryButtonText = "Allow",
-            CloseButtonText = "Not now",
+            PrimaryButtonText = L.T("allow"),
+            CloseButtonText = L.T("not.now"),
             DefaultButton = ContentDialogButton.Close,
         };
 
@@ -263,7 +263,7 @@ public sealed partial class ExtensionsPage : Page
         {
             body.Children.Add(new TextBlock
             {
-                Text = "IT ADDS",
+                Text = L.T("it.adds"),
                 Style = (Style)Application.Current.Resources["Text.SectionHeader"],
             });
 
@@ -284,7 +284,7 @@ public sealed partial class ExtensionsPage : Page
 
         body.Children.Add(new TextBlock
         {
-            Text = "IT MAY",
+            Text = L.T("it.may"),
             Style = (Style)Application.Current.Resources["Text.SectionHeader"],
         });
 
@@ -303,7 +303,7 @@ public sealed partial class ExtensionsPage : Page
             XamlRoot = XamlRoot,
             Title = manifest.Name,
             Content = body,
-            CloseButtonText = "Done",
+            CloseButtonText = L.T("done"),
         }.ShowAsync();
     }
 
@@ -340,7 +340,7 @@ public sealed partial class ExtensionsPage : Page
 
         if (installed is null)
         {
-            Notifications.Show("Nothing was installed.", NoticeKind.Warning);
+            Notifications.Show(L.T("nothing.was.installed"), NoticeKind.Warning);
             return;
         }
 

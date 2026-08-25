@@ -277,22 +277,22 @@ public sealed class WorkspaceTabs
     {
         var menu = new MenuFlyout();
 
-        var close = new MenuFlyoutItem { Text = "Close" };
+        var close = new MenuFlyoutItem { Text = L.T("close") };
         close.Click += (_, _) => Close(tab);
         menu.Items.Add(close);
 
-        var others = new MenuFlyoutItem { Text = "Close others" };
+        var others = new MenuFlyoutItem { Text = L.T("close.others") };
         others.Click += (_, _) => { Activate(tab); CloseOthers(); };
         menu.Items.Add(others);
 
-        var all = new MenuFlyoutItem { Text = "Close all" };
+        var all = new MenuFlyoutItem { Text = L.T("close.all") };
         all.Click += (_, _) => CloseAll();
         menu.Items.Add(all);
 
         if (tab.IsPreview)
         {
             menu.Items.Add(new MenuFlyoutSeparator());
-            var keep = new MenuFlyoutItem { Text = "Keep open" };
+            var keep = new MenuFlyoutItem { Text = L.T("keep.open") };
             keep.Click += (_, _) => { tab.IsPreview = false; Render(); };
             menu.Items.Add(keep);
         }

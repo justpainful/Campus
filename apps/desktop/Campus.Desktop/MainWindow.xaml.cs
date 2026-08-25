@@ -39,13 +39,18 @@ public sealed partial class MainWindow : Window
         _theme = App.GetService<ThemeService>();
         _theme.ThemeChanged += (_, _) => UpdateStatusBar();
 
+        // A translated label is read when its page is built, so a language change has to rebuild
+        // what is on screen. The rail, the sidebar heading and the tab titles are redrawn too:
+        // they were built once, in the old language, and are not pages.
+        Localization.Language.Current.Changed += (_, _) => Relanguage();
+
         _workspace = App.GetService<WorkspaceService>();
         // Unlock finishes on a background thread, so the UI change is marshalled rather than
         // applied wherever the continuation happened to land.
         _workspace.LockStateChanged += (_, unlocked) =>
             DispatcherQueue.TryEnqueue(() => ApplyLockState(unlocked));
 
-        Title = "Campus";
+        Title = L.T("campus");
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
         AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "Campus.ico"));
@@ -99,7 +104,7 @@ public sealed partial class MainWindow : Window
         if (DeveloperWorkspace.Requested)
         {
             SampleBadge.Visibility = Visibility.Visible;
-            WorkspaceLabel.Text = "Sample workspace";
+            WorkspaceLabel.Text = L.T("sample.workspace");
         }
 
         ApplyLockState(_workspace.IsUnlocked);
@@ -210,7 +215,7 @@ public sealed partial class MainWindow : Window
         var field = new TextBox
         {
             Style = (Style)Application.Current.Resources["Input.Text"],
-            PlaceholderText = "Pick an emoji",
+            PlaceholderText = L.T("pick.an.emoji"),
         };
 
         var picker = new Design.Emoji.EmojiPicker();
@@ -223,9 +228,9 @@ public sealed partial class MainWindow : Window
         var dialog = new ContentDialog
         {
             XamlRoot = root,
-            Title = "Emoji",
+            Title = L.T("emoji"),
             Content = body,
-            CloseButtonText = "Done",
+            CloseButtonText = L.T("done"),
         };
         await dialog.ShowAsync();
     }
@@ -251,7 +256,7 @@ public sealed partial class MainWindow : Window
         var entity = await _workspace.Objects.GetAsync(id);
         if (entity is null)
         {
-            Notifications.Show("That item is no longer here.", NoticeKind.Warning);
+            Notifications.Show(L.T("that.item.is.no.longer.here"), NoticeKind.Warning);
             return;
         }
 
@@ -282,6 +287,28 @@ public sealed partial class MainWindow : Window
     private Frame ActiveFrame => _splitOpen && _secondPaneActive ? SecondFrame : ContentFrame;
 
     /// <summary>Puts a tab's page in the active frame.</summary>
+    /// <summary>Rebuilds everything showing words, after the language has changed.</summary>
+    private void Relanguage()
+    {
+        // The destinations look up their own names, so the rail only needs telling that they
+        // changed.
+        Rail.Destinations = _destinations;
+        Rail.Select(CurrentDestination);
+
+        var destination = _destinations.FirstOrDefault(d => d.Id == CurrentDestination);
+        SidebarTitle.Text = destination?.Title.ToUpperInvariant() ?? string.Empty;
+
+        // Navigating to the same page type is normally a no-op, so the frame is emptied first.
+        // Without that the page stays on screen in the language it was built in.
+        if (_tabs.Active is { } active)
+        {
+            ActiveFrame.Content = null;
+            Show(active);
+        }
+
+        UpdateStatusBar();
+    }
+
     private void Show(WorkspaceTab tab)
     {
         if (tab.Parameter is null) ActiveFrame.Navigate(tab.PageType);
@@ -311,7 +338,7 @@ public sealed partial class MainWindow : Window
 
             if (id == "gallery")
             {
-                SidebarTitle.Text = "THEME";
+                SidebarTitle.Text = L.T("theme");
                 Rail.Select(ShellDestinations.Settings);
             }
             return;
@@ -548,7 +575,7 @@ public sealed partial class MainWindow : Window
         {
             if (!_focusMode) ToggleFocusMode();
             AppWindow.SetPresenter(Microsoft.UI.Windowing.AppWindowPresenterKind.FullScreen);
-            Notifications.Show("Study mode. Ctrl+Shift+D to leave.");
+            Notifications.Show(L.T("study.mode.ctrl.shift.d.to.leave"));
         }
         else
         {
@@ -583,7 +610,7 @@ public sealed partial class MainWindow : Window
             + "folder is NOT encrypted — anyone who can open it can read it.",
             "Export")) return;
 
-        Notifications.Show("Exporting…");
+        Notifications.Show(L.T("exporting"));
 
         try
         {
@@ -658,7 +685,7 @@ public sealed partial class MainWindow : Window
     {
         if (!_workspace.IsUnlocked) return;
 
-        Notifications.Show("Backing up…");
+        Notifications.Show(L.T("backing.up"));
 
         try
         {
@@ -757,15 +784,15 @@ public sealed partial class MainWindow : Window
     private void UpdateStatusBar()
     {
         VaultStatus.Text = DeveloperWorkspace.Requested
-            ? "Sample workspace — not your data"
-            : _workspace.IsUnlocked ? "Vault unlocked"
-            : _workspace.IsInitialised ? "Vault locked" : "No vault yet";
+            ? L.T("status.sample")
+            : _workspace.IsUnlocked ? L.T("status.unlocked")
+            : _workspace.IsInitialised ? L.T("status.locked") : L.T("status.none");
 
         AppearanceStatus.Text = _theme.Appearance switch
         {
-            AppearanceMode.Light => "Light",
-            AppearanceMode.Dark => "Dark",
-            _ => _theme.IsDark ? "System · Dark" : "System · Light",
+            AppearanceMode.Light => L.T("light"),
+            AppearanceMode.Dark => L.T("dark"),
+            _ => L.T(_theme.IsDark ? "status.system.dark" : "status.system.light"),
         };
     }
 }

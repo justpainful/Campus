@@ -70,10 +70,10 @@ public sealed partial class FilesPage : Page
 
         if (files.Count == 0)
         {
-            Subtitle.Text = "Nothing stored yet";
+            Subtitle.Text = L.T("nothing.stored.yet");
             if (_filter.Length > 0)
             {
-                EmptyTitle.Text = "No matches";
+                EmptyTitle.Text = L.T("no.matches");
                 EmptyMessage.Text = $"No file here matches “{_filter}”.";
             }
             return;

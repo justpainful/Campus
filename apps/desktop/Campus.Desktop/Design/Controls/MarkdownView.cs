@@ -292,7 +292,7 @@ public sealed partial class MarkdownView : StackPanel
 
         var copyLabel = new TextBlock
         {
-            Text = "Copy",
+            Text = L.T("copy"),
             FontFamily = Font("Theme.Font.Small"),
             FontSize = 11,
             Foreground = Brush(ThemeTokens.Label.Secondary),
@@ -318,7 +318,7 @@ public sealed partial class MarkdownView : StackPanel
             MinHeight = 0,
         };
 
-        AutomationProperties.SetName(copy, "Copy this code");
+        AutomationProperties.SetName(copy, L.T("copy.this.code"));
 
         copy.Click += (_, _) =>
         {
@@ -328,11 +328,11 @@ public sealed partial class MarkdownView : StackPanel
 
             // Says so on the button rather than in a notification: the reader is looking at the
             // button, and a banner for something this small is an interruption.
-            copyLabel.Text = "Copied";
+            copyLabel.Text = L.T("copied");
             var revert = DispatcherQueue.CreateTimer();
             revert.Interval = TimeSpan.FromSeconds(2);
             revert.IsRepeating = false;
-            revert.Tick += (t, _) => { copyLabel.Text = "Copy"; t.Stop(); };
+            revert.Tick += (t, _) => { copyLabel.Text = L.T("copy"); t.Stop(); };
             revert.Start();
         };
 

@@ -26,8 +26,8 @@ public static class EmojiFlyout
                     Application.Current.Resources[ThemeTokens.Label.Secondary],
             },
         };
-        AutomationProperties.SetName(button, "Insert emoji");
-        ToolTipService.SetToolTip(button, "Insert emoji");
+        AutomationProperties.SetName(button, L.T("insert.emoji"));
+        ToolTipService.SetToolTip(button, L.T("insert.emoji"));
 
         Attach(button, target);
         return button;

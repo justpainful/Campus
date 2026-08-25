@@ -81,7 +81,7 @@ public sealed class PdfPageRail : Grid
         _callout.IsHitTestVisible = false;
         Children.Add(_callout);
 
-        AutomationProperties.SetName(this, "Document position");
+        AutomationProperties.SetName(this, L.T("document.position"));
 
         PointerEntered += (_, _) => Highlight(true);
         PointerExited += (_, _) => { if (!_dragging) Highlight(false); };

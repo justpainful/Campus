@@ -37,7 +37,7 @@ public sealed class ImageViewer : Grid, IContentViewer
         _image.Stretch = Stretch.Uniform;
         _image.RenderTransformOrigin = new Point(0.5, 0.5);
         _image.RenderTransform = _rotation;
-        AutomationProperties.SetName(_image, "Image");
+        AutomationProperties.SetName(_image, L.T("image"));
 
         // The image sits inside a container so that a rotation can swap the space it occupies
         // without fighting the scroller over layout.
@@ -84,7 +84,7 @@ public sealed class ImageViewer : Grid, IContentViewer
         {
             Children.Add(new TextBlock
             {
-                Text = "This image could not be decoded.",
+                Text = L.T("this.image.could.not.be.decoded"),
                 Style = (Style)Application.Current.Resources["Text.Callout"],
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,

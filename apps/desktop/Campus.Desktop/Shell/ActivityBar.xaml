@@ -2,6 +2,7 @@
     x:Class="Campus.Desktop.Shell.ActivityBar"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:Campus.Desktop.Localization"
     xmlns:local="using:Campus.Desktop.Shell"
     xmlns:icons="using:Campus.Desktop.Design.Icons"
     mc:Ignorable="d"
@@ -78,7 +79,7 @@
                 x:Name="MainItems"
                 Margin="0,6,0,0"
                 ItemTemplate="{StaticResource DestinationTemplate}"
-                AutomationProperties.Name="Main destinations" />
+                AutomationProperties.Name="{l:T Key=main.destinations}" />
         </ScrollViewer>
 
         <ItemsControl
@@ -86,6 +87,6 @@
             Grid.Row="1"
             Margin="0,0,0,6"
             ItemTemplate="{StaticResource DestinationTemplate}"
-            AutomationProperties.Name="Workspace and settings" />
+            AutomationProperties.Name="{l:T Key=workspace.and.settings}" />
     </Grid>
 </UserControl>

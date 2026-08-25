@@ -76,7 +76,7 @@ public sealed partial class ConversationPage : Page
 
         TitleText.Text = _conversation.Title;
         PartyIcon.Symbol = SymbolFor(_payload.ConversationKind);
-        CloseButton.Content = _payload.Closed ? "Reopen" : "Close";
+        CloseButton.Content = L.T(_payload.Closed ? "reopen" : "close");
 
         var messages = await _workspace.Objects.QueryAsync(new CampusQuery
         {
@@ -88,20 +88,19 @@ public sealed partial class ConversationPage : Page
         Subtitle.Text = string.Join(" · ", new[]
         {
             Describe(_payload),
-            messages.Count switch
-            {
-                0 => "Nothing written down yet",
-                1 => "1 message",
-                _ => $"{messages.Count} messages",
-            },
-            _payload.Closed ? "Closed" : "Last " + BoardPage.Ago(
-                _payload.LastActivityAt ?? _conversation.CreatedAt),
+            messages.Count == 0
+                ? L.T("messages.none")
+                : Plural.Of("message.count", messages.Count),
+            _payload.Closed
+                ? L.T("closed")
+                : L.T("last.when", BoardPage.Ago(
+                    _payload.LastActivityAt ?? _conversation.CreatedAt)),
         });
 
         BuildSpeakerPicker();
         Composer.IsEnabled = !_payload.Closed;
         Composer.PlaceholderText = _payload.Closed
-            ? "This conversation is closed."
+            ? L.T("this.conversation.is.closed")
             : PlaceholderFor(_speaker);
 
         Messages.Children.Clear();
@@ -144,15 +143,15 @@ public sealed partial class ConversationPage : Page
         {
             new TextBlock
             {
-                Text = "Nothing written down yet.",
+                Text = L.T("nothing.written.down.yet"),
                 Style = (Style)Application.Current.Resources["Text.Headline"],
                 HorizontalAlignment = HorizontalAlignment.Center,
             },
             new TextBlock
             {
-                Text = _payload.ConversationKind == ConversationKind.Assistant
-                    ? "Paste what you asked and what came back. Markdown in the answer is drawn."
-                    : "Write down what was said while you still remember it.",
+                Text = L.T(_payload.ConversationKind == ConversationKind.Assistant
+                    ? "conversation.empty.assistant"
+                    : "conversation.empty.person"),
                 Style = (Style)Application.Current.Resources["Text.Footnote"],
                 HorizontalAlignment = HorizontalAlignment.Center,
                 TextWrapping = TextWrapping.Wrap,
@@ -222,7 +221,7 @@ public sealed partial class ConversationPage : Page
         };
 
         AutomationProperties.SetName(bubble,
-            $"{(mine ? "You" : NameOfOther())}: {payload.Body}");
+            $"{(mine ? L.T("you") : NameOfOther())}: {payload.Body}");
 
         bubble.RightTapped += (_, e) =>
         {
@@ -255,7 +254,7 @@ public sealed partial class ConversationPage : Page
 
         header.Children.Add(new TextBlock
         {
-            Text = mine ? "You" : NameOfOther(),
+            Text = mine ? L.T("you") : NameOfOther(),
             FontFamily = Font("Theme.Font.Text"),
             FontSize = 12.5,
             FontWeight = FontWeights.SemiBold,
@@ -297,7 +296,7 @@ public sealed partial class ConversationPage : Page
                 // says so rather than showing an empty square.
                 frame.Child = new TextBlock
                 {
-                    Text = "Picture removed",
+                    Text = L.T("picture.removed"),
                     Style = (Style)Application.Current.Resources["Text.Caption"],
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
@@ -334,10 +333,10 @@ public sealed partial class ConversationPage : Page
     {
         var menu = new MenuFlyout();
 
-        menu.Items.Add(ObjectCommands.Item("Edit", CampusSymbols.Edit, () => EditAsync(entity)));
+        menu.Items.Add(ObjectCommands.Item(L.T("edit"), CampusSymbols.Edit, () => EditAsync(entity)));
 
         menu.Items.Add(ObjectCommands.Item(
-            payload.IsMarkdown ? "Show as plain text" : "Draw as markdown",
+            L.T(payload.IsMarkdown ? "show.as.plain.text" : "draw.as.markdown"),
             CampusSymbols.Markdown,
             async () =>
             {
@@ -347,20 +346,20 @@ public sealed partial class ConversationPage : Page
                 await ReloadAsync();
             }));
 
-        menu.Items.Add(ObjectCommands.Item("Copy text", CampusSymbols.Copy, () =>
+        menu.Items.Add(ObjectCommands.Item(L.T("copy.text"), CampusSymbols.Copy, () =>
         {
             App.GetService<SensitiveMode>().Copy(payload.Body, DispatcherQueue);
-            Notifications.Show("Copied.");
+            Notifications.Show(L.T("copied.d249"));
             return Task.CompletedTask;
         }));
 
         menu.Items.Add(new MenuFlyoutSeparator());
 
-        var delete = ObjectCommands.Item("Delete message", CampusSymbols.Trash, async () =>
+        var delete = ObjectCommands.Item(L.T("delete.message"), CampusSymbols.Trash, async () =>
         {
-            if (!await ObjectCommands.ConfirmAsync(XamlRoot, "Delete this message?",
-                "It moves to the trash. Any pictures sent with it stay in the library.",
-                "Delete")) return;
+            if (!await ObjectCommands.ConfirmAsync(XamlRoot, L.T("delete.this.message"),
+                L.T("delete.message.explain"),
+                L.T("delete"))) return;
 
             await _workspace.Objects.TrashAsync(entity.Id);
             await UpdateCountAsync();
@@ -385,7 +384,7 @@ public sealed partial class ConversationPage : Page
     {
         SpeakerPicker.Children.Clear();
 
-        SpeakerPicker.Children.Add(Segment("You", Speaker.Me, first: true));
+        SpeakerPicker.Children.Add(Segment(L.T("you"), Speaker.Me, first: true));
         SpeakerPicker.Children.Add(Segment(NameOfOther(), Speaker.Them, first: false));
     }
 
@@ -402,7 +401,7 @@ public sealed partial class ConversationPage : Page
             Margin = new Thickness(first ? 0 : 1, 0, 0, 0),
         };
 
-        AutomationProperties.SetName(button, $"Speaking as {label}");
+        AutomationProperties.SetName(button, L.T("speaking.as", label));
 
         button.Click += (_, _) =>
         {
@@ -440,9 +439,9 @@ public sealed partial class ConversationPage : Page
 
     private string PlaceholderFor(Speaker speaker) => speaker switch
     {
-        Speaker.Me => "What you asked…",
-        _ when _payload.ConversationKind == ConversationKind.Assistant => "Paste the answer…",
-        _ => $"What {NameOfOther()} said…",
+        Speaker.Me => L.T("composer.you"),
+        _ when _payload.ConversationKind == ConversationKind.Assistant => L.T("composer.answer"),
+        _ => L.T("composer.them", NameOfOther()),
     };
 
     private async Task SendAsync()
@@ -498,7 +497,11 @@ public sealed partial class ConversationPage : Page
         var line = text.Split('\n')[0].Trim();
 
         if (line.Length == 0)
-            line = pictures switch { 0 => "Message", 1 => "Picture", _ => $"{pictures} pictures" };
+            line = pictures switch
+            {
+                0 => L.T("a.message"),
+                _ => Plural.Of("picture.count", pictures),
+            };
 
         return line.Length > 90 ? line[..90] + "…" : line;
     }
@@ -631,10 +634,10 @@ public sealed partial class ConversationPage : Page
         var dialog = new ContentDialog
         {
             XamlRoot = XamlRoot,
-            Title = "Edit this message",
+            Title = L.T("edit.this.message"),
             Content = input,
-            PrimaryButtonText = "Save",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = L.T("save"),
+            CloseButtonText = L.T("cancel"),
             DefaultButton = ContentDialogButton.Primary,
         };
 
@@ -718,7 +721,7 @@ public sealed partial class ConversationPage : Page
         }
         catch (Exception ex) when (ex is IOException or InvalidOperationException or UnauthorizedAccessException)
         {
-            Notifications.Show("That picture could not be read.", NoticeKind.Error);
+            Notifications.Show(L.T("that.picture.could.not.be.read"), NoticeKind.Error);
         }
     }
 
@@ -756,7 +759,7 @@ public sealed partial class ConversationPage : Page
 
         var menu = ObjectCommands.Build(_conversation, XamlRoot, ReloadAsync);
 
-        menu.Items.Insert(1, ObjectCommands.Item("Rename the other side", CampusSymbols.Rename,
+        menu.Items.Insert(1, ObjectCommands.Item(L.T("rename.the.other.side"), CampusSymbols.Rename,
             async () =>
             {
                 var input = new TextBox
@@ -770,10 +773,10 @@ public sealed partial class ConversationPage : Page
                 var dialog = new ContentDialog
                 {
                     XamlRoot = XamlRoot,
-                    Title = "Who is this with?",
+                    Title = L.T("who.is.this.with"),
                     Content = input,
-                    PrimaryButtonText = "Save",
-                    CloseButtonText = "Cancel",
+                    PrimaryButtonText = L.T("save"),
+                    CloseButtonText = L.T("cancel"),
                     DefaultButton = ContentDialogButton.Primary,
                 };
 
@@ -795,10 +798,11 @@ public sealed partial class ConversationPage : Page
 
     internal static string DefaultNameFor(ConversationKind kind) => kind switch
     {
-        ConversationKind.Teacher => "The teacher",
+        ConversationKind.Teacher => L.T("the.teacher"),
+        // Not translated: it is what the thing is called.
         ConversationKind.Assistant => "ChatGPT",
-        ConversationKind.Classmate => "Classmate",
-        _ => "Them",
+        ConversationKind.Classmate => L.T("classmate"),
+        _ => L.T("them"),
     };
 
     internal static string SymbolFor(ConversationKind kind) => kind switch
@@ -811,10 +815,10 @@ public sealed partial class ConversationPage : Page
 
     internal static string Describe(ConversationPayload payload) => payload.ConversationKind switch
     {
-        ConversationKind.Teacher => "With a teacher",
-        ConversationKind.Assistant => "With an assistant",
-        ConversationKind.Classmate => "With a classmate",
-        _ => "Conversation",
+        ConversationKind.Teacher => L.T("with.a.teacher"),
+        ConversationKind.Assistant => L.T("with.an.assistant"),
+        ConversationKind.Classmate => L.T("with.a.classmate"),
+        _ => L.T("conversation"),
     };
 
     private static Brush Brush(string token) => (Brush)Application.Current.Resources[token];

@@ -41,7 +41,7 @@ public sealed class OfficeViewer : Grid, IContentViewer
         _outline.SelectionMode = ListViewSelectionMode.Single;
         _outline.Padding = new Thickness(8, 12, 8, 24);
         _outline.SelectionChanged += OnOutlineSelected;
-        AutomationProperties.SetName(_outline, "Outline");
+        AutomationProperties.SetName(_outline, L.T("outline"));
 
         var outlinePanel = new Border
         {
@@ -98,8 +98,7 @@ public sealed class OfficeViewer : Grid, IContentViewer
     {
         _content.Children.Add(new TextBlock
         {
-            Text = "This document could not be read. It may be password-protected, or saved in "
-                 + "the older binary format.",
+            Text = L.T("this.document.could.not.be.read.it.may.be.pass.543894"),
             Style = (Style)Application.Current.Resources["Text.Callout"],
             TextWrapping = TextWrapping.Wrap,
         });
@@ -115,7 +114,7 @@ public sealed class OfficeViewer : Grid, IContentViewer
         {
             _content.Children.Add(new TextBlock
             {
-                Text = "This document has no readable text.",
+                Text = L.T("this.document.has.no.readable.text"),
                 Style = (Style)Application.Current.Resources["Text.Callout"],
             });
             _outlineColumn.Width = new GridLength(0);
@@ -257,7 +256,7 @@ public sealed class OfficeViewer : Grid, IContentViewer
         header.Children.Add(ViewerChrome.Icon(CampusSymbols.Comment, 14, ThemeTokens.Label.Tertiary));
         header.Children.Add(new TextBlock
         {
-            Text = "Speaker notes",
+            Text = L.T("speaker.notes"),
             Style = (Style)Application.Current.Resources["Text.Caption"],
         });
 

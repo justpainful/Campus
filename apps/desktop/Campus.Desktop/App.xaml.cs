@@ -64,12 +64,19 @@ public partial class App : Application
 
         var theme = GetService<ThemeService>();
 
+        // Before the window exists: the markup extension that translates a label reads the
+        // language when the page is built, and the first page is built by the constructor below.
+        Localization.Language.Current.Initialise(Localization.Language.Load());
+
         _window = new MainWindow(StartupDestination());
         MainWindow = _window;
         theme.Initialise(_window.DispatcherQueue);
 
         if (_window.Content is FrameworkElement root)
+        {
             theme.RegisterRoot(root);
+            Localization.Language.Current.Register(root);
+        }
 
         _window.Activate();
 

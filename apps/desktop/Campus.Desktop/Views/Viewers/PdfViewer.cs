@@ -94,7 +94,7 @@ public sealed class PdfViewer : Grid, IContentViewer
         _list.HorizontalContentAlignment = HorizontalAlignment.Center;
         _list.ItemContainerStyle = ContainerStyle();
         _list.ContainerContentChanging += OnContainerChanging;
-        AutomationProperties.SetName(_list, "Pages");
+        AutomationProperties.SetName(_list, L.T("pages"));
 
         // A permanent scrollbar, not the thin overlay that appears when the pointer is already
         // moving. In a four-hundred-page document the bar is how you know where you are and the
@@ -210,7 +210,7 @@ public sealed class PdfViewer : Grid, IContentViewer
             if (_outline.SelectedIndex >= 0 && _outline.SelectedIndex < _outlineEntries.Count)
                 GoTo(_outlineEntries[_outline.SelectedIndex].PageIndex);
         };
-        AutomationProperties.SetName(_outline, "Contents");
+        AutomationProperties.SetName(_outline, L.T("contents"));
 
         _thumbnails.SelectionMode = ListViewSelectionMode.Single;
         _thumbnails.Visibility = Visibility.Collapsed;
@@ -219,16 +219,16 @@ public sealed class PdfViewer : Grid, IContentViewer
         {
             if (_thumbnails.SelectedIndex >= 0) GoTo(_thumbnails.SelectedIndex);
         };
-        AutomationProperties.SetName(_thumbnails, "Page thumbnails");
+        AutomationProperties.SetName(_thumbnails, L.T("page.thumbnails"));
 
-        _searchBox.PlaceholderText = "Find in document";
+        _searchBox.PlaceholderText = L.T("find.in.document");
         _searchBox.Style = (Style)Application.Current.Resources["Input.Search"];
         _searchBox.Margin = new Thickness(10, 10, 10, 8);
         _searchBox.KeyDown += async (_, e) =>
         {
             if (e.Key == Windows.System.VirtualKey.Enter) await SearchAsync();
         };
-        AutomationProperties.SetName(_searchBox, "Find in document");
+        AutomationProperties.SetName(_searchBox, L.T("find.in.document"));
 
         _searchResults.SelectionMode = ListViewSelectionMode.Single;
         _searchResults.Padding = new Thickness(4, 0, 4, 20);
@@ -271,7 +271,7 @@ public sealed class PdfViewer : Grid, IContentViewer
             var count = await ReadAsync(() => PdfRenderer.PageCount(content));
             if (count == 0)
             {
-                Notifications.Show("This PDF could not be read.", NoticeKind.Error);
+                Notifications.Show(L.T("this.pdf.could.not.be.read"), NoticeKind.Error);
                 return;
             }
 
@@ -406,7 +406,7 @@ public sealed class PdfViewer : Grid, IContentViewer
         _outline.Items.Clear();
         _outline.Items.Add(new TextBlock
         {
-            Text = "Reading the contents…",
+            Text = L.T("reading.the.contents"),
             Style = (Style)Application.Current.Resources["Text.Caption"],
             Margin = new Thickness(10, 6, 10, 6),
         });
@@ -418,7 +418,7 @@ public sealed class PdfViewer : Grid, IContentViewer
         {
             _outline.Items.Add(new TextBlock
             {
-                Text = "This document has no table of contents.",
+                Text = L.T("this.document.has.no.table.of.contents"),
                 Style = (Style)Application.Current.Resources["Text.Caption"],
                 TextWrapping = TextWrapping.Wrap,
                 Margin = new Thickness(10, 6, 10, 6),
@@ -513,7 +513,7 @@ public sealed class PdfViewer : Grid, IContentViewer
 
         _searchResults.Items.Add(new TextBlock
         {
-            Text = "Searching…",
+            Text = L.T("searching"),
             Style = (Style)Application.Current.Resources["Text.Caption"],
             Margin = new Thickness(10, 4, 10, 4),
         });
@@ -602,7 +602,7 @@ public sealed class PdfViewer : Grid, IContentViewer
             JumpToTypedPage();
         };
         _pageBox.LostFocus += (_, _) => UpdatePageLabel();
-        AutomationProperties.SetName(_pageBox, "Page number");
+        AutomationProperties.SetName(_pageBox, L.T("page.number"));
         yield return _pageBox;
 
         yield return _pageLabel;
@@ -713,7 +713,8 @@ public sealed class PdfViewer : Grid, IContentViewer
 
         if (page < 1 || page > _pages.Count)
         {
-            Notifications.Show($"This document has {_pages.Count} pages.", NoticeKind.Warning);
+            Notifications.Show(
+                L.T("document.has", Plural.Of("page.count", _pages.Count)), NoticeKind.Warning);
             UpdatePageLabel();
             return;
         }
@@ -751,11 +752,11 @@ public sealed class PdfViewer : Grid, IContentViewer
                     UseShellExecute = true,
                 });
 
-            Notifications.Show("Sent to the printer. The copy it printed from is not encrypted.");
+            Notifications.Show(L.T("sent.to.the.printer.the.copy.it.printed.from.i.41c94d"));
         }
         catch (Exception ex) when (ex is IOException or System.ComponentModel.Win32Exception)
         {
-            Notifications.Show("Windows could not print this file.", NoticeKind.Error);
+            Notifications.Show(L.T("windows.could.not.print.this.file"), NoticeKind.Error);
         }
     }
 
@@ -770,7 +771,7 @@ public sealed class PdfViewer : Grid, IContentViewer
             CampusSymbols.Comment,
             () => EditAnnotationAsync(annotation)));
 
-        var colours = new MenuFlyoutSubItem { Text = "Colour" };
+        var colours = new MenuFlyoutSubItem { Text = L.T("colour") };
         foreach (var token in ThemeTokens.Highlight.All)
         {
             var name = Name(token);
@@ -787,7 +788,7 @@ public sealed class PdfViewer : Grid, IContentViewer
 
         menu.Items.Add(new MenuFlyoutSeparator());
 
-        var remove = ObjectCommands.Item("Remove", CampusSymbols.Delete, async () =>
+        var remove = ObjectCommands.Item(L.T("remove"), CampusSymbols.Delete, async () =>
         {
             await _workspace.Annotations.DeleteAsync(annotation.Id);
             await LoadAnnotationsAsync();
@@ -815,8 +816,8 @@ public sealed class PdfViewer : Grid, IContentViewer
             XamlRoot = XamlRoot,
             Title = $"Note on page {(annotation.Page ?? 0) + 1}",
             Content = input,
-            PrimaryButtonText = "Save",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = L.T("save"),
+            CloseButtonText = L.T("cancel"),
             DefaultButton = ContentDialogButton.Primary,
         };
 

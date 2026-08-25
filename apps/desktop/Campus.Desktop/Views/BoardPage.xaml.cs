@@ -221,11 +221,11 @@ public sealed partial class BoardPage : Page
 
         return span switch
         {
-            { TotalMinutes: < 2 } => "just now",
-            { TotalMinutes: < 60 } => $"{(int)span.TotalMinutes} minutes ago",
-            { TotalHours: < 24 } => $"{(int)span.TotalHours} hours ago",
-            { TotalDays: < 7 } => $"{(int)span.TotalDays} days ago",
-            { TotalDays: < 60 } => $"{(int)(span.TotalDays / 7)} weeks ago",
+            { TotalMinutes: < 2 } => L.T("ago.now"),
+            { TotalMinutes: < 60 } => Plural.Of("ago.minutes", (int)span.TotalMinutes),
+            { TotalHours: < 24 } => Plural.Of("ago.hours", (int)span.TotalHours),
+            { TotalDays: < 7 } => Plural.Of("ago.days", (int)span.TotalDays),
+            { TotalDays: < 60 } => Plural.Of("ago.weeks", (int)(span.TotalDays / 7)),
             _ => when.ToLocalTime().ToString("d MMM yyyy"),
         };
     }

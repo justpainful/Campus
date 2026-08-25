@@ -2,6 +2,7 @@
     x:Class="Campus.Desktop.Views.FilesPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:Campus.Desktop.Localization"
     xmlns:controls="using:Campus.Desktop.Design.Controls"
     xmlns:icons="using:Campus.Desktop.Design.Icons"
     Background="{ThemeResource Theme.Background.Primary}">
@@ -24,20 +25,20 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Spacing="2" VerticalAlignment="Center">
-                <TextBlock Text="Files" Style="{StaticResource Text.LargeTitle}" />
+                <TextBlock Text="{l:T Key=files}" Style="{StaticResource Text.LargeTitle}" />
                 <TextBlock x:Name="Subtitle" Style="{StaticResource Text.Footnote}" />
             </StackPanel>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                 <TextBox x:Name="FilterBox" Style="{StaticResource Input.Search}"
-                         PlaceholderText="Filter" Width="200"
+                         PlaceholderText="{l:T Key=filter}" Width="200"
                          TextChanged="OnFilterChanged"
-                         AutomationProperties.Name="Filter files" />
+                         AutomationProperties.Name="{l:T Key=filter.files}" />
 
                 <Button x:Name="ViewToggle" Style="{StaticResource Button.Icon}"
                         Click="OnToggleViewClick"
-                        AutomationProperties.Name="Switch between grid and list"
-                        ToolTipService.ToolTip="Switch between grid and list">
+                        AutomationProperties.Name="{l:T Key=switch.between.grid.and.list}"
+                        ToolTipService.ToolTip="{l:T Key=switch.between.grid.and.list}">
                     <icons:CampusIcon x:Name="ViewGlyph" Symbol="view.list"
                                       IconSize="{StaticResource Theme.Icon.L}"
                                       Foreground="{ThemeResource Theme.Label.Secondary}" />
@@ -47,7 +48,7 @@
                     <StackPanel Orientation="Horizontal" Spacing="7">
                         <icons:CampusIcon Symbol="import" IconSize="{StaticResource Theme.Icon.M}"
                                           Foreground="{ThemeResource Theme.Label.OnAccent}" />
-                        <TextBlock Text="Add files" Foreground="{ThemeResource Theme.Label.OnAccent}"
+                        <TextBlock Text="{l:T Key=add.files}" Foreground="{ThemeResource Theme.Label.OnAccent}"
                                    FontWeight="SemiBold" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
@@ -67,11 +68,11 @@
                     <icons:CampusIcon Symbol="files" IconSize="{StaticResource Theme.Icon.Display}"
                                       Weight="Light" Foreground="{ThemeResource Theme.Label.Tertiary}" />
                 </Border>
-                <TextBlock x:Name="EmptyTitle" Text="No files yet" Style="{StaticResource Text.Title3}"
+                <TextBlock x:Name="EmptyTitle" Text="{l:T Key=no.files.yet}" Style="{StaticResource Text.Title3}"
                            HorizontalAlignment="Center" />
                 <TextBlock x:Name="EmptyMessage" Style="{StaticResource Text.Callout}"
                            HorizontalAlignment="Center" TextAlignment="Center"
-                           Text="Drop anything here — a scan, a slide deck, a recording. It is encrypted on the way in and searchable once it lands." />
+                           Text="{l:T Key=drop.anything.here.a.scan.a.slide.deck.a.recor.e0a10e}" />
             </StackPanel>
 
             <Border x:Name="DropHint" Visibility="Collapsed"
@@ -83,7 +84,7 @@
                     <icons:CampusIcon Symbol="import" IconSize="{StaticResource Theme.Icon.Display}"
                                       Weight="Light" Foreground="{ThemeResource Theme.Accent.Primary}"
                                       HorizontalAlignment="Center" />
-                    <TextBlock Text="Drop to add to the vault" Style="{StaticResource Text.Headline}"
+                    <TextBlock Text="{l:T Key=drop.to.add.to.the.vault}" Style="{StaticResource Text.Headline}"
                                HorizontalAlignment="Center" />
                 </StackPanel>
             </Border>

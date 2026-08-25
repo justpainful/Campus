@@ -55,7 +55,7 @@ public sealed class TextViewer : Grid, IContentViewer
         _body.IsTextSelectionEnabled = true;
         _body.TextWrapping = TextWrapping.Wrap;
         _body.Padding = new Thickness(0, 0, 24, 40);
-        AutomationProperties.SetName(_body, "File contents");
+        AutomationProperties.SetName(_body, L.T("file.contents"));
 
         var columns = new Grid { Padding = new Thickness(0, 16, 0, 0) };
         columns.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -178,11 +178,11 @@ public sealed class TextViewer : Grid, IContentViewer
 
     public IEnumerable<FrameworkElement> BuildTools()
     {
-        _find.PlaceholderText = "Find";
+        _find.PlaceholderText = L.T("find");
         _find.Width = 180;
         _find.Style = (Style)Application.Current.Resources["Input.Search"];
         _find.TextChanged += (_, _) => Render();
-        AutomationProperties.SetName(_find, "Find in file");
+        AutomationProperties.SetName(_find, L.T("find.in.file"));
         yield return _find;
 
         yield return _status;

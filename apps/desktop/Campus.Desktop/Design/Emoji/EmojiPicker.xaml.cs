@@ -238,7 +238,7 @@ public sealed partial class EmojiPicker : UserControl
 
         _activeGroup = string.Empty;
         HighlightActiveTab();
-        NoResults.Text = "Nothing matches that.";
+        NoResults.Text = L.T("nothing.matches.that");
         Fill(Catalogue.Search(query));
     }
 

@@ -101,7 +101,7 @@ public sealed partial class ObjectDetailPage : Page
         PriorityChoice.SelectedIndex = (int)_model.Priority;
 
         SubjectChoice.Items.Clear();
-        SubjectChoice.Items.Add(new ComboBoxItem { Content = "No subject", Tag = null });
+        SubjectChoice.Items.Add(new ComboBoxItem { Content = L.T("no.subject"), Tag = null });
         foreach (var subject in _subjects)
             SubjectChoice.Items.Add(new ComboBoxItem { Content = subject.Title, Tag = subject.Id });
         SubjectChoice.SelectedIndex = _model.SubjectId is { } subjectId
@@ -310,7 +310,7 @@ public sealed partial class ObjectDetailPage : Page
         {
             choice.Items.Add(new ComboBoxItem { Content = $"Convert to {label}", Tag = kind });
         }
-        AutomationProperties.SetName(choice, "Convert this to");
+        AutomationProperties.SetName(choice, L.T("convert.this.to"));
         choice.SelectionChanged += async (_, _) =>
         {
             if (_loading || choice.SelectedItem is not ComboBoxItem { Tag: ObjectKind kind }) return;
@@ -507,7 +507,7 @@ public sealed partial class ObjectDetailPage : Page
         {
             LinkList.Children.Add(new TextBlock
             {
-                Text = "Nothing linked yet. Typing [[a title]] in the notes links to it too.",
+                Text = L.T("nothing.linked.yet.typing.a.title.in.the.notes.cc7cfe"),
                 Style = (Style)Application.Current.Resources["Text.Footnote"],
             });
             return;
@@ -563,7 +563,7 @@ public sealed partial class ObjectDetailPage : Page
             },
             VerticalAlignment = VerticalAlignment.Center,
         };
-        AutomationProperties.SetName(unlink, "Remove this link");
+        AutomationProperties.SetName(unlink, L.T("remove.this.link"));
         unlink.Click += async (_, _) =>
         {
             await _workspace.Relations.UnlinkAsync(link.Relation.Id);
@@ -597,7 +597,7 @@ public sealed partial class ObjectDetailPage : Page
 
         var box = new AutoSuggestBox
         {
-            PlaceholderText = "Start typing a title",
+            PlaceholderText = L.T("start.typing.a.title"),
             Width = 360,
         };
 
@@ -627,10 +627,10 @@ public sealed partial class ObjectDetailPage : Page
         var dialog = new ContentDialog
         {
             XamlRoot = XamlRoot,
-            Title = "Link to something",
+            Title = L.T("link.to.something"),
             Content = box,
-            PrimaryButtonText = "Link",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = L.T("link"),
+            CloseButtonText = L.T("cancel"),
             DefaultButton = ContentDialogButton.Primary,
         };
 
@@ -642,7 +642,7 @@ public sealed partial class ObjectDetailPage : Page
 
         if (chosen is not { } target)
         {
-            Notifications.Show("Nothing here has that title.", NoticeKind.Warning);
+            Notifications.Show(L.T("nothing.here.has.that.title"), NoticeKind.Warning);
             return;
         }
 
@@ -692,7 +692,7 @@ public sealed partial class ObjectDetailPage : Page
         var restore = new Button
         {
             Style = (Style)Application.Current.Resources["Button.Secondary"],
-            Content = "Restore",
+            Content = L.T("restore.a76e"),
             MinWidth = 0,
             VerticalAlignment = VerticalAlignment.Center,
         };
@@ -709,7 +709,7 @@ public sealed partial class ObjectDetailPage : Page
             {
                 Load();
                 await LoadVersionsAsync();
-                Notifications.Show("Restored.", NoticeKind.Success);
+                Notifications.Show(L.T("restored"), NoticeKind.Success);
             }
         };
         Grid.SetColumn(restore, 1);
@@ -782,7 +782,7 @@ public sealed partial class ObjectDetailPage : Page
     private void OnFieldChanged(object sender, RoutedEventArgs e)
     {
         if (_loading) return;
-        SavedHint.Text = "Saving…";
+        SavedHint.Text = L.T("saving");
         _saveTimer.Start();     // restarting the timer is what turns a burst of keystrokes into one write
     }
 
@@ -976,11 +976,11 @@ public sealed partial class ObjectDetailPage : Page
         var dialog = new ContentDialog
         {
             XamlRoot = XamlRoot,
-            Title = "Move to trash?",
+            Title = L.T("move.to.trash.6d09"),
             Content = $"“{_model.Title}” goes to the trash. Nothing is destroyed until the trash "
                     + "is emptied.",
-            PrimaryButtonText = "Move to trash",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = L.T("move.to.trash"),
+            CloseButtonText = L.T("cancel"),
             DefaultButton = ContentDialogButton.Close,
         };
 

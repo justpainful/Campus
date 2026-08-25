@@ -152,7 +152,7 @@ public sealed partial class ThreadPage : Page
         {
             content.Children.Add(new TextBlock
             {
-                Text = "No detail was written with the question.",
+                Text = L.T("no.detail.was.written.with.the.question"),
                 Style = (Style)Application.Current.Resources["Text.Footnote"],
             });
         }
@@ -169,14 +169,14 @@ public sealed partial class ThreadPage : Page
         {
             var menu = new MenuFlyout();
 
-            menu.Items.Add(ObjectCommands.Item("Edit", CampusSymbols.Edit, () => EditAsync(entity, isOpening)));
+            menu.Items.Add(ObjectCommands.Item(L.T("edit"), CampusSymbols.Edit, () => EditAsync(entity, isOpening)));
 
-            menu.Items.Add(ObjectCommands.Item("Copy text", CampusSymbols.Copy, () =>
+            menu.Items.Add(ObjectCommands.Item(L.T("copy.text"), CampusSymbols.Copy, () =>
             {
                 // Through the sensitive-mode service rather than the clipboard directly, so that
                 // a copy made in that mode is cleared again rather than left sitting there.
                 App.GetService<SensitiveMode>().Copy(body, DispatcherQueue);
-                Notifications.Show("Copied.");
+                Notifications.Show(L.T("copied.d249"));
                 return Task.CompletedTask;
             }));
 
@@ -184,9 +184,9 @@ public sealed partial class ThreadPage : Page
             {
                 menu.Items.Add(new MenuFlyoutSeparator());
 
-                var delete = ObjectCommands.Item("Delete reply", CampusSymbols.Trash, async () =>
+                var delete = ObjectCommands.Item(L.T("delete.reply"), CampusSymbols.Trash, async () =>
                 {
-                    if (!await ObjectCommands.ConfirmAsync(XamlRoot, "Delete this reply?",
+                    if (!await ObjectCommands.ConfirmAsync(XamlRoot, L.T("delete.this.reply"),
                         "It moves to the trash.", "Delete")) return;
 
                     await _workspace.Objects.TrashAsync(entity.Id);
@@ -240,8 +240,8 @@ public sealed partial class ThreadPage : Page
             XamlRoot = XamlRoot,
             Title = isOpening ? "Edit the question" : "Edit this reply",
             Content = input,
-            PrimaryButtonText = "Save",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = L.T("save"),
+            CloseButtonText = L.T("cancel"),
             DefaultButton = ContentDialogButton.Primary,
         };
 

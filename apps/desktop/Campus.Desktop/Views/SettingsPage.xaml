@@ -2,6 +2,7 @@
     x:Class="Campus.Desktop.Views.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:Campus.Desktop.Localization"
     xmlns:controls="using:Campus.Desktop.Design.Controls"
     xmlns:icons="using:Campus.Desktop.Design.Icons"
     Background="{ThemeResource Theme.GroupedBackground.Primary}">
@@ -13,322 +14,338 @@
     <ScrollViewer Padding="0,0,0,40">
         <StackPanel MaxWidth="720" HorizontalAlignment="Stretch" Margin="24,20,24,0">
 
-            <TextBlock Text="Settings" Style="{StaticResource Text.LargeTitle}" Margin="16,0,0,20" />
+            <TextBlock Text="{l:T Key=settings}" Style="{StaticResource Text.LargeTitle}" Margin="16,0,0,20" />
 
             <controls:SettingsSection
-                Header="APPEARANCE"
-                Footer="System follows Windows and updates the moment it changes — no restart.">
+                Header="{l:T Key=language}"
+                Footer="{l:T Key=choosing.arabic.turns.the.whole.interface.arou.f140e7}">
                 <StackPanel>
                     <controls:SettingsRow
-                        Title="Appearance"
-                        Subtitle="How Campus decides between light and dark"
+                        Title="{l:T Key=interface.language}"
+                        Subtitle="{l:T Key=the.words.the.direction.they.run.in.and.the.ty.3027d6}"
+                        Symbol="profile"
+                        ShowSeparator="False">
+                        <ComboBox x:Name="LanguageChoice" MinWidth="180"
+                                  SelectionChanged="OnLanguageChanged"
+                                  AutomationProperties.Name="{l:T Key=interface.language}" />
+                    </controls:SettingsRow>
+                </StackPanel>
+            </controls:SettingsSection>
+
+            <controls:SettingsSection
+                Header="{l:T Key=appearance}"
+                Footer="{l:T Key=system.follows.windows.and.updates.the.moment.94cf2b}">
+                <StackPanel>
+                    <controls:SettingsRow
+                        Title="{l:T Key=appearance.3907}"
+                        Subtitle="{l:T Key=how.campus.decides.between.light.and.dark}"
                         Symbol="contrast"
                         ShowSeparator="False">
                         <StackPanel Orientation="Horizontal" Spacing="4">
-                            <RadioButton x:Name="AppearanceSystem" Content="System"
+                            <RadioButton x:Name="AppearanceSystem" Content="{l:T Key=system}"
                                          GroupName="Appearance" Checked="OnAppearanceChanged" Tag="System" />
-                            <RadioButton x:Name="AppearanceLight" Content="Light"
+                            <RadioButton x:Name="AppearanceLight" Content="{l:T Key=light}"
                                          GroupName="Appearance" Checked="OnAppearanceChanged" Tag="Light" />
-                            <RadioButton x:Name="AppearanceDark" Content="Dark"
+                            <RadioButton x:Name="AppearanceDark" Content="{l:T Key=dark}"
                                          GroupName="Appearance" Checked="OnAppearanceChanged" Tag="Dark" />
                         </StackPanel>
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
-                        Title="Theme gallery"
-                        Subtitle="Every surface, label, fill and state in one place"
+                        Title="{l:T Key=theme.gallery}"
+                        Subtitle="{l:T Key=every.surface.label.fill.and.state.in.one.plac.4d9acb}"
                         Symbol="palette">
                         <Button Style="{StaticResource Button.Secondary}"
-                                Content="Open" Click="OnOpenGalleryClick"
-                                AutomationProperties.Name="Open theme gallery" />
+                                Content="{l:T Key=open}" Click="OnOpenGalleryClick"
+                                AutomationProperties.Name="{l:T Key=open.theme.gallery}" />
                     </controls:SettingsRow>
                 </StackPanel>
             </controls:SettingsSection>
 
             <controls:SettingsSection
-                Header="ACCESSIBILITY"
-                Footer="Anything Windows already enforces stays on here, whatever these switches say.">
+                Header="{l:T Key=accessibility}"
+                Footer="{l:T Key=anything.windows.already.enforces.stays.on.her.6bff19}">
                 <StackPanel>
                     <controls:SettingsRow
-                        Title="Increase contrast"
-                        Subtitle="Separate surfaces further and make hairlines opaque"
+                        Title="{l:T Key=increase.contrast}"
+                        Subtitle="{l:T Key=separate.surfaces.further.and.make.hairlines.o.8cd265}"
                         Symbol="accessibility"
                         ShowSeparator="False">
                         <ToggleSwitch x:Name="ContrastToggle" OnContent="" OffContent=""
                                       Toggled="OnAccessibilityToggled"
-                                      AutomationProperties.Name="Increase contrast" />
+                                      AutomationProperties.Name="{l:T Key=increase.contrast}" />
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
-                        Title="Reduce motion"
-                        Subtitle="Collapse transitions to nothing"
+                        Title="{l:T Key=reduce.motion}"
+                        Subtitle="{l:T Key=collapse.transitions.to.nothing}"
                         Symbol="speed">
                         <ToggleSwitch x:Name="MotionToggle" OnContent="" OffContent=""
                                       Toggled="OnAccessibilityToggled"
-                                      AutomationProperties.Name="Reduce motion" />
+                                      AutomationProperties.Name="{l:T Key=reduce.motion}" />
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
-                        Title="Reduce transparency"
-                        Subtitle="Paint materials as solid surfaces"
+                        Title="{l:T Key=reduce.transparency}"
+                        Subtitle="{l:T Key=paint.materials.as.solid.surfaces}"
                         Symbol="eye">
                         <ToggleSwitch x:Name="TransparencyToggle" OnContent="" OffContent=""
                                       Toggled="OnAccessibilityToggled"
-                                      AutomationProperties.Name="Reduce transparency" />
+                                      AutomationProperties.Name="{l:T Key=reduce.transparency}" />
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
-                        Title="Large hit targets"
-                        Subtitle="Grow every control to a comfortable 44 pixels"
+                        Title="{l:T Key=large.hit.targets}"
+                        Subtitle="{l:T Key=grow.every.control.to.a.comfortable.44.pixels}"
                         Symbol="target">
                         <ToggleSwitch x:Name="HitTargetToggle" OnContent="" OffContent=""
                                       Toggled="OnAccessibilityToggled"
-                                      AutomationProperties.Name="Large hit targets" />
+                                      AutomationProperties.Name="{l:T Key=large.hit.targets}" />
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
-                        Title="Always show focus ring"
-                        Subtitle="Keep the keyboard focus visible even after a click"
+                        Title="{l:T Key=always.show.focus.ring}"
+                        Subtitle="{l:T Key=keep.the.keyboard.focus.visible.even.after.a.c.8604d7}"
                         Symbol="focus">
                         <ToggleSwitch x:Name="FocusRingToggle" OnContent="" OffContent=""
                                       Toggled="OnAccessibilityToggled"
-                                      AutomationProperties.Name="Always show focus ring" />
+                                      AutomationProperties.Name="{l:T Key=always.show.focus.ring}" />
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
-                        Title="Text size"
-                        Subtitle="Scales what you read without scaling the whole interface"
+                        Title="{l:T Key=text.size}"
+                        Subtitle="{l:T Key=scales.what.you.read.without.scaling.the.whole.923e7d}"
                         Symbol="text.size">
                         <Slider x:Name="TextScaleSlider" Width="200"
                                 Minimum="80" Maximum="180" StepFrequency="10" TickFrequency="20"
                                 ValueChanged="OnScaleChanged"
-                                AutomationProperties.Name="Text size" />
+                                AutomationProperties.Name="{l:T Key=text.size}" />
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
-                        Title="Interface size"
-                        Subtitle="Scales icons, bars and rows"
+                        Title="{l:T Key=interface.size}"
+                        Subtitle="{l:T Key=scales.icons.bars.and.rows}"
                         Symbol="accessibility">
                         <Slider x:Name="UiScaleSlider" Width="200"
                                 Minimum="80" Maximum="140" StepFrequency="10" TickFrequency="20"
                                 ValueChanged="OnScaleChanged"
-                                AutomationProperties.Name="Interface size" />
+                                AutomationProperties.Name="{l:T Key=interface.size}" />
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
-                        Title="Large mouse pointer"
-                        Subtitle="Only Windows can change the pointer — this opens the setting"
+                        Title="{l:T Key=large.mouse.pointer}"
+                        Subtitle="{l:T Key=only.windows.can.change.the.pointer.this.opens.71a9b3}"
                         Symbol="accessibility">
                         <Button Style="{StaticResource Button.Secondary}"
-                                Content="Open Windows settings" Click="OnPointerSettingsClick"
-                                AutomationProperties.Name="Open Windows pointer settings" />
+                                Content="{l:T Key=open.windows.settings}" Click="OnPointerSettingsClick"
+                                AutomationProperties.Name="{l:T Key=open.windows.pointer.settings}" />
                     </controls:SettingsRow>
                 </StackPanel>
             </controls:SettingsSection>
 
             <controls:SettingsSection
-                Header="READING"
-                Footer="These change how documents and notes are set, not how the interface looks.">
+                Header="{l:T Key=reading}"
+                Footer="{l:T Key=these.change.how.documents.and.notes.are.set.n.b36da1}">
                 <StackPanel>
                     <controls:SettingsRow
-                        Title="Plainer reading face"
-                        Subtitle="A wider, more open typeface for long passages"
+                        Title="{l:T Key=plainer.reading.face}"
+                        Subtitle="{l:T Key=a.wider.more.open.typeface.for.long.passages}"
                         Symbol="book"
                         ShowSeparator="False">
                         <ToggleSwitch x:Name="DyslexiaToggle" OnContent="" OffContent=""
                                       Toggled="OnAccessibilityToggled"
-                                      AutomationProperties.Name="Plainer reading face" />
+                                      AutomationProperties.Name="{l:T Key=plainer.reading.face}" />
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
-                        Title="Line spacing"
-                        Subtitle="More air between lines of prose"
+                        Title="{l:T Key=line.spacing}"
+                        Subtitle="{l:T Key=more.air.between.lines.of.prose}"
                         Symbol="text.size">
                         <Slider x:Name="LineSpacingSlider" Width="200"
                                 Minimum="100" Maximum="200" StepFrequency="10" TickFrequency="25"
                                 ValueChanged="OnScaleChanged"
-                                AutomationProperties.Name="Line spacing" />
+                                AutomationProperties.Name="{l:T Key=line.spacing}" />
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
-                        Title="Reading ruler"
-                        Subtitle="A band that follows the pointer to keep your place"
+                        Title="{l:T Key=reading.ruler}"
+                        Subtitle="{l:T Key=a.band.that.follows.the.pointer.to.keep.your.p.cb94a8}"
                         Symbol="focus">
                         <ToggleSwitch x:Name="RulerToggle" OnContent="" OffContent=""
                                       Toggled="OnAccessibilityToggled"
-                                      AutomationProperties.Name="Reading ruler" />
+                                      AutomationProperties.Name="{l:T Key=reading.ruler}" />
                     </controls:SettingsRow>
                 </StackPanel>
             </controls:SettingsSection>
 
             <controls:SettingsSection
-                Header="BACKUP"
-                Footer="A backup is a copy of the vault exactly as it is on disk — already encrypted, and openable only with your recovery key. There is no way around that, which is the same reason the workspace is worth having.">
+                Header="{l:T Key=backup}"
+                Footer="{l:T Key=a.backup.is.a.copy.of.the.vault.exactly.as.it.eef6ea}">
                 <StackPanel>
                     <controls:SettingsRow
-                        Title="Automatic backups"
-                        Subtitle="Taken when Campus opens, if one is due"
+                        Title="{l:T Key=automatic.backups}"
+                        Subtitle="{l:T Key=taken.when.campus.opens.if.one.is.due}"
                         Symbol="backup"
                         ShowSeparator="False">
                         <ToggleSwitch x:Name="BackupToggle" OnContent="" OffContent=""
                                       Toggled="OnBackupChanged"
-                                      AutomationProperties.Name="Automatic backups" />
+                                      AutomationProperties.Name="{l:T Key=automatic.backups}" />
                     </controls:SettingsRow>
 
-                    <controls:SettingsRow Title="How often" Symbol="clock">
+                    <controls:SettingsRow Title="{l:T Key=how.often}" Symbol="clock">
                         <ComboBox x:Name="BackupCadenceChoice" MinWidth="150"
                                   SelectionChanged="OnBackupChanged"
-                                  AutomationProperties.Name="Backup frequency">
-                            <ComboBoxItem Content="Only when I ask" />
-                            <ComboBoxItem Content="Daily" />
-                            <ComboBoxItem Content="Weekly" />
+                                  AutomationProperties.Name="{l:T Key=backup.frequency}">
+                            <ComboBoxItem Content="{l:T Key=only.when.i.ask}" />
+                            <ComboBoxItem Content="{l:T Key=daily}" />
+                            <ComboBoxItem Content="{l:T Key=weekly}" />
                         </ComboBox>
                     </controls:SettingsRow>
 
-                    <controls:SettingsRow x:Name="BackupFolderRow" Title="Where they go" Symbol="folder">
+                    <controls:SettingsRow x:Name="BackupFolderRow" Title="{l:T Key=where.they.go}" Symbol="folder">
                         <Button Style="{StaticResource Button.Secondary}"
-                                Content="Choose…" Click="OnBackupFolderClick"
-                                AutomationProperties.Name="Choose the backup folder" />
+                                Content="{l:T Key=choose}" Click="OnBackupFolderClick"
+                                AutomationProperties.Name="{l:T Key=choose.the.backup.folder}" />
                     </controls:SettingsRow>
 
-                    <controls:SettingsRow x:Name="BackupNowRow" Title="Back up now" Symbol="save">
+                    <controls:SettingsRow x:Name="BackupNowRow" Title="{l:T Key=back.up.now}" Symbol="save">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <Button Style="{StaticResource Button.Secondary}"
-                                    Content="Restore…" Click="OnRestoreClick"
-                                    AutomationProperties.Name="Restore from a backup" />
+                                    Content="{l:T Key=restore}" Click="OnRestoreClick"
+                                    AutomationProperties.Name="{l:T Key=restore.from.a.backup}" />
                             <Button Style="{StaticResource Button.Primary}"
-                                    Content="Back up" Click="OnBackupNowClick"
-                                    AutomationProperties.Name="Back up now" />
+                                    Content="{l:T Key=back.up}" Click="OnBackupNowClick"
+                                    AutomationProperties.Name="{l:T Key=back.up.now}" />
                         </StackPanel>
                     </controls:SettingsRow>
                 </StackPanel>
             </controls:SettingsSection>
 
             <controls:SettingsSection
-                Header="SECURITY"
-                Footer="Locking clears every key from memory. Files on disk stay unreadable until the next unlock.">
+                Header="{l:T Key=security}"
+                Footer="{l:T Key=locking.clears.every.key.from.memory.files.on.a9660c}">
                 <StackPanel>
                     <controls:SettingsRow
                         x:Name="HelloRow"
-                        Title="Windows Hello"
-                        Subtitle="Checking..."
+                        Title="{l:T Key=windows.hello}"
+                        Subtitle="{l:T Key=checking}"
                         Symbol="shield"
                         ShowSeparator="False">
                         <Button x:Name="HelloButton" Style="{StaticResource Button.Secondary}"
-                                Content="Set up" Click="OnHelloClick" />
+                                Content="{l:T Key=set.up}" Click="OnHelloClick" />
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
-                        Title="Sensitive mode"
-                        Subtitle="Clear the clipboard after copying, and refuse drag-out"
+                        Title="{l:T Key=sensitive.mode}"
+                        Subtitle="{l:T Key=clear.the.clipboard.after.copying.and.refuse.d.87953c}"
                         Symbol="eye.slash">
                         <ToggleSwitch x:Name="SensitiveToggle" OnContent="" OffContent=""
                                       Toggled="OnSensitiveToggled"
-                                      AutomationProperties.Name="Sensitive mode" />
+                                      AutomationProperties.Name="{l:T Key=sensitive.mode}" />
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
-                        Title="Lock automatically"
-                        Subtitle="After this much time with no activity"
+                        Title="{l:T Key=lock.automatically}"
+                        Subtitle="{l:T Key=after.this.much.time.with.no.activity}"
                         Symbol="timer">
                         <ComboBox x:Name="AutoLockChoice" MinWidth="150"
                                   SelectionChanged="OnAutoLockChanged"
-                                  AutomationProperties.Name="Lock automatically">
-                            <ComboBoxItem Content="Never" Tag="0" />
-                            <ComboBoxItem Content="After 5 minutes" Tag="5" />
-                            <ComboBoxItem Content="After 10 minutes" Tag="10" />
-                            <ComboBoxItem Content="After 30 minutes" Tag="30" />
+                                  AutomationProperties.Name="{l:T Key=lock.automatically}">
+                            <ComboBoxItem Content="{l:T Key=never}" Tag="0" />
+                            <ComboBoxItem Content="{l:T Key=after.5.minutes}" Tag="5" />
+                            <ComboBoxItem Content="{l:T Key=after.10.minutes}" Tag="10" />
+                            <ComboBoxItem Content="{l:T Key=after.30.minutes}" Tag="30" />
                         </ComboBox>
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
-                        Title="Lock now"
-                        Subtitle="Ctrl+Shift+L"
+                        Title="{l:T Key=lock.now}"
+                        Subtitle="{l:T Key=ctrl.shift.l}"
                         Symbol="lock">
                         <Button Style="{StaticResource Button.Secondary}"
-                                Content="Lock" Click="OnLockNowClick" />
+                                Content="{l:T Key=lock}" Click="OnLockNowClick" />
                     </controls:SettingsRow>
                 </StackPanel>
             </controls:SettingsSection>
 
             <controls:SettingsSection
-                Header="EMOJI"
-                Footer="Campus draws emoji from an artwork pack, never from the Windows emoji font. Build a pack from a colour emoji font you own with tools/emoji/build_pack.py, then drop the folder into the packs directory.">
+                Header="{l:T Key=emoji.8526}"
+                Footer="{l:T Key=campus.draws.emoji.from.an.artwork.pack.never.66f5c0}">
                 <StackPanel>
                     <controls:SettingsRow
                         x:Name="EmojiPackRow"
-                        Title="Artwork"
-                        Subtitle="Checking..."
+                        Title="{l:T Key=artwork}"
+                        Subtitle="{l:T Key=checking}"
                         Symbol="emoji"
                         ShowSeparator="False">
                         <ComboBox x:Name="EmojiPackChoice" MinWidth="180"
                                   SelectionChanged="OnEmojiPackChanged"
-                                  AutomationProperties.Name="Emoji artwork pack" />
+                                  AutomationProperties.Name="{l:T Key=emoji.artwork.pack}" />
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
-                        Title="Packs folder"
-                        Subtitle="Put a pack here and Campus finds it"
+                        Title="{l:T Key=packs.folder}"
+                        Subtitle="{l:T Key=put.a.pack.here.and.campus.finds.it}"
                         Symbol="folder">
                         <Button Style="{StaticResource Button.Secondary}"
-                                Content="Open" Click="OnOpenPacksFolderClick" />
+                                Content="{l:T Key=open}" Click="OnOpenPacksFolderClick" />
                     </controls:SettingsRow>
                 </StackPanel>
             </controls:SettingsSection>
 
             <controls:SettingsSection
-                Header="ON THIS PC"
-                Footer="Only the small background helper runs at sign-in, never the window. It holds no keys and cannot open your workspace — the most it does is catch a shortcut and watch one folder.">
+                Header="{l:T Key=on.this.pc}"
+                Footer="{l:T Key=only.the.small.background.helper.runs.at.sign.e69d4a}">
                 <StackPanel>
                     <controls:SettingsRow
                         x:Name="StartupRow"
-                        Title="Run the helper at sign-in"
-                        Subtitle="Keeps Ctrl+Alt+N working when Campus is closed"
+                        Title="{l:T Key=run.the.helper.at.sign.in}"
+                        Subtitle="{l:T Key=keeps.ctrl.alt.n.working.when.campus.is.closed}"
                         Symbol="device.laptop"
                         ShowSeparator="False">
                         <ToggleSwitch x:Name="StartupToggle" OnContent="" OffContent=""
                                       Toggled="OnStartupToggled"
-                                      AutomationProperties.Name="Run at sign-in" />
+                                      AutomationProperties.Name="{l:T Key=run.at.sign.in}" />
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
                         x:Name="DropFolderRow"
-                        Title="Drop folder"
-                        Subtitle="Anything put here lands in Campus"
+                        Title="{l:T Key=drop.folder}"
+                        Subtitle="{l:T Key=anything.put.here.lands.in.campus}"
                         Symbol="folder">
                         <Button Style="{StaticResource Button.Secondary}"
-                                Content="Open" Click="OnOpenDropFolderClick"
-                                AutomationProperties.Name="Open the drop folder" />
+                                Content="{l:T Key=open}" Click="OnOpenDropFolderClick"
+                                AutomationProperties.Name="{l:T Key=open.the.drop.folder}" />
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
                         x:Name="FileTypeRow"
-                        Title="Open .campus files with Campus"
-                        Subtitle="Gives them the right icon in Explorer"
+                        Title="{l:T Key=open.campus.files.with.campus}"
+                        Subtitle="{l:T Key=gives.them.the.right.icon.in.explorer}"
                         Symbol="file">
                         <Button x:Name="FileTypeButton" Style="{StaticResource Button.Secondary}"
-                                Content="Register" Click="OnRegisterFileTypeClick"
-                                AutomationProperties.Name="Register the .campus file type" />
+                                Content="{l:T Key=register}" Click="OnRegisterFileTypeClick"
+                                AutomationProperties.Name="{l:T Key=register.the.campus.file.type}" />
                     </controls:SettingsRow>
 
                     <controls:SettingsRow
-                        Title="Shortcuts"
-                        Subtitle="On the desktop and in the Start menu"
+                        Title="{l:T Key=shortcuts}"
+                        Subtitle="{l:T Key=on.the.desktop.and.in.the.start.menu}"
                         Symbol="add">
                         <Button Style="{StaticResource Button.Secondary}"
-                                Content="Create" Click="OnCreateShortcutsClick"
-                                AutomationProperties.Name="Create shortcuts" />
+                                Content="{l:T Key=create}" Click="OnCreateShortcutsClick"
+                                AutomationProperties.Name="{l:T Key=create.shortcuts}" />
                     </controls:SettingsRow>
                 </StackPanel>
             </controls:SettingsSection>
 
-            <controls:SettingsSection Header="ABOUT">
+            <controls:SettingsSection Header="{l:T Key=about}">
                 <StackPanel>
-                    <controls:SettingsRow Title="Campus" Subtitle="Personal Academic Workspace"
+                    <controls:SettingsRow Title="{l:T Key=campus}" Subtitle="{l:T Key=personal.academic.workspace}"
                                           ShowSeparator="False">
                         <TextBlock x:Name="VersionText" Style="{StaticResource Text.Footnote}" />
                     </controls:SettingsRow>
-                    <controls:SettingsRow Title="Vault location"
+                    <controls:SettingsRow Title="{l:T Key=vault.location}"
                                           Symbol="folder">
                         <TextBlock x:Name="VaultPathText" Style="{StaticResource Text.Footnote}"
                                    TextTrimming="CharacterEllipsis" MaxWidth="300" />

@@ -45,12 +45,12 @@ public static class ObjectCommands
             menu.Items.Add(Destructive("Delete forever", CampusSymbols.Delete, async () =>
             {
                 if (!await ConfirmAsync(root,
-                    "Delete forever?",
+                    L.T("delete.forever"),
                     $"“{entity.Title}” will be gone. This cannot be undone.",
                     "Delete forever")) return;
 
                 await workspace.Objects.DeleteForeverAsync(entity.Id);
-                Notifications.Show("Deleted.", NoticeKind.Info);
+                Notifications.Show(L.T("deleted"), NoticeKind.Info);
                 await refresh();
             }));
 
@@ -80,7 +80,7 @@ public static class ObjectCommands
 
         menu.Items.Add(Item("Rename", CampusSymbols.Rename, async () =>
         {
-            var title = await AskAsync(root, "Rename", entity.Title);
+            var title = await AskAsync(root, L.T("rename"), entity.Title);
             if (title is null) return;
 
             var was = entity.Title;
@@ -129,7 +129,7 @@ public static class ObjectCommands
     private static MenuFlyoutSubItem SubjectSubmenu(
         CampusObject entity, WorkspaceService workspace, Func<Task> refresh)
     {
-        var submenu = new MenuFlyoutSubItem { Text = "Subject" };
+        var submenu = new MenuFlyoutSubItem { Text = L.T("subject") };
         submenu.Icon = IconFor(CampusSymbols.Subjects);
 
         // Populated on first open rather than up front: a right-click should not wait on a query
@@ -235,7 +235,7 @@ public static class ObjectCommands
             Title = title,
             Content = new TextBlock { Text = message, TextWrapping = TextWrapping.Wrap },
             PrimaryButtonText = confirmLabel,
-            CloseButtonText = "Cancel",
+            CloseButtonText = L.T("cancel"),
             DefaultButton = ContentDialogButton.Close,
         };
 
@@ -259,8 +259,8 @@ public static class ObjectCommands
             XamlRoot = root,
             Title = title,
             Content = input,
-            PrimaryButtonText = "Save",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = L.T("save"),
+            CloseButtonText = L.T("cancel"),
             DefaultButton = ContentDialogButton.Primary,
         };
 

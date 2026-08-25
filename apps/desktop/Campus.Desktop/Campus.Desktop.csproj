@@ -26,6 +26,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!--
+      Available everywhere without a using line. `L.T("key")` appears in almost every file that
+      draws anything, and a using directive per file to reach a two-letter helper is noise.
+    -->
+    <Using Include="Campus.Desktop.Localization" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
     <PackageReference Include="CommunityToolkit.Mvvm" />

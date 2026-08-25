@@ -255,7 +255,7 @@ public sealed partial class GoalsPage : Page
         box.RightTapped += async (_, e) =>
         {
             e.Handled = true;
-            if (!await ObjectCommands.ConfirmAsync(XamlRoot, "Remove this step?",
+            if (!await ObjectCommands.ConfirmAsync(XamlRoot, L.T("remove.this.step"),
                 step.Text, "Remove")) return;
 
             payload.Steps.Remove(step);
@@ -269,7 +269,7 @@ public sealed partial class GoalsPage : Page
 
     private async Task AddStepAsync(CampusObject goal, GoalPayload payload)
     {
-        var text = await ObjectCommands.AskAsync(XamlRoot, "Add a step", "", "Finish chapter 4");
+        var text = await ObjectCommands.AskAsync(XamlRoot, L.T("add.a.step"), "", "Finish chapter 4");
         if (text is null) return;
 
         payload.Steps.Add(new ChecklistItem

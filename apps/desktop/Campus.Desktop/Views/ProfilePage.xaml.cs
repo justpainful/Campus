@@ -111,11 +111,11 @@ public sealed partial class ProfilePage : Page
             _profile.AcademicYear = (int)year.Value;
             _ = SaveAsync();
         };
-        AutomationProperties.SetName(year, "Academic year");
+        AutomationProperties.SetName(year, L.T("academic.year.f0b9"));
 
         rows.Children.Add(new SettingsRow
         {
-            Title = "Academic year",
+            Title = L.T("academic.year.f0b9"),
             Subtitle = "Used to file this year's work apart from last year's",
             Symbol = CampusSymbols.Calendar,
             ShowSeparator = false,
@@ -131,11 +131,11 @@ public sealed partial class ProfilePage : Page
             _profile.CurrentTerm = Enum.GetValues<TermKind>()[term.SelectedIndex];
             _ = SaveAsync();
         };
-        AutomationProperties.SetName(term, "Current term");
+        AutomationProperties.SetName(term, L.T("current.term"));
 
         rows.Children.Add(new SettingsRow
         {
-            Title = "Current term",
+            Title = L.T("current.term"),
             Subtitle = "What “this term” means in every list",
             Symbol = CampusSymbols.Clock,
             Content = term,
@@ -182,7 +182,7 @@ public sealed partial class ProfilePage : Page
         var picker = new CalendarDatePicker
         {
             Date = value,
-            PlaceholderText = "Not set",
+            PlaceholderText = L.T("not.set"),
             Width = 200,
         };
         picker.DateChanged += (_, args) => changed(args.NewDate);
@@ -206,7 +206,7 @@ public sealed partial class ProfilePage : Page
         {
             RulesList.Children.Add(new TextBlock
             {
-                Text = "Nothing set. “Never leave revision to the night before” is a rule.",
+                Text = L.T("nothing.set.never.leave.revision.to.the.night.60bbbb"),
                 Style = (Style)Application.Current.Resources["Text.Footnote"],
             });
             return;

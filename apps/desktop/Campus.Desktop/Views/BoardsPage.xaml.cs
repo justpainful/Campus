@@ -155,7 +155,7 @@ public sealed partial class BoardsPage : Page
     {
         if (!_workspace.IsUnlocked) return;
 
-        var title = await ObjectCommands.AskAsync(XamlRoot, "New board", "", "Physics questions");
+        var title = await ObjectCommands.AskAsync(XamlRoot, L.T("new.board"), "", "Physics questions");
         if (title is null) return;
 
         await _workspace.Objects.SaveAsync(new CampusObject

@@ -2,6 +2,7 @@
     x:Class="Campus.Desktop.Design.Emoji.EmojiPicker"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:Campus.Desktop.Localization"
     xmlns:icons="using:Campus.Desktop.Design.Icons"
     xmlns:local="using:Campus.Desktop.Design.Emoji"
     Width="420"
@@ -68,9 +69,9 @@
             <TextBox
                 x:Name="SearchBox"
                 Style="{StaticResource Input.Search}"
-                PlaceholderText="Search emoji"
+                PlaceholderText="{l:T Key=search.emoji}"
                 TextChanged="OnSearchChanged"
-                AutomationProperties.Name="Search emoji" />
+                AutomationProperties.Name="{l:T Key=search.emoji}" />
 
             <Button
                 x:Name="ToneButton"
@@ -78,8 +79,8 @@
                 Style="{StaticResource Button.Secondary}"
                 MinWidth="0"
                 Padding="8,4,8,4"
-                AutomationProperties.Name="Default skin tone"
-                ToolTipService.ToolTip="Default skin tone">
+                AutomationProperties.Name="{l:T Key=default.skin.tone}"
+                ToolTipService.ToolTip="{l:T Key=default.skin.tone}">
                 <Grid>
                     <local:CampusEmoji x:Name="ToneButtonGlyph" EmojiSize="20" />
                     <icons:CampusIcon x:Name="ToneButtonPlaceholder" Symbol="accessibility"
@@ -98,17 +99,17 @@
                 x:Name="SortButton"
                 Grid.Column="2"
                 Style="{StaticResource Button.Icon}"
-                AutomationProperties.Name="Sort order"
-                ToolTipService.ToolTip="Sort order">
+                AutomationProperties.Name="{l:T Key=sort.order}"
+                ToolTipService.ToolTip="{l:T Key=sort.order}">
                 <icons:CampusIcon Symbol="sort" IconSize="{StaticResource Theme.Icon.M}"
                                   Foreground="{ThemeResource Theme.Label.Secondary}" />
                 <Button.Flyout>
                     <MenuFlyout>
-                        <MenuFlyoutItem Text="Unicode order" Click="OnSortClick" Tag="Unicode" />
-                        <MenuFlyoutItem Text="Most used first" Click="OnSortClick" Tag="Frequency" />
-                        <MenuFlyoutItem Text="By name" Click="OnSortClick" Tag="Name" />
+                        <MenuFlyoutItem Text="{l:T Key=unicode.order}" Click="OnSortClick" Tag="Unicode" />
+                        <MenuFlyoutItem Text="{l:T Key=most.used.first}" Click="OnSortClick" Tag="Frequency" />
+                        <MenuFlyoutItem Text="{l:T Key=by.name}" Click="OnSortClick" Tag="Name" />
                         <MenuFlyoutSeparator />
-                        <MenuFlyoutItem Text="Clear recently used" Click="OnClearRecentsClick" />
+                        <MenuFlyoutItem Text="{l:T Key=clear.recently.used}" Click="OnClearRecentsClick" />
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>
@@ -131,7 +132,7 @@
                 SelectionMode="None"
                 IsItemClickEnabled="False"
                 ItemTemplate="{StaticResource EmojiCellTemplate}"
-                AutomationProperties.Name="Emoji">
+                AutomationProperties.Name="{l:T Key=emoji}">
                 <GridView.ItemContainerStyle>
                     <Style TargetType="GridViewItem">
                         <Setter Property="Margin" Value="0" />
@@ -155,7 +156,7 @@
                 VerticalAlignment="Center"
                 TextAlignment="Center"
                 Visibility="Collapsed"
-                Text="Nothing matches that." />
+                Text="{l:T Key=nothing.matches.that}" />
 
             <StackPanel
                 x:Name="NoPackNotice"
@@ -167,13 +168,13 @@
                 <icons:CampusIcon Symbol="emoji" IconSize="{StaticResource Theme.Icon.Display}"
                                   Weight="Light"
                                   Foreground="{ThemeResource Theme.Label.Tertiary}" />
-                <TextBlock Text="No emoji artwork installed"
+                <TextBlock Text="{l:T Key=no.emoji.artwork.installed}"
                            Style="{StaticResource Text.Title3}"
                            HorizontalAlignment="Center" TextAlignment="Center" />
                 <TextBlock
                     Style="{StaticResource Text.Footnote}"
                     HorizontalAlignment="Center" TextAlignment="Center"
-                    Text="Campus will not fall back to the Windows emoji font. Build a pack from a font you own, then choose it in Settings." />
+                    Text="{l:T Key=campus.will.not.fall.back.to.the.windows.emoji.7eb9ae}" />
                 <TextBlock
                     x:Name="NoPackCommand"
                     Style="{StaticResource Text.Mono}"
@@ -181,7 +182,7 @@
                     HorizontalAlignment="Center" TextAlignment="Center"
                     TextWrapping="Wrap"
                     Foreground="{ThemeResource Theme.Label.Tertiary}"
-                    Text="python tools/emoji/build_pack.py --font &quot;Apple Color Emoji.ttc&quot; --name apple" />
+                    Text="{l:T Key=python.tools.emoji.build.pack.py.font.quot.app.e9bdd2}" />
             </StackPanel>
         </Grid>
 
@@ -204,7 +205,7 @@
             </StackPanel>
             <Button x:Name="PinButton" Grid.Column="2" Style="{StaticResource Button.Icon}"
                     Click="OnPinClick" Visibility="Collapsed"
-                    AutomationProperties.Name="Pin this emoji">
+                    AutomationProperties.Name="{l:T Key=pin.this.emoji}">
                 <icons:CampusIcon x:Name="PinIcon" Symbol="pin" IconSize="{StaticResource Theme.Icon.M}"
                                   Foreground="{ThemeResource Theme.Label.Secondary}" />
             </Button>

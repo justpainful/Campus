@@ -20,10 +20,9 @@ public sealed partial class LockPage : Page
     {
         if (!_workspace.IsInitialised)
         {
-            HeadlineText.Text = "Welcome to Campus";
-            SubtitleText.Text = "Everything you keep here is encrypted on this device. "
-                              + "Create your workspace to begin.";
-            PrimaryLabel.Text = "Create workspace";
+            HeadlineText.Text = L.T("welcome.to.campus");
+            SubtitleText.Text = L.T("everything.you.keep.here.is.encrypted.on.this.fa2f48");
+            PrimaryLabel.Text = L.T("create.workspace");
             PrimaryIcon.Symbol = "add";
             RecoveryLink.Visibility = Visibility.Collapsed;
             return;
@@ -139,12 +138,10 @@ public sealed partial class LockPage : Page
         var dialog = new ContentDialog
         {
             XamlRoot = XamlRoot,
-            Title = "Set up Windows Hello?",
-            Content = "You can unlock Campus with your face, fingerprint or PIN instead of "
-                    + "typing the recovery key. Keep the recovery key regardless — it is the "
-                    + "only way in if Windows Hello stops working.",
-            PrimaryButtonText = "Set up",
-            CloseButtonText = "Not now",
+            Title = L.T("set.up.windows.hello"),
+            Content = L.T("you.can.unlock.campus.with.your.face.fingerpri.c3f828"),
+            PrimaryButtonText = L.T("set.up"),
+            CloseButtonText = L.T("not.now"),
             DefaultButton = ContentDialogButton.Primary,
         };
 
@@ -161,9 +158,7 @@ public sealed partial class LockPage : Page
         var body = new StackPanel { Spacing = 16 };
         body.Children.Add(new TextBlock
         {
-            Text = "Write this down and keep it somewhere safe, away from this PC. It is the only "
-                 + "way back into your workspace if Windows Hello stops working or you move to "
-                 + "another computer. Campus does not keep a copy — not even encrypted.",
+            Text = L.T("write.this.down.and.keep.it.somewhere.safe.awa.0191de"),
             TextWrapping = TextWrapping.Wrap,
         });
 
@@ -179,9 +174,9 @@ public sealed partial class LockPage : Page
         var dialog = new ContentDialog
         {
             XamlRoot = XamlRoot,
-            Title = "Your recovery key",
+            Title = L.T("your.recovery.key"),
             Content = body,
-            PrimaryButtonText = "I have written it down",
+            PrimaryButtonText = L.T("i.have.written.it.down"),
             DefaultButton = ContentDialogButton.Primary,
         };
         await dialog.ShowAsync();

@@ -2,6 +2,7 @@
     x:Class="Campus.Desktop.Views.Viewers.ViewerHost"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:Campus.Desktop.Localization"
     xmlns:icons="using:Campus.Desktop.Design.Icons"
     Background="{ThemeResource Theme.Background.Primary}">
 
@@ -29,7 +30,7 @@
 
             <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                 <Button Style="{StaticResource Button.Icon}" Click="OnBackClick"
-                        AutomationProperties.Name="Back" ToolTipService.ToolTip="Back">
+                        AutomationProperties.Name="{l:T Key=back}" ToolTipService.ToolTip="{l:T Key=back}">
                     <icons:CampusIcon Symbol="chevron.left" IconSize="{StaticResource Theme.Icon.L}"
                                       Foreground="{ThemeResource Theme.Label.Secondary}" />
                 </Button>
@@ -54,19 +55,19 @@
                 <Border Width="1" Height="20" Margin="6,0,6,0"
                         Background="{ThemeResource Theme.Separator.Standard}" />
                 <Button Style="{StaticResource Button.Icon}" Click="OnDetailsClick"
-                        AutomationProperties.Name="Details" ToolTipService.ToolTip="Details">
+                        AutomationProperties.Name="{l:T Key=details.4598}" ToolTipService.ToolTip="{l:T Key=details.4598}">
                     <icons:CampusIcon Symbol="info" IconSize="{StaticResource Theme.Icon.L}"
                                       Foreground="{ThemeResource Theme.Label.Secondary}" />
                 </Button>
                 <Button Style="{StaticResource Button.Icon}" Click="OnExportClick"
-                        AutomationProperties.Name="Export a copy"
-                        ToolTipService.ToolTip="Export a copy">
+                        AutomationProperties.Name="{l:T Key=export.a.copy}"
+                        ToolTipService.ToolTip="{l:T Key=export.a.copy}">
                     <icons:CampusIcon Symbol="export" IconSize="{StaticResource Theme.Icon.L}"
                                       Foreground="{ThemeResource Theme.Label.Secondary}" />
                 </Button>
                 <Button Style="{StaticResource Button.Icon}" Click="OnOpenExternallyClick"
-                        AutomationProperties.Name="Open in another app"
-                        ToolTipService.ToolTip="Open in another app">
+                        AutomationProperties.Name="{l:T Key=open.in.another.app}"
+                        ToolTipService.ToolTip="{l:T Key=open.in.another.app}">
                     <icons:CampusIcon Symbol="open.external" IconSize="{StaticResource Theme.Icon.L}"
                                       Foreground="{ThemeResource Theme.Label.Secondary}" />
                 </Button>
@@ -87,7 +88,7 @@
                        HorizontalAlignment="Center" TextAlignment="Center" />
             <Button x:Name="MessageAction" Style="{StaticResource Button.Secondary}"
                     HorizontalAlignment="Center" Visibility="Collapsed"
-                    Click="OnOpenExternallyClick" Content="Open in another app" />
+                    Click="OnOpenExternallyClick" Content="{l:T Key=open.in.another.app}" />
         </StackPanel>
     </Grid>
 </Page>

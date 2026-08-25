@@ -183,7 +183,7 @@ public sealed partial class SubjectPage : Page
             },
             VerticalAlignment = VerticalAlignment.Center,
         };
-        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(remove, "Remove this lesson time");
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(remove, L.T("remove.this.lesson.time"));
         remove.Click += async (_, _) =>
         {
             await _workspace.Schedule.DeleteAsync(slot.Id);
@@ -221,7 +221,7 @@ public sealed partial class SubjectPage : Page
         var room = new TextBox
         {
             Header = "Room",
-            PlaceholderText = "Optional",
+            PlaceholderText = L.T("optional"),
             Style = (Style)Application.Current.Resources["Input.Text"],
         };
 
@@ -234,10 +234,10 @@ public sealed partial class SubjectPage : Page
         var dialog = new ContentDialog
         {
             XamlRoot = XamlRoot,
-            Title = "Lesson time",
+            Title = L.T("lesson.time"),
             Content = body,
-            PrimaryButtonText = "Add",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = L.T("add"),
+            CloseButtonText = L.T("cancel"),
             DefaultButton = ContentDialogButton.Primary,
         };
 
@@ -246,7 +246,7 @@ public sealed partial class SubjectPage : Page
         // A lesson that ends before it starts is a typo, not a lesson that runs past midnight.
         if (end.Time <= start.Time)
         {
-            Notifications.Show("A lesson has to finish after it starts.", NoticeKind.Warning);
+            Notifications.Show(L.T("a.lesson.has.to.finish.after.it.starts"), NoticeKind.Warning);
             return;
         }
 
@@ -307,10 +307,10 @@ public sealed partial class SubjectPage : Page
         var dialog = new ContentDialog
         {
             XamlRoot = XamlRoot,
-            Title = "Subject",
+            Title = L.T("subject"),
             Content = body,
-            PrimaryButtonText = "Save",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = L.T("save"),
+            CloseButtonText = L.T("cancel"),
             DefaultButton = ContentDialogButton.Primary,
         };
 

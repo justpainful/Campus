@@ -203,7 +203,7 @@ public sealed partial class CollectionPage : Page
         // empty — those are different situations and only one of them needs the invitation.
         if (empty && _filter.Length > 0)
         {
-            EmptyTitle.Text = "No matches";
+            EmptyTitle.Text = L.T("no.matches");
             EmptyMessage.Text = $"Nothing here matches “{_filter}”.";
         }
         else if (empty)
@@ -271,8 +271,8 @@ public sealed partial class CollectionPage : Page
             XamlRoot = XamlRoot,
             Title = _definition.NewLabel,
             Content = input,
-            PrimaryButtonText = "Add",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = L.T("add"),
+            CloseButtonText = L.T("cancel"),
             DefaultButton = ContentDialogButton.Primary,
         };
 

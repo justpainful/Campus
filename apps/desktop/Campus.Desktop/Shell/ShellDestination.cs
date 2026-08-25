@@ -1,4 +1,5 @@
 using Campus.Desktop.Design.Icons;
+using Campus.Desktop.Localization;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Campus.Desktop.Shell;
@@ -10,8 +11,18 @@ namespace Campus.Desktop.Shell;
 public sealed partial class ShellDestination : ObservableObject
 {
     public required string Id { get; init; }
-    public required string Title { get; init; }
     public required string Symbol { get; init; }
+
+    /// <summary>
+    /// The catalogue key for this destination's name.
+    ///
+    /// A key rather than a word, because the rail is built once at startup and lives for the
+    /// session: if it held the English word, switching to Arabic would leave sixteen English
+    /// tooltips down the side of an Arabic window.
+    /// </summary>
+    public required string TitleKey { get; init; }
+
+    public string Title => Localization.Language.Get(TitleKey);
 
     /// <summary>Keyboard accelerator hint shown in the tooltip, for example "Ctrl+1".</summary>
     public string? Shortcut { get; init; }
@@ -61,28 +72,28 @@ public static class ShellDestinations
 
     public static IReadOnlyList<ShellDestination> CreateDefault() =>
     [
-        new() { Id = Home, Title = "Home", Symbol = CampusSymbols.Home, Shortcut = "Ctrl+1" },
-        new() { Id = Inbox, Title = "Inbox", Symbol = CampusSymbols.Inbox, Shortcut = "Ctrl+2" },
-        new() { Id = Subjects, Title = "Subjects", Symbol = CampusSymbols.Subjects, Shortcut = "Ctrl+3" },
-        new() { Id = Library, Title = "Library", Symbol = CampusSymbols.Library, Shortcut = "Ctrl+4" },
-        new() { Id = Files, Title = "Files", Symbol = CampusSymbols.Files },
-        new() { Id = Notes, Title = "Notes", Symbol = CampusSymbols.Notes, Shortcut = "Ctrl+5" },
-        new() { Id = Assignments, Title = "Assignments", Symbol = CampusSymbols.Assignments, Shortcut = "Ctrl+6" },
-        new() { Id = Tasks, Title = "Tasks", Symbol = CampusSymbols.Tasks, Shortcut = "Ctrl+7" },
-        new() { Id = Requirements, Title = "Requirements", Symbol = CampusSymbols.Requirements, Shortcut = "Ctrl+8" },
-        new() { Id = Goals, Title = "Goals", Symbol = CampusSymbols.Goals },
-        new() { Id = Planner, Title = "Planner", Symbol = CampusSymbols.Planner, Shortcut = "Ctrl+9" },
-        new() { Id = PrintCenter, Title = "Print Center", Symbol = CampusSymbols.PrintCenter },
-        new() { Id = Links, Title = "Links", Symbol = CampusSymbols.Links },
-        new() { Id = Boards, Title = "Boards", Symbol = CampusSymbols.Boards },
-        new() { Id = Conversations, Title = "Conversations", Symbol = CampusSymbols.Conversations },
-        new() { Id = Search, Title = "Search", Symbol = CampusSymbols.Search, Shortcut = "Ctrl+Shift+F" },
+        new() { Id = Home, TitleKey = "rail.home", Symbol = CampusSymbols.Home, Shortcut = "Ctrl+1" },
+        new() { Id = Inbox, TitleKey = "rail.inbox", Symbol = CampusSymbols.Inbox, Shortcut = "Ctrl+2" },
+        new() { Id = Subjects, TitleKey = "rail.subjects", Symbol = CampusSymbols.Subjects, Shortcut = "Ctrl+3" },
+        new() { Id = Library, TitleKey = "rail.library", Symbol = CampusSymbols.Library, Shortcut = "Ctrl+4" },
+        new() { Id = Files, TitleKey = "rail.files", Symbol = CampusSymbols.Files },
+        new() { Id = Notes, TitleKey = "rail.notes", Symbol = CampusSymbols.Notes, Shortcut = "Ctrl+5" },
+        new() { Id = Assignments, TitleKey = "rail.assignments", Symbol = CampusSymbols.Assignments, Shortcut = "Ctrl+6" },
+        new() { Id = Tasks, TitleKey = "rail.tasks", Symbol = CampusSymbols.Tasks, Shortcut = "Ctrl+7" },
+        new() { Id = Requirements, TitleKey = "rail.requirements", Symbol = CampusSymbols.Requirements, Shortcut = "Ctrl+8" },
+        new() { Id = Goals, TitleKey = "rail.goals", Symbol = CampusSymbols.Goals },
+        new() { Id = Planner, TitleKey = "rail.planner", Symbol = CampusSymbols.Planner, Shortcut = "Ctrl+9" },
+        new() { Id = PrintCenter, TitleKey = "rail.print.center", Symbol = CampusSymbols.PrintCenter },
+        new() { Id = Links, TitleKey = "rail.links", Symbol = CampusSymbols.Links },
+        new() { Id = Boards, TitleKey = "rail.boards", Symbol = CampusSymbols.Boards },
+        new() { Id = Conversations, TitleKey = "rail.conversations", Symbol = CampusSymbols.Conversations },
+        new() { Id = Search, TitleKey = "rail.search", Symbol = CampusSymbols.Search, Shortcut = "Ctrl+Shift+F" },
 
-        new() { Id = Archive, Title = "Archive", Symbol = CampusSymbols.Archive, Placement = DestinationPlacement.Bottom },
-        new() { Id = Trash, Title = "Trash", Symbol = CampusSymbols.Trash, Placement = DestinationPlacement.Bottom },
-        new() { Id = Sync, Title = "Sync", Symbol = CampusSymbols.Sync, Placement = DestinationPlacement.Bottom },
-        new() { Id = Extensions, Title = "Extensions", Symbol = CampusSymbols.Extensions, Placement = DestinationPlacement.Bottom },
-        new() { Id = Profile, Title = "Profile", Symbol = CampusSymbols.Profile, Placement = DestinationPlacement.Bottom },
-        new() { Id = Settings, Title = "Settings", Symbol = CampusSymbols.Settings, Shortcut = "Ctrl+,", Placement = DestinationPlacement.Bottom },
+        new() { Id = Archive, TitleKey = "rail.archive", Symbol = CampusSymbols.Archive, Placement = DestinationPlacement.Bottom },
+        new() { Id = Trash, TitleKey = "rail.trash", Symbol = CampusSymbols.Trash, Placement = DestinationPlacement.Bottom },
+        new() { Id = Sync, TitleKey = "rail.sync", Symbol = CampusSymbols.Sync, Placement = DestinationPlacement.Bottom },
+        new() { Id = Extensions, TitleKey = "rail.extensions", Symbol = CampusSymbols.Extensions, Placement = DestinationPlacement.Bottom },
+        new() { Id = Profile, TitleKey = "rail.profile", Symbol = CampusSymbols.Profile, Placement = DestinationPlacement.Bottom },
+        new() { Id = Settings, TitleKey = "rail.settings", Symbol = CampusSymbols.Settings, Shortcut = "Ctrl+,", Placement = DestinationPlacement.Bottom },
     ];
 }

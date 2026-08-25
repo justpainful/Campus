@@ -46,12 +46,10 @@ public sealed partial class ConversationsPage : Page
         var open = conversations.Count(c =>
             c.PayloadAs<ConversationPayload>()?.Closed != true);
 
-        Summary.Text = conversations.Count switch
-        {
-            0 => "Nothing recorded yet",
-            1 => "1 conversation",
-            _ => $"{conversations.Count} conversations · {open} still open",
-        };
+        Summary.Text = conversations.Count == 0
+            ? L.T("conversations.none")
+            : Plural.Of("conversation.count", conversations.Count)
+              + " · " + L.T("still.open", open);
 
         foreach (var conversation in conversations)
         {
@@ -109,7 +107,7 @@ public sealed partial class ConversationsPage : Page
                 VerticalAlignment = VerticalAlignment.Center,
                 Child = new TextBlock
                 {
-                    Text = "Closed",
+                    Text = L.T("closed"),
                     Style = (Style)Application.Current.Resources["Text.Caption"],
                 },
             });
@@ -126,7 +124,7 @@ public sealed partial class ConversationsPage : Page
             Text = string.Join(" · ", new[]
             {
                 name,
-                "Last " + BoardPage.Ago(payload.LastActivityAt ?? conversation.UpdatedAt),
+                L.T("last.when", BoardPage.Ago(payload.LastActivityAt ?? conversation.UpdatedAt)),
             }),
             Style = (Style)Application.Current.Resources["Text.Footnote"],
             TextTrimming = TextTrimming.CharacterEllipsis,
@@ -153,7 +151,7 @@ public sealed partial class ConversationsPage : Page
         });
         counts.Children.Add(new TextBlock
         {
-            Text = messages == 1 ? "message" : "messages",
+            Text = Plural.Of("message.word", messages),
             Style = (Style)Application.Current.Resources["Text.Caption"],
             HorizontalAlignment = HorizontalAlignment.Right,
         });
@@ -172,7 +170,8 @@ public sealed partial class ConversationsPage : Page
             Opacity = payload.Closed ? 0.62 : 1,
         };
 
-        AutomationProperties.SetName(button, $"{conversation.Title}, {name}, {messages} messages");
+        AutomationProperties.SetName(button,
+            L.T("conversation.row.spoken", conversation.Title, name, messages));
         button.Click += (_, _) => Frame?.Navigate(typeof(ConversationPage), conversation.Id);
         button.RightTapped += (_, e) =>
         {
@@ -205,15 +204,15 @@ public sealed partial class ConversationsPage : Page
 
         var title = await ObjectCommands.AskAsync(
             XamlRoot,
-            kind == ConversationKind.Assistant ? "What did you ask about?" : "What was it about?",
+            L.T(kind == ConversationKind.Assistant ? "what.did.you.ask.about" : "what.was.it.about"),
             "",
-            kind == ConversationKind.Assistant ? "Balancing redox equations" : "Why the test moved");
+            L.T(kind == ConversationKind.Assistant ? "example.redox" : "example.test.moved"));
 
         if (title is null) return;
 
         var with = await ObjectCommands.AskAsync(
             XamlRoot,
-            "Who was it with?",
+            L.T("who.was.it.with"),
             ConversationPage.DefaultNameFor(kind),
             ConversationPage.DefaultNameFor(kind));
 

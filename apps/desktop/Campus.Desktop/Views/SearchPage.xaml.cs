@@ -93,7 +93,7 @@ public sealed partial class SearchPage : Page
         {
             EmptyState.Visibility = Visibility.Visible;
             EmptyGlyph.Symbol = CampusSymbols.Search;
-            EmptyTitle.Text = "No matches";
+            EmptyTitle.Text = L.T("no.matches");
             EmptyMessage.Text = $"Nothing in the workspace mentions “{_query}”.";
             return;
         }
@@ -115,9 +115,8 @@ public sealed partial class SearchPage : Page
         SaveButton.Visibility = Visibility.Collapsed;
         EmptyState.Visibility = Visibility.Visible;
         EmptyGlyph.Symbol = CampusSymbols.Search;
-        EmptyTitle.Text = "Search everything";
-        EmptyMessage.Text = "Titles, notes, tags, and the text inside every PDF, document and "
-            + "slide deck you have imported.";
+        EmptyTitle.Text = L.T("search.everything");
+        EmptyMessage.Text = L.T("titles.notes.tags.and.the.text.inside.every.pd.ce19de");
     }
 
     private FrameworkElement BuildRow(SearchHit hit)
@@ -263,7 +262,7 @@ public sealed partial class SearchPage : Page
     {
         if (_query.Length == 0 || !_workspace.IsUnlocked) return;
 
-        var name = await ObjectCommands.AskAsync(XamlRoot, "Save this search", _query);
+        var name = await ObjectCommands.AskAsync(XamlRoot, L.T("save.this.search"), _query);
         if (name is null) return;
 
         var filter = Filters[Math.Clamp(Segments.SelectedIndex, 0, Filters.Length - 1)];

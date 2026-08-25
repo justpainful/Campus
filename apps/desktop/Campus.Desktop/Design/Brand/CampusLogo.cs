@@ -31,7 +31,12 @@ public sealed class CampusLogo : Control
     {
         DefaultStyleKey = typeof(CampusLogo);
         IsTabStop = false;
-        AutomationProperties.SetName(this, "Campus");
+        AutomationProperties.SetName(this, L.T("campus"));
+
+        // A logo is a drawing, not a sentence. In a right-to-left interface everything else is
+        // mirrored and should be — the back arrow, the sidebar, the reading order — but a mark
+        // that has been flipped is a different mark, and the wordmark comes out backwards.
+        FlowDirection = FlowDirection.LeftToRight;
     }
 
     public static readonly DependencyProperty FormProperty = DependencyProperty.Register(

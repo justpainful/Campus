@@ -2,6 +2,7 @@
     x:Class="Campus.Desktop.Views.CommandPalette"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:Campus.Desktop.Localization"
     xmlns:icons="using:Campus.Desktop.Design.Icons"
     xmlns:local="using:Campus.Desktop.Views"
     mc:Ignorable="d"
@@ -57,10 +58,10 @@
                         Background="Transparent"
                         Padding="0"
                         FontSize="{StaticResource Theme.Text.Title3}"
-                        PlaceholderText="Type a command"
+                        PlaceholderText="{l:T Key=type.a.command}"
                         TextChanged="OnQueryChanged"
                         KeyDown="OnInputKeyDown"
-                        AutomationProperties.Name="Command palette" />
+                        AutomationProperties.Name="{l:T Key=command.palette}" />
                 </Grid>
 
                 <Border Grid.Row="1" Height="1" Background="{ThemeResource Theme.Separator.Standard}" />
@@ -72,7 +73,7 @@
                     SelectionMode="Single"
                     IsItemClickEnabled="True"
                     ItemClick="OnResultClick"
-                    AutomationProperties.Name="Results">
+                    AutomationProperties.Name="{l:T Key=results}">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
                             <Setter Property="Padding" Value="10,0,10,0" />
@@ -133,7 +134,7 @@
                     <TextBlock
                         x:Name="HintText"
                         Style="{StaticResource Text.Caption}"
-                        Text="Enter to run · Tab to switch to search · Esc to close" />
+                        Text="{l:T Key=enter.to.run.tab.to.switch.to.search.esc.to.cl.2e43d6}" />
                 </Grid>
             </Grid>
         </Border>

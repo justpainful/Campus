@@ -64,7 +64,7 @@ public sealed partial class SyncPage : Page
         {
             DeviceList.Children.Add(new SettingsRow
             {
-                Title = "Nothing paired yet",
+                Title = L.T("nothing.paired.yet"),
                 Subtitle = "Pair your phone to capture on the move and pick it up here",
                 Symbol = CampusSymbols.Phone,
                 ShowSeparator = false,
@@ -152,8 +152,8 @@ public sealed partial class SyncPage : Page
             XamlRoot = XamlRoot,
             Title = $"Send to {peer.DisplayName}",
             Content = choice,
-            PrimaryButtonText = "Continue",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = L.T("continue.31fb"),
+            CloseButtonText = L.T("cancel"),
             DefaultButton = ContentDialogButton.Primary,
         };
 
@@ -235,7 +235,7 @@ public sealed partial class SyncPage : Page
 
         if (devices.Count == 0)
         {
-            Notifications.Show("Pair a device first.", NoticeKind.Warning);
+            Notifications.Show(L.T("pair.a.device.first"), NoticeKind.Warning);
             return null;
         }
 
@@ -247,10 +247,10 @@ public sealed partial class SyncPage : Page
         var dialog = new ContentDialog
         {
             XamlRoot = XamlRoot,
-            Title = "Which device?",
+            Title = L.T("which.device"),
             Content = list,
-            PrimaryButtonText = "Continue",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = L.T("continue.31fb"),
+            CloseButtonText = L.T("cancel"),
             DefaultButton = ContentDialogButton.Primary,
         };
 
@@ -372,14 +372,14 @@ public sealed partial class SyncPage : Page
         };
         var code = new TextBox
         {
-            PlaceholderText = "Pairing code",
+            PlaceholderText = L.T("pairing.code"),
             Style = (Style)Application.Current.Resources["Input.Text"],
         };
 
         var body = new StackPanel { Spacing = 12, Width = 320 };
         body.Children.Add(new TextBlock
         {
-            Text = "The address shown on the other device, and the code it is using.",
+            Text = L.T("the.address.shown.on.the.other.device.and.the.0bc2a9"),
             Style = (Style)Application.Current.Resources["Text.Footnote"],
             TextWrapping = TextWrapping.Wrap,
         });
@@ -389,10 +389,10 @@ public sealed partial class SyncPage : Page
         var dialog = new ContentDialog
         {
             XamlRoot = XamlRoot,
-            Title = "Fetch from a device",
+            Title = L.T("fetch.from.a.device"),
             Content = body,
-            PrimaryButtonText = "Connect",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = L.T("connect"),
+            CloseButtonText = L.T("cancel"),
             DefaultButton = ContentDialogButton.Primary,
         };
 
@@ -465,7 +465,7 @@ public sealed partial class SyncPage : Page
     {
         if (!_workspace.IsUnlocked) return;
 
-        var name = await ObjectCommands.AskAsync(XamlRoot, "What is the phone called?", "", "My iPhone");
+        var name = await ObjectCommands.AskAsync(XamlRoot, L.T("what.is.the.phone.called"), "", "My iPhone");
         if (name is null) return;
 
         var code = await _sync.BeginPhonePairingAsync(name);
@@ -474,8 +474,7 @@ public sealed partial class SyncPage : Page
 
         body.Children.Add(new TextBlock
         {
-            Text = "In Campus Pocket, open Settings and choose \u201CPair with your PC\u201D, then "
-                 + "point the camera here.",
+            Text = L.T("in.campus.pocket.open.settings.and.choose.u201.9f6514"),
             Style = (Style)Application.Current.Resources["Text.Callout"],
             TextWrapping = TextWrapping.Wrap,
         });
@@ -491,8 +490,7 @@ public sealed partial class SyncPage : Page
 
         body.Children.Add(new TextBlock
         {
-            Text = "This code contains the secret the two devices will share. It is shown once, "
-                 + "and anyone who photographs it can pair with this workspace.",
+            Text = L.T("this.code.contains.the.secret.the.two.devices.7db7f4"),
             Style = (Style)Application.Current.Resources["Text.Footnote"],
             TextWrapping = TextWrapping.Wrap,
         });
@@ -502,7 +500,7 @@ public sealed partial class SyncPage : Page
             XamlRoot = XamlRoot,
             Title = $"Pair {name}",
             Content = body,
-            CloseButtonText = "Done",
+            CloseButtonText = L.T("done"),
         }.ShowAsync();
 
         await ReloadAsync();
@@ -514,13 +512,13 @@ public sealed partial class SyncPage : Page
     {
         var name = new TextBox
         {
-            PlaceholderText = "My phone",
+            PlaceholderText = L.T("my.phone"),
             Style = (Style)Application.Current.Resources["Input.Text"],
         };
 
         var id = new TextBox
         {
-            PlaceholderText = "The other device's id",
+            PlaceholderText = L.T("the.other.device.s.id"),
             Style = (Style)Application.Current.Resources["Input.Text"],
         };
 
@@ -530,8 +528,7 @@ public sealed partial class SyncPage : Page
         var body = new StackPanel { Spacing = 12, Width = 340 };
         body.Children.Add(new TextBlock
         {
-            Text = "Campus does not go looking for devices. Add the one you mean, then use a code "
-                 + "when you transfer — the code is what protects the contents, and it is never stored.",
+            Text = L.T("campus.does.not.go.looking.for.devices.add.the.f2f830"),
             Style = (Style)Application.Current.Resources["Text.Footnote"],
             TextWrapping = TextWrapping.Wrap,
         });
@@ -550,17 +547,17 @@ public sealed partial class SyncPage : Page
         var dialog = new ContentDialog
         {
             XamlRoot = XamlRoot,
-            Title = "Pair a device",
+            Title = L.T("pair.a.device"),
             Content = body,
-            PrimaryButtonText = "Pair",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = L.T("pair"),
+            CloseButtonText = L.T("cancel"),
             DefaultButton = ContentDialogButton.Primary,
         };
 
         if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
         if (name.Text.Trim().Length == 0 || id.Text.Trim().Length == 0)
         {
-            Notifications.Show("A device needs a name and an id.", NoticeKind.Warning);
+            Notifications.Show(L.T("a.device.needs.a.name.and.an.id"), NoticeKind.Warning);
             return;
         }
 
@@ -577,7 +574,7 @@ public sealed partial class SyncPage : Page
     {
         var box = new TextBox
         {
-            PlaceholderText = "XXXX-XXXX-XXXX",
+            PlaceholderText = L.T("xxxx.xxxx.xxxx"),
             Style = (Style)Application.Current.Resources["Input.Text"],
         };
 
@@ -595,8 +592,8 @@ public sealed partial class SyncPage : Page
             XamlRoot = XamlRoot,
             Title = title,
             Content = body,
-            PrimaryButtonText = "Continue",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = L.T("continue.31fb"),
+            CloseButtonText = L.T("cancel"),
             DefaultButton = ContentDialogButton.Primary,
         };
 
@@ -605,7 +602,7 @@ public sealed partial class SyncPage : Page
         var code = box.Text.Trim();
         if (Pairing.IsWellFormed(code)) return code;
 
-        Notifications.Show("A pairing code is twelve characters.", NoticeKind.Warning);
+        Notifications.Show(L.T("a.pairing.code.is.twelve.characters"), NoticeKind.Warning);
         return null;
     }
 

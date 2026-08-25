@@ -33,7 +33,7 @@ public sealed class SheetViewer : Grid, IContentViewer
 
         _sheet.HorizontalAlignment = HorizontalAlignment.Left;
         _sheet.Margin = new Thickness(20);
-        AutomationProperties.SetName(_sheet, "Sheet");
+        AutomationProperties.SetName(_sheet, L.T("sheet"));
 
         _scroller.Content = _sheet;
         _scroller.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
@@ -62,8 +62,7 @@ public sealed class SheetViewer : Grid, IContentViewer
         {
             _sheet.Children.Add(new TextBlock
             {
-                Text = "This spreadsheet could not be read. It may be password-protected, or "
-                     + "saved in the older binary format.",
+                Text = L.T("this.spreadsheet.could.not.be.read.it.may.be.p.355a7a"),
                 Style = (Style)Application.Current.Resources["Text.Callout"],
                 TextWrapping = TextWrapping.Wrap,
                 MaxWidth = 420,
@@ -86,7 +85,7 @@ public sealed class SheetViewer : Grid, IContentViewer
 
         if (_tables.Count == 0)
         {
-            _status.Text = "Empty";
+            _status.Text = L.T("empty");
             return;
         }
 

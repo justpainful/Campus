@@ -2,6 +2,7 @@
     x:Class="Campus.Desktop.Views.ThemeGalleryPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:Campus.Desktop.Localization"
     xmlns:controls="using:Campus.Desktop.Design.Controls"
     xmlns:icons="using:Campus.Desktop.Design.Icons"
     xmlns:brand="using:Campus.Desktop.Design.Brand"
@@ -23,20 +24,20 @@
                     Background="{ThemeResource Theme.Separator.Standard}" />
             <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                 <Button Style="{StaticResource Button.Icon}" Click="OnBackClick"
-                        AutomationProperties.Name="Back">
+                        AutomationProperties.Name="{l:T Key=back}">
                     <icons:CampusIcon Symbol="chevron.left" IconSize="{StaticResource Theme.Icon.L}"
                                       Foreground="{ThemeResource Theme.Label.Secondary}" />
                 </Button>
-                <TextBlock Text="Theme Gallery" Style="{StaticResource Text.Title2}"
+                <TextBlock Text="{l:T Key=theme.gallery.a6cc}" Style="{StaticResource Text.Title2}"
                            VerticalAlignment="Center" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right"
                         VerticalAlignment="Center">
-                <RadioButton x:Name="ModeSystem" Content="System" GroupName="GalleryMode"
+                <RadioButton x:Name="ModeSystem" Content="{l:T Key=system}" GroupName="GalleryMode"
                              Checked="OnModeChanged" Tag="System" />
-                <RadioButton x:Name="ModeLight" Content="Light" GroupName="GalleryMode"
+                <RadioButton x:Name="ModeLight" Content="{l:T Key=light}" GroupName="GalleryMode"
                              Checked="OnModeChanged" Tag="Light" />
-                <RadioButton x:Name="ModeDark" Content="Dark" GroupName="GalleryMode"
+                <RadioButton x:Name="ModeDark" Content="{l:T Key=dark}" GroupName="GalleryMode"
                              Checked="OnModeChanged" Tag="Dark" />
             </StackPanel>
         </Grid>
@@ -46,38 +47,38 @@
 
                 <!-- ================================================== BACKGROUNDS -->
                 <controls:SettingsSection
-                    Header="BACKGROUND"
-                    Footer="Canvas levels. In dark these run #000000, #1C1C1E, #2C2C2E — neutral, with no blue in them.">
+                    Header="{l:T Key=background}"
+                    Footer="{l:T Key=canvas.levels.in.dark.these.run.000000.1c1c1e.464e98}">
                     <StackPanel x:Name="BackgroundSwatches" Padding="16" Spacing="10" />
                 </controls:SettingsSection>
 
                 <controls:SettingsSection
-                    Header="GROUPED BACKGROUND"
-                    Footer="What a Settings-style page paints, and what its sections paint on top.">
+                    Header="{l:T Key=grouped.background}"
+                    Footer="{l:T Key=what.a.settings.style.page.paints.and.what.its.632e47}">
                     <StackPanel x:Name="GroupedSwatches" Padding="16" Spacing="10" />
                 </controls:SettingsSection>
 
                 <controls:SettingsSection
-                    Header="SURFACE"
-                    Footer="Raising an element raises its surface. Depth comes from level, not from a border.">
+                    Header="{l:T Key=surface}"
+                    Footer="{l:T Key=raising.an.element.raises.its.surface.depth.co.ebb744}">
                     <StackPanel x:Name="SurfaceSwatches" Padding="16" Spacing="10" />
                 </controls:SettingsSection>
 
                 <!-- ======================================================= LABELS -->
                 <controls:SettingsSection
-                    Header="LABEL"
-                    Footer="Text hierarchy is real opacity, not four hand-picked greys.">
+                    Header="{l:T Key=label}"
+                    Footer="{l:T Key=text.hierarchy.is.real.opacity.not.four.hand.p.a0f9f7}">
                     <StackPanel Padding="16" Spacing="8">
-                        <TextBlock Text="Primary — the thing you are reading"
+                        <TextBlock Text="{l:T Key=primary.the.thing.you.are.reading}"
                                    Foreground="{ThemeResource Theme.Label.Primary}"
                                    FontSize="{StaticResource Theme.Text.Body}" />
-                        <TextBlock Text="Secondary — the sentence underneath it"
+                        <TextBlock Text="{l:T Key=secondary.the.sentence.underneath.it}"
                                    Foreground="{ThemeResource Theme.Label.Secondary}"
                                    FontSize="{StaticResource Theme.Text.Body}" />
-                        <TextBlock Text="Tertiary — metadata and placeholders"
+                        <TextBlock Text="{l:T Key=tertiary.metadata.and.placeholders}"
                                    Foreground="{ThemeResource Theme.Label.Tertiary}"
                                    FontSize="{StaticResource Theme.Text.Body}" />
-                        <TextBlock Text="Quaternary — the faintest thing still on screen"
+                        <TextBlock Text="{l:T Key=quaternary.the.faintest.thing.still.on.screen}"
                                    Foreground="{ThemeResource Theme.Label.Quaternary}"
                                    FontSize="{StaticResource Theme.Text.Body}" />
                     </StackPanel>
@@ -85,40 +86,40 @@
 
                 <!-- ================================================== TYPOGRAPHY -->
                 <controls:SettingsSection
-                    Header="TYPOGRAPHY"
-                    Footer="Large text uses the display face and reading sizes the text face, so glyphs are optically corrected per size.">
+                    Header="{l:T Key=typography}"
+                    Footer="{l:T Key=large.text.uses.the.display.face.and.reading.s.0d8d97}">
                     <StackPanel Padding="16" Spacing="6">
-                        <TextBlock Text="Large Title" Style="{StaticResource Text.LargeTitle}" />
-                        <TextBlock Text="Title 1" Style="{StaticResource Text.Title1}" />
-                        <TextBlock Text="Title 2" Style="{StaticResource Text.Title2}" />
-                        <TextBlock Text="Title 3" Style="{StaticResource Text.Title3}" />
-                        <TextBlock Text="Headline" Style="{StaticResource Text.Headline}" />
-                        <TextBlock Text="Body — the size everything long is set in." Style="{StaticResource Text.Body}" />
-                        <TextBlock Text="Callout" Style="{StaticResource Text.Callout}" />
-                        <TextBlock Text="Footnote" Style="{StaticResource Text.Footnote}" />
-                        <TextBlock Text="Caption" Style="{StaticResource Text.Caption}" />
-                        <TextBlock Text="SECTION HEADER" Style="{StaticResource Text.SectionHeader}" />
+                        <TextBlock Text="{l:T Key=large.title}" Style="{StaticResource Text.LargeTitle}" />
+                        <TextBlock Text="{l:T Key=title.1}" Style="{StaticResource Text.Title1}" />
+                        <TextBlock Text="{l:T Key=title.2}" Style="{StaticResource Text.Title2}" />
+                        <TextBlock Text="{l:T Key=title.3}" Style="{StaticResource Text.Title3}" />
+                        <TextBlock Text="{l:T Key=headline}" Style="{StaticResource Text.Headline}" />
+                        <TextBlock Text="{l:T Key=body.the.size.everything.long.is.set.in}" Style="{StaticResource Text.Body}" />
+                        <TextBlock Text="{l:T Key=callout}" Style="{StaticResource Text.Callout}" />
+                        <TextBlock Text="{l:T Key=footnote}" Style="{StaticResource Text.Footnote}" />
+                        <TextBlock Text="{l:T Key=caption}" Style="{StaticResource Text.Caption}" />
+                        <TextBlock Text="{l:T Key=section.header}" Style="{StaticResource Text.SectionHeader}" />
                     </StackPanel>
                 </controls:SettingsSection>
 
                 <!-- ======================================================== FILLS -->
                 <controls:SettingsSection
-                    Header="FILL"
-                    Footer="Fills are for control backgrounds, hover, pressed and selection. They are never a substitute for a surface.">
+                    Header="{l:T Key=fill}"
+                    Footer="{l:T Key=fills.are.for.control.backgrounds.hover.presse.554e21}">
                     <StackPanel x:Name="FillSwatches" Padding="16" Spacing="10" />
                 </controls:SettingsSection>
 
                 <!-- =================================================== SEPARATORS -->
                 <controls:SettingsSection
-                    Header="SEPARATOR"
-                    Footer="Drawn only where content genuinely abuts. Under Increase Contrast they become opaque.">
+                    Header="{l:T Key=separator}"
+                    Footer="{l:T Key=drawn.only.where.content.genuinely.abuts.under.03ed85}">
                     <StackPanel Padding="16" Spacing="14">
                         <StackPanel Spacing="8">
-                            <TextBlock Text="Standard" Style="{StaticResource Text.Footnote}" />
+                            <TextBlock Text="{l:T Key=standard}" Style="{StaticResource Text.Footnote}" />
                             <Border Height="1" Background="{ThemeResource Theme.Separator.Standard}" />
                         </StackPanel>
                         <StackPanel Spacing="8">
-                            <TextBlock Text="Opaque" Style="{StaticResource Text.Footnote}" />
+                            <TextBlock Text="{l:T Key=opaque}" Style="{StaticResource Text.Footnote}" />
                             <Border Height="1" Background="{ThemeResource Theme.Separator.Opaque}" />
                         </StackPanel>
                     </StackPanel>
@@ -126,31 +127,31 @@
 
                 <!-- ====================================================== BUTTONS -->
                 <controls:SettingsSection
-                    Header="BUTTONS"
-                    Footer="Blue is the primary action. Red is only for what cannot be undone. Hover and press each have their own role.">
+                    Header="{l:T Key=buttons}"
+                    Footer="{l:T Key=blue.is.the.primary.action.red.is.only.for.wha.e97216}">
                     <StackPanel Padding="16" Spacing="14">
                         <StackPanel Orientation="Horizontal" Spacing="10">
-                            <Button Style="{StaticResource Button.Primary}" Content="Primary" />
-                            <Button Style="{StaticResource Button.Secondary}" Content="Secondary" />
-                            <Button Style="{StaticResource Button.Plain}" Content="Plain" />
-                            <Button Style="{StaticResource Button.Destructive}" Content="Delete" />
+                            <Button Style="{StaticResource Button.Primary}" Content="{l:T Key=primary}" />
+                            <Button Style="{StaticResource Button.Secondary}" Content="{l:T Key=secondary}" />
+                            <Button Style="{StaticResource Button.Plain}" Content="{l:T Key=plain}" />
+                            <Button Style="{StaticResource Button.Destructive}" Content="{l:T Key=delete}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Spacing="10">
-                            <Button Style="{StaticResource Button.Primary}" Content="Disabled" IsEnabled="False" />
-                            <Button Style="{StaticResource Button.Secondary}" Content="Disabled" IsEnabled="False" />
-                            <Button Style="{StaticResource Button.Destructive}" Content="Disabled" IsEnabled="False" />
+                            <Button Style="{StaticResource Button.Primary}" Content="{l:T Key=disabled}" IsEnabled="False" />
+                            <Button Style="{StaticResource Button.Secondary}" Content="{l:T Key=disabled}" IsEnabled="False" />
+                            <Button Style="{StaticResource Button.Destructive}" Content="{l:T Key=disabled}" IsEnabled="False" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <Button Style="{StaticResource Button.Icon}" AutomationProperties.Name="Add">
+                            <Button Style="{StaticResource Button.Icon}" AutomationProperties.Name="{l:T Key=add}">
                                 <icons:CampusIcon Symbol="add" IconSize="{StaticResource Theme.Icon.XL}" />
                             </Button>
-                            <Button Style="{StaticResource Button.Icon}" AutomationProperties.Name="Search">
+                            <Button Style="{StaticResource Button.Icon}" AutomationProperties.Name="{l:T Key=search}">
                                 <icons:CampusIcon Symbol="search" IconSize="{StaticResource Theme.Icon.L}" />
                             </Button>
-                            <Button Style="{StaticResource Button.Icon}" AutomationProperties.Name="Star">
+                            <Button Style="{StaticResource Button.Icon}" AutomationProperties.Name="{l:T Key=star}">
                                 <icons:CampusIcon Symbol="star" IconSize="{StaticResource Theme.Icon.L}" />
                             </Button>
-                            <Button Style="{StaticResource Button.IconLarge}" AutomationProperties.Name="Print">
+                            <Button Style="{StaticResource Button.IconLarge}" AutomationProperties.Name="{l:T Key=print}">
                                 <icons:CampusIcon Symbol="print" IconSize="{StaticResource Theme.Icon.XXL}" />
                             </Button>
                         </StackPanel>
@@ -158,39 +159,39 @@
                 </controls:SettingsSection>
 
                 <!-- ======================================================= INPUTS -->
-                <controls:SettingsSection Header="INPUTS">
+                <controls:SettingsSection Header="{l:T Key=inputs}">
                     <StackPanel Padding="16" Spacing="12">
-                        <TextBox Style="{StaticResource Input.Text}" PlaceholderText="Title"
-                                 AutomationProperties.Name="Title" />
-                        <TextBox Style="{StaticResource Input.Search}" PlaceholderText="Search everything"
-                                 AutomationProperties.Name="Search" />
+                        <TextBox Style="{StaticResource Input.Text}" PlaceholderText="{l:T Key=title}"
+                                 AutomationProperties.Name="{l:T Key=title}" />
+                        <TextBox Style="{StaticResource Input.Search}" PlaceholderText="{l:T Key=search.everything}"
+                                 AutomationProperties.Name="{l:T Key=search}" />
                         <StackPanel Orientation="Horizontal" Spacing="20">
-                            <CheckBox Content="Checkbox" />
-                            <CheckBox Content="Checked" IsChecked="True" />
-                            <CheckBox Content="Disabled" IsEnabled="False" />
+                            <CheckBox Content="{l:T Key=checkbox}" />
+                            <CheckBox Content="{l:T Key=checked}" IsChecked="True" />
+                            <CheckBox Content="{l:T Key=disabled}" IsEnabled="False" />
                             <ToggleSwitch OnContent="" OffContent="" IsOn="True"
-                                          AutomationProperties.Name="Sample toggle" />
+                                          AutomationProperties.Name="{l:T Key=sample.toggle}" />
                         </StackPanel>
                     </StackPanel>
                 </controls:SettingsSection>
 
                 <!-- =============================================== SETTINGS ROWS -->
                 <controls:SettingsSection
-                    Header="SETTINGS SECTION"
-                    Footer="One surface, hairlines between rows. Not a page of separate cards.">
+                    Header="{l:T Key=settings.section}"
+                    Footer="{l:T Key=one.surface.hairlines.between.rows.not.a.page.6123c3}">
                     <StackPanel>
-                        <controls:SettingsRow Title="Wi-Fi" Symbol="wifi" ShowSeparator="False">
+                        <controls:SettingsRow Title="{l:T Key=wi.fi}" Symbol="wifi" ShowSeparator="False">
                             <ToggleSwitch OnContent="" OffContent="" IsOn="True"
-                                          AutomationProperties.Name="Wi-Fi" />
+                                          AutomationProperties.Name="{l:T Key=wi.fi}" />
                         </controls:SettingsRow>
-                        <controls:SettingsRow Title="Local network sync"
-                                              Subtitle="Pair a device to turn this on"
+                        <controls:SettingsRow Title="{l:T Key=local.network.sync}"
+                                              Subtitle="{l:T Key=pair.a.device.to.turn.this.on}"
                                               Symbol="sync">
                             <ToggleSwitch OnContent="" OffContent=""
-                                          AutomationProperties.Name="Local network sync" />
+                                          AutomationProperties.Name="{l:T Key=local.network.sync}" />
                         </controls:SettingsRow>
-                        <controls:SettingsRow Title="Delete workspace"
-                                              Subtitle="This cannot be undone"
+                        <controls:SettingsRow Title="{l:T Key=delete.workspace}"
+                                              Subtitle="{l:T Key=this.cannot.be.undone}"
                                               Symbol="trash"
                                               IsDestructive="True">
                             <icons:CampusIcon Symbol="chevron.right"
@@ -202,22 +203,22 @@
 
                 <!-- ======================================================= STATES -->
                 <controls:SettingsSection
-                    Header="SEMANTIC STATES"
-                    Footer="Meaning, not decoration: blue acts, red destroys, amber warns, green confirms.">
+                    Header="{l:T Key=semantic.states}"
+                    Footer="{l:T Key=meaning.not.decoration.blue.acts.red.destroys.8656c4}">
                     <StackPanel x:Name="StateSwatches" Padding="16" Spacing="10" />
                 </controls:SettingsSection>
 
                 <!-- ============================================== SUBJECT ACCENTS -->
                 <controls:SettingsSection
-                    Header="SUBJECT ACCENTS"
-                    Footer="A fixed, calm set. Subjects store the name, never a colour value.">
+                    Header="{l:T Key=subject.accents}"
+                    Footer="{l:T Key=a.fixed.calm.set.subjects.store.the.name.never.8d37a8}">
                     <StackPanel x:Name="SubjectSwatches" Padding="16" Spacing="10" />
                 </controls:SettingsSection>
 
                 <!-- ======================================================== ICONS -->
                 <controls:SettingsSection
-                    Header="ICONS"
-                    Footer="Drawn geometry on a 24-unit grid, stroked at render time. Never emoji.">
+                    Header="{l:T Key=icons}"
+                    Footer="{l:T Key=drawn.geometry.on.a.24.unit.grid.stroked.at.re.da7c65}">
                     <StackPanel Padding="16" Spacing="16">
                         <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
                             <icons:CampusIcon Symbol="library" IconSize="12" />
@@ -226,7 +227,7 @@
                             <icons:CampusIcon Symbol="library" IconSize="24" />
                             <icons:CampusIcon Symbol="library" IconSize="32" />
                             <icons:CampusIcon Symbol="library" IconSize="48" />
-                            <TextBlock Text="One definition, optically corrected per size"
+                            <TextBlock Text="{l:T Key=one.definition.optically.corrected.per.size}"
                                        Style="{StaticResource Text.Footnote}" VerticalAlignment="Center" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
@@ -236,7 +237,7 @@
                             <icons:CampusIcon Symbol="tasks" IconSize="28" Weight="Medium" />
                             <icons:CampusIcon Symbol="tasks" IconSize="28" Weight="Semibold" />
                             <icons:CampusIcon Symbol="tasks" IconSize="28" Weight="Bold" />
-                            <TextBlock Text="Six weights" Style="{StaticResource Text.Footnote}"
+                            <TextBlock Text="{l:T Key=six.weights}" Style="{StaticResource Text.Footnote}"
                                        VerticalAlignment="Center" />
                         </StackPanel>
                         <ItemsControl x:Name="IconGrid">
@@ -251,8 +252,8 @@
 
                 <!-- ======================================================== BRAND -->
                 <controls:SettingsSection
-                    Header="BRAND"
-                    Footer="The mark and the wordmark are geometry, so they take the current label colour and stay exact at any size.">
+                    Header="{l:T Key=brand}"
+                    Footer="{l:T Key=the.mark.and.the.wordmark.are.geometry.so.they.cb2bcc}">
                     <StackPanel Padding="16" Spacing="20">
                         <StackPanel Orientation="Horizontal" Spacing="24" VerticalAlignment="Center">
                             <brand:CampusLogo Form="Mark" LogoHeight="64" />

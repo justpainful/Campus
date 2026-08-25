@@ -94,6 +94,6 @@ public sealed class QrCode : Grid
         }
 
         Children.Add(canvas);
-        AutomationProperties.SetName(this, "Pairing code");
+        AutomationProperties.SetName(this, L.T("pairing.code"));
     }
 }

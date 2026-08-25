@@ -25,6 +25,13 @@ public sealed partial class SettingsPage : Page
 
     private void Load()
     {
+        LanguageChoice.Items.Clear();
+        foreach (var language in Localization.Language.Available)
+            LanguageChoice.Items.Add(language.NativeName);
+
+        LanguageChoice.SelectedIndex = Math.Max(0, Localization.Language.Available
+            .ToList().FindIndex(l => l.Code == Localization.Language.Current.Code));
+
         (_settings.Appearance switch
         {
             AppearanceMode.Light => AppearanceLight,
@@ -255,7 +262,7 @@ public sealed partial class SettingsPage : Page
                 ? "Nothing was backed up."
                 : $"Backed up · {ViewModels.ObjectItem.FormatSize(backup.SizeBytes)}";
 
-            Notifications.Show("Backed up. It needs your recovery key to open.", NoticeKind.Success);
+            Notifications.Show(L.T("backed.up.it.needs.your.recovery.key.to.open"), NoticeKind.Success);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException
                                       or InvalidOperationException)
@@ -282,12 +289,12 @@ public sealed partial class SettingsPage : Page
         var manifest = await BackupService.ReadManifestAsync(file.Path);
         if (manifest is null)
         {
-            Notifications.Show("That is not a Campus backup.", NoticeKind.Error);
+            Notifications.Show(L.T("that.is.not.a.campus.backup"), NoticeKind.Error);
             return;
         }
 
         if (!await ObjectCommands.ConfirmAsync(XamlRoot,
-            "Unpack this backup?",
+            L.T("unpack.this.backup"),
             $"Taken {manifest.CreatedAt.ToLocalTime():f} on {manifest.Device}. It will be unpacked "
             + "into a folder of its own — your current workspace is not touched. Opening it needs "
             + "the recovery key from the machine it came from.",
@@ -322,7 +329,7 @@ public sealed partial class SettingsPage : Page
         if (SensitiveToggle.IsOn)
         {
             Notifications.Show(
-                "Sensitive mode is on. Copies clear after "
+                L.T("sensitive.mode.is.on.copies.clear.after")
                 + $"{SensitiveMode.ClipboardLifetime.TotalSeconds:0} seconds and files cannot be "
                 + "dragged out. It cannot stop a screenshot.");
         }
@@ -418,6 +425,24 @@ public sealed partial class SettingsPage : Page
 
     private void OnOpenGalleryClick(object sender, RoutedEventArgs e)
         => Frame?.Navigate(typeof(ThemeGalleryPage));
+
+    /// <summary>
+    /// Switches the interface's language.
+    ///
+    /// Nothing is reloaded here. A translated label is read when its page is built, so the shell
+    /// rebuilds every open tab in response to the change — which is the same path a theme change
+    /// takes, and means a language switch cannot leave half the window in the old one.
+    /// </summary>
+    private void OnLanguageChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_loading || LanguageChoice.SelectedIndex < 0) return;
+
+        var chosen = Localization.Language.Available[LanguageChoice.SelectedIndex];
+        if (chosen.Code == Localization.Language.Current.Code) return;
+
+        _settings.Language = chosen.Code;
+        Localization.Language.Current.Use(chosen.Code);
+    }
 
     private async void OnHelloClick(object sender, RoutedEventArgs e)
     {

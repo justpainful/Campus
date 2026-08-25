@@ -302,7 +302,7 @@ public sealed partial class PlannerPage : Page
     {
         var start = DateOnly.FromDateTime(DateTime.Today);
         var end = start.AddDays(14);
-        RangeText.Text = "Next two weeks";
+        RangeText.Text = L.T("next.two.weeks");
 
         Surface.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         Surface.MinWidth = 0;

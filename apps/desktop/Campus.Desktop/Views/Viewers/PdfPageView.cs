@@ -228,7 +228,7 @@ public sealed class PdfPageView : Grid
                 foreach (var point in ParsePoints(geometry))
                     line.Points.Add(new Point(point.X * _sheet.Width, point.Y * _sheet.Height));
 
-                AutomationProperties.SetName(line, "Drawing");
+                AutomationProperties.SetName(line, L.T("drawing"));
                 return line;
             }
 

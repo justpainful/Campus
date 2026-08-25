@@ -249,15 +249,15 @@ public sealed partial class SubjectsPage : Page
     {
         var menu = new MenuFlyout();
 
-        menu.Items.Add(ObjectCommands.Item("Open", CampusSymbols.OpenExternal, () =>
+        menu.Items.Add(ObjectCommands.Item(L.T("open"), CampusSymbols.OpenExternal, () =>
         {
             Frame?.Navigate(typeof(SubjectPage), subject.Id);
             return Task.CompletedTask;
         }));
 
-        menu.Items.Add(ObjectCommands.Item("Rename", CampusSymbols.Rename, async () =>
+        menu.Items.Add(ObjectCommands.Item(L.T("rename"), CampusSymbols.Rename, async () =>
         {
-            var title = await ObjectCommands.AskAsync(XamlRoot, "Rename subject", subject.Title);
+            var title = await ObjectCommands.AskAsync(XamlRoot, L.T("rename.subject"), subject.Title);
             if (title is null) return;
 
             subject.Title = title;
@@ -269,9 +269,9 @@ public sealed partial class SubjectsPage : Page
 
         menu.Items.Add(new MenuFlyoutSeparator());
 
-        var remove = ObjectCommands.Item("Move to trash", CampusSymbols.Trash, async () =>
+        var remove = ObjectCommands.Item(L.T("move.to.trash"), CampusSymbols.Trash, async () =>
         {
-            if (!await ObjectCommands.ConfirmAsync(XamlRoot, "Move this subject to the trash?",
+            if (!await ObjectCommands.ConfirmAsync(XamlRoot, L.T("move.this.subject.to.the.trash"),
                 $"Everything filed under “{subject.Title}” stays where it is, but it will no "
                 + "longer have a subject.", "Move to trash")) return;
 
@@ -291,7 +291,7 @@ public sealed partial class SubjectsPage : Page
     /// </summary>
     private MenuFlyoutSubItem ColourSubmenu(CampusObject subject)
     {
-        var submenu = new MenuFlyoutSubItem { Text = "Colour" };
+        var submenu = new MenuFlyoutSubItem { Text = L.T("colour") };
 
         foreach (var token in ThemeTokens.Subject.All)
         {
@@ -328,7 +328,7 @@ public sealed partial class SubjectsPage : Page
     {
         if (!_workspace.IsUnlocked) return;
 
-        var title = await ObjectCommands.AskAsync(XamlRoot, "New subject", "", "Physics");
+        var title = await ObjectCommands.AskAsync(XamlRoot, L.T("new.subject"), "", "Physics");
         if (title is null) return;
 
         var count = await _workspace.Objects.CountAsync(new CampusQuery { Kinds = { ObjectKind.Subject } });

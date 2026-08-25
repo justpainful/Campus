@@ -2,6 +2,7 @@
     x:Class="Campus.Desktop.Views.SyncPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:Campus.Desktop.Localization"
     xmlns:controls="using:Campus.Desktop.Design.Controls"
     xmlns:icons="using:Campus.Desktop.Design.Icons"
     Background="{ThemeResource Theme.GroupedBackground.Primary}">
@@ -15,7 +16,7 @@
         <StackPanel Padding="28,24,28,48" Spacing="24" MaxWidth="760" HorizontalAlignment="Left">
 
             <StackPanel Spacing="2">
-                <TextBlock Text="Sync" Style="{StaticResource Text.LargeTitle}" />
+                <TextBlock Text="{l:T Key=sync}" Style="{StaticResource Text.LargeTitle}" />
                 <TextBlock x:Name="Subtitle" Style="{StaticResource Text.Footnote}" />
             </StackPanel>
 
@@ -25,24 +26,24 @@
                         <icons:CampusIcon Symbol="cloud.off" IconSize="20"
                                           Foreground="{ThemeResource Theme.Label.Secondary}"
                                           VerticalAlignment="Center" />
-                        <TextBlock Text="No account, no server, no cloud"
+                        <TextBlock Text="{l:T Key=no.account.no.server.no.cloud}"
                                    Style="{StaticResource Text.Headline}"
                                    VerticalAlignment="Center" />
                     </StackPanel>
                     <TextBlock Style="{StaticResource Text.Footnote}" TextWrapping="Wrap"
-                               Text="Your devices exchange changes directly. A bundle carries only what the other device has not seen, encrypted with a key both sides work out from a code you type once. Campus never listens on the network unless you are on this page and have asked it to." />
+                               Text="{l:T Key=your.devices.exchange.changes.directly.a.bundl.6bc8b4}" />
                 </StackPanel>
             </Border>
 
             <StackPanel Spacing="10">
                 <Grid>
-                    <TextBlock Text="DEVICES" Style="{StaticResource Text.SectionHeader}"
+                    <TextBlock Text="{l:T Key=devices}" Style="{StaticResource Text.SectionHeader}"
                                VerticalAlignment="Center" />
                     <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
                         <Button Style="{StaticResource Button.Secondary}"
-                                Content="Pair a computer" Click="OnPairClick" MinWidth="0" />
+                                Content="{l:T Key=pair.a.computer}" Click="OnPairClick" MinWidth="0" />
                         <Button Style="{StaticResource Button.Primary}"
-                                Content="Pair a phone" Click="OnPairPhoneClick" MinWidth="0" />
+                                Content="{l:T Key=pair.a.phone}" Click="OnPairPhoneClick" MinWidth="0" />
                     </StackPanel>
                 </Grid>
                 <Border Style="{StaticResource Surface.Section}" Padding="4">
@@ -51,16 +52,16 @@
             </StackPanel>
 
             <StackPanel x:Name="ConflictSection" Spacing="10" Visibility="Collapsed">
-                <TextBlock Text="NEEDS A DECISION" Style="{StaticResource Text.SectionHeader}" />
+                <TextBlock Text="{l:T Key=needs.a.decision}" Style="{StaticResource Text.SectionHeader}" />
                 <Border Style="{StaticResource Surface.Section}" Padding="4">
                     <StackPanel x:Name="ConflictList" />
                 </Border>
                 <TextBlock Style="{StaticResource Text.Footnote}" TextWrapping="Wrap"
-                           Text="Both devices changed these since they last agreed. Campus will not guess which one you meant." />
+                           Text="{l:T Key=both.devices.changed.these.since.they.last.agr.bbf001}" />
             </StackPanel>
 
-            <controls:SettingsSection x:Name="TransferSection" Header="TRANSFER"
-                                      Footer="A bundle is a file. Put it on a stick, drop it in a shared folder, or send it straight over the local network — the contents are the same either way." />
+            <controls:SettingsSection x:Name="TransferSection" Header="{l:T Key=transfer}"
+                                      Footer="{l:T Key=a.bundle.is.a.file.put.it.on.a.stick.drop.it.i.9bff13}" />
 
             <Border x:Name="StatusPanel" Style="{StaticResource Surface.Section}"
                     Padding="16" Visibility="Collapsed">

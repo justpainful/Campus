@@ -2,6 +2,7 @@
     x:Class="Campus.Desktop.Views.ConversationPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:Campus.Desktop.Localization"
     xmlns:icons="using:Campus.Desktop.Design.Icons"
     Background="{ThemeResource Theme.Background.Primary}">
 
@@ -33,7 +34,7 @@
 
             <Button Style="{StaticResource Button.Icon}" Click="OnBackClick"
                     VerticalAlignment="Center"
-                    AutomationProperties.Name="Back" ToolTipService.ToolTip="Back">
+                    AutomationProperties.Name="{l:T Key=back}" ToolTipService.ToolTip="{l:T Key=back}">
                 <icons:CampusIcon Symbol="chevron.left" IconSize="{StaticResource Theme.Icon.L}"
                                   Foreground="{ThemeResource Theme.Label.Secondary}" />
             </Button>
@@ -54,9 +55,9 @@
 
             <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                 <Button x:Name="CloseButton" Style="{StaticResource Button.Secondary}"
-                        Click="OnCloseClick" Content="Close" MinWidth="0" />
+                        Click="OnCloseClick" Content="{l:T Key=close}" MinWidth="0" />
                 <Button Style="{StaticResource Button.Icon}" Click="OnMoreClick"
-                        AutomationProperties.Name="More" ToolTipService.ToolTip="More">
+                        AutomationProperties.Name="{l:T Key=more}" ToolTipService.ToolTip="{l:T Key=more}">
                     <icons:CampusIcon Symbol="more" IconSize="{StaticResource Theme.Icon.L}"
                                       Foreground="{ThemeResource Theme.Label.Secondary}" />
                 </Button>
@@ -104,12 +105,12 @@
 
                     <ToggleButton x:Name="MarkdownToggle" Style="{StaticResource Toggle.Chip}"
                                   Click="OnMarkdownToggled"
-                                  AutomationProperties.Name="Render markdown"
-                                  ToolTipService.ToolTip="Draw markdown in this message rather than showing the characters">
+                                  AutomationProperties.Name="{l:T Key=render.markdown}"
+                                  ToolTipService.ToolTip="{l:T Key=draw.markdown.in.this.message.rather.than.show.ee35ca}">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <icons:CampusIcon Symbol="file.markdown" IconSize="14"
                                               Foreground="{ThemeResource Theme.Label.Secondary}" />
-                            <TextBlock Text="Markdown" Style="{StaticResource Text.Caption}" />
+                            <TextBlock Text="{l:T Key=markdown}" Style="{StaticResource Text.Caption}" />
                         </StackPanel>
                     </ToggleButton>
                 </StackPanel>
@@ -129,32 +130,32 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBox x:Name="Composer" Style="{StaticResource Input.Text}"
-                             PlaceholderText="What was said…"
+                             PlaceholderText="{l:T Key=what.was.said}"
                              AcceptsReturn="True" TextWrapping="Wrap"
                              MinHeight="44" MaxHeight="220"
                              KeyDown="OnComposerKeyDown"
                              Paste="OnComposerPaste"
-                             AutomationProperties.Name="Write a message" />
+                             AutomationProperties.Name="{l:T Key=write.a.message}" />
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6"
                                 VerticalAlignment="Bottom">
                         <Button Style="{StaticResource Button.Icon}" Click="OnAttachClick"
-                                AutomationProperties.Name="Attach a picture"
-                                ToolTipService.ToolTip="Attach a picture">
+                                AutomationProperties.Name="{l:T Key=attach.a.picture}"
+                                ToolTipService.ToolTip="{l:T Key=attach.a.picture}">
                             <icons:CampusIcon Symbol="attachment" IconSize="{StaticResource Theme.Icon.L}"
                                               Foreground="{ThemeResource Theme.Label.Secondary}" />
                         </Button>
                         <Button x:Name="EmojiButton" Style="{StaticResource Button.Icon}"
-                                AutomationProperties.Name="Emoji" ToolTipService.ToolTip="Emoji">
+                                AutomationProperties.Name="{l:T Key=emoji}" ToolTipService.ToolTip="{l:T Key=emoji}">
                             <icons:CampusIcon Symbol="emoji" IconSize="{StaticResource Theme.Icon.L}"
                                               Foreground="{ThemeResource Theme.Label.Secondary}" />
                         </Button>
                         <Button Style="{StaticResource Button.Primary}" Click="OnSendClick"
-                                MinWidth="0" AutomationProperties.Name="Add this message">
+                                MinWidth="0" AutomationProperties.Name="{l:T Key=add.this.message}">
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <icons:CampusIcon Symbol="send" IconSize="15"
                                                   Foreground="{ThemeResource Theme.Label.OnAccent}" />
-                                <TextBlock Text="Add" />
+                                <TextBlock Text="{l:T Key=add}" />
                             </StackPanel>
                         </Button>
                     </StackPanel>

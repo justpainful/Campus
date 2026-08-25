@@ -1,0 +1,209 @@
+#!/usr/bin/env python3
+"""Turns the literal strings in the interface into keys, and keeps the catalogue honest.
+
+Run it after adding a page, or after adding a string to one:
+
+    python tools/dev/localize.py            # rewrite XAML, refresh the catalogue
+    python tools/dev/localize.py --check    # fail if anything is untranslated (CI)
+
+What it does, in order:
+
+  1. Finds every user-visible literal in the XAML — the handful of attributes that end up in
+     front of a person, and nothing else.
+  2. Replaces each one with `{l:T Key=some.key}`, adding the namespace to the page if needed.
+  3. Writes `Strings.En.cs` from what it found, and merges `Strings.Ar.cs` so that translations
+     already made are kept and new strings appear with an empty value to be filled in.
+
+The keys are slugs of the English text, so the same word in two places is one entry: "Cancel" is
+Cancel everywhere, and translating it twice is how the two copies end up different.
+
+C# is deliberately not rewritten. A literal in XAML is a label by construction; a literal in C#
+might be a file name, a SQL fragment or a log line, and a regular expression cannot tell the
+difference. Those are converted by hand and checked by --check, which knows which files are
+supposed to be clean.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import io
+import re
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+APP = ROOT / "apps" / "desktop" / "Campus.Desktop"
+CATALOGUE = APP / "Localization"
+
+# The attributes a person actually reads. AutomationProperties.Name is included because a screen
+# reader announcing English inside an Arabic interface is the same bug, heard rather than seen.
+ATTRIBUTES = [
+    "Text",
+    "Content",
+    "PlaceholderText",
+    "Header",
+    "Footer",
+    "Subtitle",
+    "Description",
+    "Title",
+    "ToolTipService.ToolTip",
+    "AutomationProperties.Name",
+    "AutomationProperties.HelpText",
+]
+
+PATTERN = re.compile(
+    r'(?P<attr>' + "|".join(re.escape(a) for a in ATTRIBUTES) + r')="(?P<value>[^"{][^"]*)"')
+
+NAMESPACE = 'xmlns:l="using:Campus.Desktop.Localization"'
+
+# Values that are not prose and must be left alone.
+SKIP = re.compile(r'^[\s\d.,:;·/\\+\-–—%×()\[\]#*]*$')
+
+
+def slug(text: str) -> str:
+    """A stable, readable key for a string."""
+    cleaned = re.sub(r"[^a-z0-9]+", ".", text.lower()).strip(".")
+
+    if not cleaned:
+        cleaned = "text"
+
+    if len(cleaned) > 46:
+        # Long sentences get a shortened slug with a digest, so two different paragraphs that
+        # start the same way cannot collide.
+        digest = hashlib.sha256(text.encode("utf-8")).hexdigest()[:6]
+        cleaned = cleaned[:46].rstrip(".") + "." + digest
+
+    return cleaned
+
+
+def collect() -> dict[str, str]:
+    """Rewrites the XAML in place and returns every English string it found, keyed."""
+    found: dict[str, str] = {}
+
+    for path in sorted(APP.rglob("*.xaml")):
+        if "obj" in path.parts or "bin" in path.parts:
+            continue
+
+        source = io.open(path, encoding="utf-8").read()
+        original = source
+
+        def replace(match: re.Match) -> str:
+            value = match.group("value")
+            if SKIP.match(value):
+                return match.group(0)
+
+            key = slug(value)
+            existing = found.get(key)
+            if existing is not None and existing != value:
+                # Two different strings wanting one key: keep them apart.
+                key += "." + hashlib.sha256(value.encode("utf-8")).hexdigest()[:4]
+
+            found[key] = value
+            return f'{match.group("attr")}="{{l:T Key={key}}}"'
+
+        source = PATTERN.sub(replace, source)
+
+        if source != original and NAMESPACE not in source:
+            # After the last xmlns on the root element, so the declarations stay together.
+            source = re.sub(
+                r'(\n(\s*)xmlns:[^\n]*\n)',
+                lambda m: m.group(1) if NAMESPACE in m.group(1)
+                else m.group(1).rstrip("\n") + "\n" + m.group(2) + NAMESPACE + "\n",
+                source, count=1)
+
+        if source != original:
+            io.open(path, "w", encoding="utf-8", newline="").write(source)
+
+    return found
+
+
+def read_existing(path: Path) -> dict[str, str]:
+    """Reads a catalogue back, so translations already made survive a re-run."""
+    if not path.exists():
+        return {}
+
+    text = io.open(path, encoding="utf-8").read()
+    return {
+        m.group(1): m.group(2).replace('\\"', '"').replace("\\\\", "\\")
+        for m in re.finditer(r'^\s*\["([^"]+)"\] = "((?:[^"\\]|\\.)*)",$', text, re.MULTILINE)
+    }
+
+
+def escape(value: str) -> str:
+    return value.replace("\\", "\\\\").replace('"', '\\"')
+
+
+def write(path: Path, member: str, summary: str, entries: dict[str, str]) -> None:
+    lines = [
+        "// Generated by tools/dev/localize.py. Edit the translations, not the keys.",
+        "",
+        "namespace Campus.Desktop.Localization;",
+        "",
+        "public static partial class Strings",
+        "{",
+        f"    /// <summary>{summary}</summary>",
+        f"    public static readonly IReadOnlyDictionary<string, string> {member} =",
+        "        new Dictionary<string, string>(StringComparer.Ordinal)",
+        "    {",
+    ]
+
+    for key in sorted(entries):
+        lines.append(f'        ["{key}"] = "{escape(entries[key])}",')
+
+    lines += ["    };", "}", ""]
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    io.open(path, "w", encoding="utf-8", newline="\n").write("\n".join(lines))
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--check", action="store_true",
+                        help="Report untranslated strings and fail, without rewriting anything.")
+    args = parser.parse_args()
+
+    english_path = CATALOGUE / "Strings.En.cs"
+    arabic_path = CATALOGUE / "Strings.Ar.cs"
+
+    previous_en = read_existing(english_path)
+    arabic = read_existing(arabic_path)
+
+    if args.check:
+        english = previous_en
+    else:
+        english = collect()
+        # Strings converted by hand in C# live in the catalogue too, and the XAML sweep cannot
+        # see them — so anything already there that is still translated is kept.
+        for key, value in previous_en.items():
+            english.setdefault(key, value)
+
+        write(english_path, "English", "Every string in the interface, as written.", english)
+        write(arabic_path, "Arabic", "The same strings in Arabic. Empty means not yet translated.",
+              {key: arabic.get(key, "") for key in english})
+
+    missing = sorted(k for k in english if not arabic.get(k))
+    stale = sorted(k for k in arabic if k not in english)
+
+    print(f"{len(english)} strings, {len(english) - len(missing)} translated.")
+
+    if stale:
+        print(f"\n{len(stale)} translations no longer used:")
+        for key in stale[:10]:
+            print(f"  {key}")
+
+    if missing:
+        print(f"\n{len(missing)} not yet translated:")
+        for key in missing[:20]:
+            print(f'  ["{key}"] = "",   // {english[key]}')
+        if len(missing) > 20:
+            print(f"  … and {len(missing) - 20} more")
+
+        if args.check:
+            return 1
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

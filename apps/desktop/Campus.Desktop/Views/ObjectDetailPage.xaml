@@ -2,6 +2,7 @@
     x:Class="Campus.Desktop.Views.ObjectDetailPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:Campus.Desktop.Localization"
     xmlns:controls="using:Campus.Desktop.Design.Controls"
     xmlns:icons="using:Campus.Desktop.Design.Icons"
     xmlns:local="using:Campus.Desktop.Views"
@@ -24,8 +25,8 @@
 
             <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
                 <Button Style="{StaticResource Button.Icon}" Click="OnBackClick"
-                        AutomationProperties.Name="Back"
-                        ToolTipService.ToolTip="Back">
+                        AutomationProperties.Name="{l:T Key=back}"
+                        ToolTipService.ToolTip="{l:T Key=back}">
                     <icons:CampusIcon Symbol="chevron.left" IconSize="{StaticResource Theme.Icon.L}"
                                       Foreground="{ThemeResource Theme.Label.Secondary}" />
                 </Button>
@@ -41,20 +42,20 @@
                 <TextBlock x:Name="SavedHint" Style="{StaticResource Text.Caption}"
                            VerticalAlignment="Center" Margin="0,0,10,0" />
                 <Button x:Name="FavoriteButton" Style="{StaticResource Button.Icon}"
-                        Click="OnFavoriteClick" AutomationProperties.Name="Favourite">
+                        Click="OnFavoriteClick" AutomationProperties.Name="{l:T Key=favourite}">
                     <icons:CampusIcon x:Name="FavoriteIcon" Symbol="star"
                                       IconSize="{StaticResource Theme.Icon.L}"
                                       Foreground="{ThemeResource Theme.Label.Secondary}" />
                 </Button>
                 <Button x:Name="PinButton" Style="{StaticResource Button.Icon}"
-                        Click="OnPinClick" AutomationProperties.Name="Pin">
+                        Click="OnPinClick" AutomationProperties.Name="{l:T Key=pin}">
                     <icons:CampusIcon x:Name="PinIcon" Symbol="pin"
                                       IconSize="{StaticResource Theme.Icon.L}"
                                       Foreground="{ThemeResource Theme.Label.Secondary}" />
                 </Button>
                 <Button Style="{StaticResource Button.Icon}" Click="OnDeleteClick"
-                        AutomationProperties.Name="Move to trash"
-                        ToolTipService.ToolTip="Move to trash">
+                        AutomationProperties.Name="{l:T Key=move.to.trash}"
+                        ToolTipService.ToolTip="{l:T Key=move.to.trash}">
                     <icons:CampusIcon Symbol="trash" IconSize="{StaticResource Theme.Icon.L}"
                                       Foreground="{ThemeResource Theme.Label.Secondary}" />
                 </Button>
@@ -77,9 +78,9 @@
                     Foreground="{ThemeResource Theme.Label.Primary}"
                     AcceptsReturn="False"
                     TextWrapping="Wrap"
-                    PlaceholderText="Untitled"
+                    PlaceholderText="{l:T Key=untitled}"
                     TextChanged="OnFieldChanged"
-                    AutomationProperties.Name="Title" />
+                    AutomationProperties.Name="{l:T Key=title}" />
 
                 <StackPanel Orientation="Horizontal" Spacing="8" Margin="12,0,0,20">
                     <Ellipse x:Name="SubjectDot" Width="9" Height="9" VerticalAlignment="Center" />
@@ -88,50 +89,50 @@
                 </StackPanel>
 
                 <!-- The fields every kind has -->
-                <controls:SettingsSection Header="DETAILS">
+                <controls:SettingsSection Header="{l:T Key=details}">
                     <StackPanel>
-                        <controls:SettingsRow Title="Status" Symbol="tasks" ShowSeparator="False">
+                        <controls:SettingsRow Title="{l:T Key=status}" Symbol="tasks" ShowSeparator="False">
                             <ComboBox x:Name="StatusChoice" MinWidth="170"
                                       SelectionChanged="OnFieldChanged"
-                                      AutomationProperties.Name="Status">
-                                <ComboBoxItem Content="Not started" Tag="1" />
-                                <ComboBoxItem Content="In progress" Tag="2" />
-                                <ComboBoxItem Content="Completed" Tag="3" />
-                                <ComboBoxItem Content="Blocked" Tag="4" />
-                                <ComboBoxItem Content="Waiting" Tag="5" />
+                                      AutomationProperties.Name="{l:T Key=status}">
+                                <ComboBoxItem Content="{l:T Key=not.started}" Tag="1" />
+                                <ComboBoxItem Content="{l:T Key=in.progress}" Tag="2" />
+                                <ComboBoxItem Content="{l:T Key=completed}" Tag="3" />
+                                <ComboBoxItem Content="{l:T Key=blocked}" Tag="4" />
+                                <ComboBoxItem Content="{l:T Key=waiting}" Tag="5" />
                             </ComboBox>
                         </controls:SettingsRow>
 
-                        <controls:SettingsRow Title="Subject" Symbol="subjects">
+                        <controls:SettingsRow Title="{l:T Key=subject}" Symbol="subjects">
                             <ComboBox x:Name="SubjectChoice" MinWidth="170"
                                       SelectionChanged="OnFieldChanged"
-                                      AutomationProperties.Name="Subject" />
+                                      AutomationProperties.Name="{l:T Key=subject}" />
                         </controls:SettingsRow>
 
-                        <controls:SettingsRow Title="Due" Symbol="calendar">
+                        <controls:SettingsRow Title="{l:T Key=due}" Symbol="calendar">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <CalendarDatePicker x:Name="DuePicker" MinWidth="170"
-                                                    PlaceholderText="No date"
+                                                    PlaceholderText="{l:T Key=no.date}"
                                                     DateChanged="OnDueChanged"
-                                                    AutomationProperties.Name="Due date" />
+                                                    AutomationProperties.Name="{l:T Key=due.date}" />
                                 <Button x:Name="ClearDueButton" Style="{StaticResource Button.Icon}"
                                         Click="OnClearDueClick" Visibility="Collapsed"
-                                        AutomationProperties.Name="Clear due date">
+                                        AutomationProperties.Name="{l:T Key=clear.due.date}">
                                     <icons:CampusIcon Symbol="close" IconSize="{StaticResource Theme.Icon.S}"
                                                       Foreground="{ThemeResource Theme.Label.Secondary}" />
                                 </Button>
                             </StackPanel>
                         </controls:SettingsRow>
 
-                        <controls:SettingsRow Title="Priority" Symbol="flag">
+                        <controls:SettingsRow Title="{l:T Key=priority}" Symbol="flag">
                             <ComboBox x:Name="PriorityChoice" MinWidth="170"
                                       SelectionChanged="OnFieldChanged"
-                                      AutomationProperties.Name="Priority">
-                                <ComboBoxItem Content="None" Tag="0" />
-                                <ComboBoxItem Content="Low" Tag="1" />
-                                <ComboBoxItem Content="Normal" Tag="2" />
-                                <ComboBoxItem Content="High" Tag="3" />
-                                <ComboBoxItem Content="Urgent" Tag="4" />
+                                      AutomationProperties.Name="{l:T Key=priority}">
+                                <ComboBoxItem Content="{l:T Key=none}" Tag="0" />
+                                <ComboBoxItem Content="{l:T Key=low}" Tag="1" />
+                                <ComboBoxItem Content="{l:T Key=normal}" Tag="2" />
+                                <ComboBoxItem Content="{l:T Key=high}" Tag="3" />
+                                <ComboBoxItem Content="{l:T Key=urgent}" Tag="4" />
                             </ComboBox>
                         </controls:SettingsRow>
                     </StackPanel>
@@ -146,7 +147,7 @@
                 <!-- Body -->
                 <StackPanel x:Name="BodySection" Spacing="8" Margin="0,0,0,24">
                     <Grid Margin="16,0,0,0">
-                        <TextBlock x:Name="BodyHeader" Text="NOTES"
+                        <TextBlock x:Name="BodyHeader" Text="{l:T Key=notes}"
                                    Style="{StaticResource Text.SectionHeader}"
                                    VerticalAlignment="Center" />
                         <StackPanel x:Name="BodyToolbar" Orientation="Horizontal"
@@ -162,16 +163,16 @@
                             MinHeight="150"
                             AcceptsReturn="True"
                             TextWrapping="Wrap"
-                            PlaceholderText="Anything worth remembering"
+                            PlaceholderText="{l:T Key=anything.worth.remembering}"
                             TextChanged="OnFieldChanged"
-                            AutomationProperties.Name="Notes" />
+                            AutomationProperties.Name="{l:T Key=notes.8a75}" />
                     </Border>
                 </StackPanel>
 
                 <!-- Checklist -->
                 <StackPanel x:Name="ChecklistSection" Spacing="8" Margin="0,0,0,24"
                             Visibility="Collapsed">
-                    <TextBlock Text="CHECKLIST" Style="{StaticResource Text.SectionHeader}"
+                    <TextBlock Text="{l:T Key=checklist}" Style="{StaticResource Text.SectionHeader}"
                                Margin="16,0,0,0" />
                     <Border Background="{ThemeResource Theme.GroupedBackground.Secondary}"
                             CornerRadius="{StaticResource Theme.Radius.Section}"
@@ -185,11 +186,11 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBox x:Name="NewChecklistBox"
                                          Style="{StaticResource Input.Text}"
-                                         PlaceholderText="Add a step"
+                                         PlaceholderText="{l:T Key=add.a.step}"
                                          KeyDown="OnNewChecklistKeyDown"
-                                         AutomationProperties.Name="Add a checklist step" />
+                                         AutomationProperties.Name="{l:T Key=add.a.checklist.step}" />
                                 <Button Grid.Column="1" Style="{StaticResource Button.Secondary}"
-                                        Content="Add" Click="OnAddChecklistClick" MinWidth="0" />
+                                        Content="{l:T Key=add}" Click="OnAddChecklistClick" MinWidth="0" />
                             </Grid>
                         </StackPanel>
                     </Border>
@@ -197,7 +198,7 @@
 
                 <!-- Tags -->
                 <StackPanel Spacing="8" Margin="0,0,0,24">
-                    <TextBlock Text="TAGS" Style="{StaticResource Text.SectionHeader}"
+                    <TextBlock Text="{l:T Key=tags}" Style="{StaticResource Text.SectionHeader}"
                                Margin="16,0,0,0" />
                     <Border Background="{ThemeResource Theme.GroupedBackground.Secondary}"
                             CornerRadius="{StaticResource Theme.Radius.Section}"
@@ -210,11 +211,11 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBox x:Name="NewTagBox" Style="{StaticResource Input.Text}"
-                                         PlaceholderText="Add a tag"
+                                         PlaceholderText="{l:T Key=add.a.tag}"
                                          KeyDown="OnNewTagKeyDown"
-                                         AutomationProperties.Name="Add a tag" />
+                                         AutomationProperties.Name="{l:T Key=add.a.tag}" />
                                 <Button Grid.Column="1" Style="{StaticResource Button.Secondary}"
-                                        Content="Add" Click="OnAddTagClick" MinWidth="0" />
+                                        Content="{l:T Key=add}" Click="OnAddTagClick" MinWidth="0" />
                             </Grid>
                         </StackPanel>
                     </Border>
@@ -225,7 +226,7 @@
                     round, so nothing here can go stale on one side only.
                 -->
                 <StackPanel Spacing="8" Margin="0,0,0,24">
-                    <TextBlock Text="LINKS" Style="{StaticResource Text.SectionHeader}"
+                    <TextBlock Text="{l:T Key=links}" Style="{StaticResource Text.SectionHeader}"
                                Margin="16,0,0,0" />
                     <Border Background="{ThemeResource Theme.GroupedBackground.Secondary}"
                             CornerRadius="{StaticResource Theme.Radius.Section}"
@@ -233,7 +234,7 @@
                         <StackPanel Spacing="10">
                             <StackPanel x:Name="LinkList" Spacing="2" />
                             <Button Style="{StaticResource Button.Secondary}"
-                                    Content="Link to something" Click="OnAddLinkClick"
+                                    Content="{l:T Key=link.to.something}" Click="OnAddLinkClick"
                                     MinWidth="0" HorizontalAlignment="Left" />
                         </StackPanel>
                     </Border>
@@ -245,7 +246,7 @@
                 -->
                 <StackPanel x:Name="VersionSection" Spacing="8" Margin="0,0,0,24"
                             Visibility="Collapsed">
-                    <TextBlock Text="EARLIER VERSIONS" Style="{StaticResource Text.SectionHeader}"
+                    <TextBlock Text="{l:T Key=earlier.versions}" Style="{StaticResource Text.SectionHeader}"
                                Margin="16,0,0,0" />
                     <Border Background="{ThemeResource Theme.GroupedBackground.Secondary}"
                             CornerRadius="{StaticResource Theme.Radius.Section}"
@@ -255,8 +256,8 @@
                 </StackPanel>
 
                 <!-- History -->
-                <controls:SettingsSection Header="HISTORY"
-                                          Footer="Every change is recorded, including the ones made on another device.">
+                <controls:SettingsSection Header="{l:T Key=history}"
+                                          Footer="{l:T Key=every.change.is.recorded.including.the.ones.ma.db13d3}">
                     <StackPanel x:Name="HistoryList" Padding="16" Spacing="8" />
                 </controls:SettingsSection>
 

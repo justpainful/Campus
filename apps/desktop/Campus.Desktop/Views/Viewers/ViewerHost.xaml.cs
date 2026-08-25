@@ -189,7 +189,7 @@ public sealed partial class ViewerHost : Page
         await _workspace.Vault.Objects.ExportAsync(_payload.ContentHash, temporary);
 
         await Windows.System.Launcher.LaunchUriAsync(new Uri($"file:///{temporary.Replace('\\', '/')}"));
-        Notifications.Show("Opened a copy outside Campus. That copy is not encrypted.");
+        Notifications.Show(L.T("opened.a.copy.outside.campus.that.copy.is.not.62bdce"));
     }
 
     private static void InitialiseWithWindow(object picker)
