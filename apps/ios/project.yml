@@ -64,6 +64,10 @@ targets:
         TARGETED_DEVICE_FAMILY: "1,2"
         INFOPLIST_KEY_UIStatusBarStyle: UIStatusBarStyleLightContent
         CODE_SIGN_ENTITLEMENTS: CampusPocket/CampusPocket.entitlements
+        # The mark is defined once as geometry and derived everywhere; this is that same mark,
+        # rendered at 1024 by the brand exporter and committed because a macOS runner cannot run it.
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
 
   # The share sheet target. It writes one small file into the group container and closes; it
   # never opens the workspace, never reaches the network, and holds no key.
