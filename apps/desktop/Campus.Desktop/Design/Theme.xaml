@@ -378,6 +378,56 @@
     <SolidColorBrush x:Key="Theme.Fill.Tertiary" Color="{ThemeResource Theme.Color.Fill.Tertiary}" />
     <SolidColorBrush x:Key="Theme.Fill.Quaternary" Color="{ThemeResource Theme.Color.Fill.Quaternary}" />
 
+    <!--
+        WinUI's own text-box brushes, overridden.
+
+        A TextBox styled only through its Background setter reverts to the system's colours the
+        moment it is hovered or focused, because the default template swaps in these keys from its
+        visual states — and the system's focused background is white. On a black app that is a
+        white flash on every field, and it is not something a style setter can reach. Naming them
+        here is the only way; the values are the app's own, so this is a redirection rather than a
+        new palette.
+    -->
+    <SolidColorBrush x:Key="TextControlBackground" Color="{ThemeResource Theme.Color.Fill.Tertiary}" />
+    <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="{ThemeResource Theme.Color.Fill.Secondary}" />
+    <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="{ThemeResource Theme.Color.Fill.Secondary}" />
+    <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="{ThemeResource Theme.Color.Fill.Quaternary}" />
+
+    <SolidColorBrush x:Key="TextControlForeground" Color="{ThemeResource Theme.Color.Label.Primary}" />
+    <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="{ThemeResource Theme.Color.Label.Primary}" />
+    <SolidColorBrush x:Key="TextControlForegroundFocused" Color="{ThemeResource Theme.Color.Label.Primary}" />
+    <SolidColorBrush x:Key="TextControlForegroundDisabled" Color="{ThemeResource Theme.Color.Label.Quaternary}" />
+
+    <SolidColorBrush x:Key="TextControlBorderBrush" Color="{ThemeResource Theme.Color.Separator.Standard}" />
+    <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="{ThemeResource Theme.Color.Separator.Standard}" />
+    <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="{ThemeResource Theme.Color.Accent.Primary}" />
+    <SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="{ThemeResource Theme.Color.Separator.Standard}" />
+
+    <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="{ThemeResource Theme.Color.Label.Tertiary}" />
+    <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="{ThemeResource Theme.Color.Label.Tertiary}" />
+    <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="{ThemeResource Theme.Color.Label.Tertiary}" />
+    <SolidColorBrush x:Key="TextControlPlaceholderForegroundDisabled" Color="{ThemeResource Theme.Color.Label.Quaternary}" />
+
+    <SolidColorBrush x:Key="TextControlHeaderForeground" Color="{ThemeResource Theme.Color.Label.Secondary}" />
+    <SolidColorBrush x:Key="TextControlHeaderForegroundDisabled" Color="{ThemeResource Theme.Color.Label.Quaternary}" />
+
+    <SolidColorBrush x:Key="TextControlButtonForeground" Color="{ThemeResource Theme.Color.Label.Secondary}" />
+    <SolidColorBrush x:Key="TextControlButtonForegroundPointerOver" Color="{ThemeResource Theme.Color.Label.Primary}" />
+    <SolidColorBrush x:Key="TextControlButtonForegroundPressed" Color="{ThemeResource Theme.Color.Label.OnAccent}" />
+    <SolidColorBrush x:Key="TextControlButtonBackground" Color="Transparent" />
+    <SolidColorBrush x:Key="TextControlButtonBackgroundPointerOver" Color="{ThemeResource Theme.Color.Fill.Tertiary}" />
+    <SolidColorBrush x:Key="TextControlButtonBackgroundPressed" Color="{ThemeResource Theme.Color.Accent.Primary}" />
+
+    <!-- The same story for combo boxes, which share the pattern and the white flash. -->
+    <SolidColorBrush x:Key="ComboBoxBackground" Color="{ThemeResource Theme.Color.Fill.Tertiary}" />
+    <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="{ThemeResource Theme.Color.Fill.Secondary}" />
+    <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="{ThemeResource Theme.Color.Fill.Secondary}" />
+    <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="{ThemeResource Theme.Color.Fill.Quaternary}" />
+    <SolidColorBrush x:Key="ComboBoxForeground" Color="{ThemeResource Theme.Color.Label.Primary}" />
+    <SolidColorBrush x:Key="ComboBoxForegroundPointerOver" Color="{ThemeResource Theme.Color.Label.Primary}" />
+    <SolidColorBrush x:Key="ComboBoxForegroundPressed" Color="{ThemeResource Theme.Color.Label.Primary}" />
+    <SolidColorBrush x:Key="ComboBoxForegroundDisabled" Color="{ThemeResource Theme.Color.Label.Quaternary}" />
+
     <SolidColorBrush x:Key="Theme.Separator.Standard" Color="{ThemeResource Theme.Color.Separator.Standard}" />
     <SolidColorBrush x:Key="Theme.Separator.Opaque" Color="{ThemeResource Theme.Color.Separator.Opaque}" />
 

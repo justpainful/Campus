@@ -395,8 +395,7 @@ public static class DeveloperWorkspace
         // sits inside `#if DEBUG`, and in a release build the compiler scans that region for
         // preprocessor directives — where a line beginning with `#` is one, string or not.
         var notes = Path.Combine(staging, "Chemistry — bonding.md");
-        await File.WriteAllTextAsync(notes, string.Join('
-',
+        await File.WriteAllTextAsync(notes, string.Join('\n',
         [
             "# Bonding",
             "",

@@ -8,9 +8,11 @@ using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Storage.Streams;
+using Windows.System;
 
 namespace Campus.Desktop.Views.Viewers;
 
@@ -45,7 +47,8 @@ public sealed class PdfViewer : Grid, IContentViewer
 
     private readonly ObservableCollection<PdfPageView> _pages = [];
     private readonly ListView _list = new();
-    private readonly ScrollViewer? _scroller;
+    private readonly PdfPageRail _rail = new();
+    private ScrollViewer? _scroller;
 
     private readonly ColumnDefinition _sideColumn = new() { Width = new GridLength(0) };
     private readonly Grid _side = new();
@@ -55,6 +58,7 @@ public sealed class PdfViewer : Grid, IContentViewer
     private readonly TextBox _searchBox = new();
     private readonly ListView _searchResults = new();
 
+    private readonly TextBox _pageBox = new();
     private readonly TextBlock _pageLabel = ViewerChrome.ToolLabel();
     private readonly Dictionary<int, ImageSource> _rendered = [];
 
@@ -62,9 +66,12 @@ public sealed class PdfViewer : Grid, IContentViewer
     private CampusObject? _entity;
     private double _zoom = 1.0;
     private int _turns;
+    private int _current;
     private PageTool _tool = PageTool.None;
     private string _colour = ThemeTokens.Highlight.Yellow;
     private IReadOnlyList<PdfOutlineEntry> _outlineEntries = [];
+    private bool _outlineLoaded;
+    private bool _thumbnailsBuilt;
     private IReadOnlyList<PdfMatch> _matches = [];
 
     public PdfViewer()
@@ -78,17 +85,101 @@ public sealed class PdfViewer : Grid, IContentViewer
 
         _list.ItemsSource = _pages;
         _list.SelectionMode = ListViewSelectionMode.None;
-        _list.Padding = new Thickness(0, 20, 0, 60);
-        _list.HorizontalAlignment = HorizontalAlignment.Center;
+        _list.Padding = new Thickness(0, 20, 22, 60);
+        // The list fills the pane and centres its pages, rather than shrinking to the width of a
+        // page. Those look identical until you go looking for the scrollbar, which in the second
+        // case is floating somewhere in the middle of the window beside the paper instead of down
+        // the edge where a reader reaches for it.
+        _list.HorizontalAlignment = HorizontalAlignment.Stretch;
+        _list.HorizontalContentAlignment = HorizontalAlignment.Center;
         _list.ItemContainerStyle = ContainerStyle();
         _list.ContainerContentChanging += OnContainerChanging;
         AutomationProperties.SetName(_list, "Pages");
 
+        // A permanent scrollbar, not the thin overlay that appears when the pointer is already
+        // moving. In a four-hundred-page document the bar is how you know where you are and the
+        // only way to cover distance by dragging — hiding it until it is touched means it cannot
+        // be touched.
+        ScrollViewer.SetVerticalScrollBarVisibility(_list, ScrollBarVisibility.Visible);
+        ScrollViewer.SetHorizontalScrollBarVisibility(_list, ScrollBarVisibility.Auto);
+
         SetColumn(_list, 1);
         Children.Add(_list);
 
-        _scroller = _list.FindScrollViewer();
-        if (_scroller is not null) _scroller.ViewChanged += (_, _) => UpdatePageLabel();
+        _rail.HorizontalAlignment = HorizontalAlignment.Right;
+        _rail.PageScrubbed += (_, page) =>
+        {
+            _current = page;
+            UpdatePageLabel();
+        };
+        SetColumn(_rail, 1);
+        Children.Add(_rail);
+
+        // Not in the constructor: a ListView has no template, and therefore no ScrollViewer inside
+        // it, until it has been loaded — so asking now returns null and the page indicator never
+        // moves again.
+        _list.Loaded += (_, _) =>
+        {
+            if (_scroller is not null) return;
+
+            _scroller = _list.FindScrollViewer();
+            if (_scroller is null) return;
+
+            _scroller.ViewChanged += (_, _) => UpdatePageLabel();
+            _rail.Attach(_scroller);
+            UpdatePageLabel();
+        };
+
+        // The whole viewer takes the keyboard, so the usual reading keys work without first
+        // having to click on the right thing.
+        IsTabStop = true;
+        KeyboardAccelerators.Add(Accelerator(VirtualKey.G, VirtualKeyModifiers.Control,
+            () => { _pageBox.Focus(FocusState.Programmatic); _pageBox.SelectAll(); }));
+        KeyDown += OnKeyDown;
+    }
+
+    private static KeyboardAccelerator Accelerator(VirtualKey key, VirtualKeyModifiers modifiers,
+        Action invoke)
+    {
+        var accelerator = new KeyboardAccelerator { Key = key, Modifiers = modifiers };
+        accelerator.Invoked += (_, e) =>
+        {
+            e.Handled = true;
+            invoke();
+        };
+        return accelerator;
+    }
+
+    /// <summary>
+    /// Reading keys: a page at a time, or straight to either end of the document.
+    ///
+    /// Space and the arrows are left alone — those scroll by a screenful, which is what a reader
+    /// expects them to do, and the list already handles them.
+    /// </summary>
+    private void OnKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        // Not while a number is being typed into the page box, or a phrase into the search box.
+        if (FocusManager.GetFocusedElement(XamlRoot) is TextBox) return;
+
+        switch (e.Key)
+        {
+            case VirtualKey.PageDown:
+                Step(1);
+                break;
+            case VirtualKey.PageUp:
+                Step(-1);
+                break;
+            case VirtualKey.Home:
+                GoTo(0);
+                break;
+            case VirtualKey.End:
+                GoTo(_pages.Count - 1);
+                break;
+            default:
+                return;
+        }
+
+        e.Handled = true;
     }
 
     private static Style ContainerStyle()
@@ -170,6 +261,13 @@ public sealed class PdfViewer : Grid, IContentViewer
 
         try
         {
+            // Two cheap reads, and then the document is on screen.
+            //
+            // It used to measure every page before showing anything, which on a three-hundred-page
+            // textbook is three hundred round trips into PDFium before the first pixel — and then
+            // parse the whole document again for its table of contents. Both are now avoided: the
+            // first page's shape stands in for the rest, each page corrects itself the moment it
+            // renders, and the contents are read only if somebody opens the contents pane.
             var count = await ReadAsync(() => PdfRenderer.PageCount(content));
             if (count == 0)
             {
@@ -177,26 +275,13 @@ public sealed class PdfViewer : Grid, IContentViewer
                 return;
             }
 
-            // Page shapes are read up front so every page can be laid out before any of them has
-            // been rendered. Otherwise the scroll position moves under the reader.
-            var ratios = await ReadAsync(() =>
-            {
-                var values = new double[count];
-                for (var i = 0; i < count; i++)
-                {
-                    var size = PdfRenderer.PageSize(content, i);
-                    values[i] = size is { Width: > 0 } s ? s.Height / s.Width : 1.414;
-                }
-                return values;
-            });
+            var first = await ReadAsync(() => PdfRenderer.PageSize(content, 0));
+            var ratio = first is { Width: > 0 } size ? size.Height / size.Width : 1.414;
 
             _pages.Clear();
-            for (var i = 0; i < count; i++) _pages.Add(BuildPage(i, ratios[i]));
+            for (var i = 0; i < count; i++) _pages.Add(BuildPage(i, ratio));
 
-            _outlineEntries = await ReadAsync(() => PdfText.Outline(content));
-            BuildOutline();
-            BuildThumbnails(count);
-
+            _rail.PageCount = count;
             await LoadAnnotationsAsync();
         }
         finally
@@ -264,6 +349,12 @@ public sealed class PdfViewer : Grid, IContentViewer
 
         var image = await DecodeAsync(png);
         _rendered[page.PageIndex] = image;
+
+        // The rendered bitmap knows the page's real shape, so a document whose pages are not all
+        // the same size corrects itself as it is read rather than being measured up front.
+        if (image is BitmapImage { PixelWidth: > 0 } bitmap)
+            page.Reshape((double)bitmap.PixelHeight / bitmap.PixelWidth);
+
         page.SetImage(image);
     }
 
@@ -301,6 +392,40 @@ public sealed class PdfViewer : Grid, IContentViewer
 
     // -------------------------------------------------------------------------- sides
 
+    /// <summary>
+    /// Reads the document's table of contents, once, the first time it is asked for.
+    ///
+    /// Parsing a large PDF for its bookmarks costs about as much as opening it, and most reading
+    /// never needs them — so it is not part of opening the file.
+    /// </summary>
+    private async Task LoadOutlineAsync()
+    {
+        if (_outlineLoaded || _content is null) return;
+        _outlineLoaded = true;
+
+        _outline.Items.Clear();
+        _outline.Items.Add(new TextBlock
+        {
+            Text = "Reading the contents…",
+            Style = (Style)Application.Current.Resources["Text.Caption"],
+            Margin = new Thickness(10, 6, 10, 6),
+        });
+
+        _outlineEntries = await ReadAsync(() => PdfText.Outline(_content));
+        BuildOutline();
+
+        if (_outlineEntries.Count == 0)
+        {
+            _outline.Items.Add(new TextBlock
+            {
+                Text = "This document has no table of contents.",
+                Style = (Style)Application.Current.Resources["Text.Caption"],
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(10, 6, 10, 6),
+            });
+        }
+    }
+
     private void BuildOutline()
     {
         _outline.Items.Clear();
@@ -326,11 +451,21 @@ public sealed class PdfViewer : Grid, IContentViewer
         }
     }
 
-    private void BuildThumbnails(int count)
+    /// <summary>
+    /// Fills the thumbnail strip, once, the first time it is opened.
+    ///
+    /// Building a row per page is cheap per page and expensive per book — a thousand-page
+    /// reference costs five thousand elements — so it is not part of opening the document. The
+    /// images inside the rows are lazier still: see below.
+    /// </summary>
+    private void BuildThumbnails()
     {
+        if (_thumbnailsBuilt || _content is null) return;
+        _thumbnailsBuilt = true;
+
         _thumbnails.Items.Clear();
 
-        for (var i = 0; i < count; i++)
+        for (var i = 0; i < _pages.Count; i++)
         {
             var image = new Image { Stretch = Stretch.Fill };
 
@@ -450,16 +585,35 @@ public sealed class PdfViewer : Grid, IContentViewer
 
     public IEnumerable<FrameworkElement> BuildTools()
     {
+        yield return ViewerChrome.ToolButton(CampusSymbols.ChevronUp, "Previous page",
+            () => Step(-1));
+        yield return ViewerChrome.ToolButton(CampusSymbols.ChevronDown, "Next page",
+            () => Step(1));
+
+        // A page number you can type into. Everything else about reading a long document is
+        // scrolling; going to page 214 is not, and hunting for it by dragging is miserable.
+        _pageBox.Width = 52;
+        _pageBox.TextAlignment = TextAlignment.Center;
+        _pageBox.Style = (Style)Application.Current.Resources["Input.Text"];
+        _pageBox.KeyDown += (_, e) =>
+        {
+            if (e.Key != Windows.System.VirtualKey.Enter) return;
+            e.Handled = true;
+            JumpToTypedPage();
+        };
+        _pageBox.LostFocus += (_, _) => UpdatePageLabel();
+        AutomationProperties.SetName(_pageBox, "Page number");
+        yield return _pageBox;
+
         yield return _pageLabel;
 
         yield return ViewerChrome.ToolButton(CampusSymbols.Thumbnails, "Page thumbnails",
-            () => ShowSide(_thumbnails));
+            () => { BuildThumbnails(); ShowSide(_thumbnails); });
 
-        if (_outlineEntries.Count > 0)
-        {
-            yield return ViewerChrome.ToolButton(CampusSymbols.Outline, "Contents",
-                () => ShowSide(_outline));
-        }
+        // Always offered: whether the document has a table of contents is not known until it has
+        // been read, and reading it is what opening this does.
+        yield return ViewerChrome.ToolButton(CampusSymbols.Outline, "Contents",
+            () => _ = ShowOutlineAsync());
 
         yield return ViewerChrome.ToolButton(CampusSymbols.Search, "Find in document",
             () => ShowSide(_searchPanel));
@@ -540,7 +694,38 @@ public sealed class PdfViewer : Grid, IContentViewer
     private void GoTo(int pageIndex)
     {
         if (pageIndex < 0 || pageIndex >= _pages.Count) return;
+
+        _current = pageIndex;
         _list.ScrollIntoView(_pages[pageIndex], ScrollIntoViewAlignment.Leading);
+        UpdatePageLabel();
+    }
+
+    /// <summary>Moves one page forward or back from wherever the reader is.</summary>
+    private void Step(int direction) => GoTo(Math.Clamp(_current + direction, 0, _pages.Count - 1));
+
+    private void JumpToTypedPage()
+    {
+        if (!int.TryParse(_pageBox.Text.Trim(), out var page))
+        {
+            UpdatePageLabel();
+            return;
+        }
+
+        if (page < 1 || page > _pages.Count)
+        {
+            Notifications.Show($"This document has {_pages.Count} pages.", NoticeKind.Warning);
+            UpdatePageLabel();
+            return;
+        }
+
+        // Typed page numbers are what is printed on the page, which starts at one.
+        GoTo(page - 1);
+    }
+
+    private async Task ShowOutlineAsync()
+    {
+        await LoadOutlineAsync();
+        ShowSide(_outline);
     }
 
     /// <summary>
@@ -646,14 +831,18 @@ public sealed class PdfViewer : Grid, IContentViewer
     {
         if (_pages.Count == 0) return;
 
-        var current = 1;
         if (_scroller is { ExtentHeight: > 0 })
         {
             var progress = _scroller.VerticalOffset / Math.Max(1, _scroller.ExtentHeight);
-            current = Math.Clamp((int)(progress * _pages.Count) + 1, 1, _pages.Count);
+            _current = Math.Clamp((int)(progress * _pages.Count), 0, _pages.Count - 1);
         }
 
-        _pageLabel.Text = $"{current} of {_pages.Count}  ·  {_zoom * 100:0}%";
+        // Not while it is being typed into: rewriting the box under the cursor is how a page
+        // number becomes impossible to enter.
+        if (_pageBox.FocusState == FocusState.Unfocused)
+            _pageBox.Text = (_current + 1).ToString();
+
+        _pageLabel.Text = $"of {_pages.Count}  ·  {_zoom * 100:0}%";
     }
 }
 

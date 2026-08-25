@@ -76,7 +76,24 @@ public sealed class PdfPageView : Grid
     }
 
     public int PageIndex { get; }
-    public double AspectRatio { get; }
+
+    /// <summary>Height over width. Assumed from the first page until this one has been rendered.</summary>
+    public double AspectRatio { get; private set; }
+
+    /// <summary>
+    /// Corrects the shape once the page has actually been rendered.
+    ///
+    /// Opening a document measures only its first page, because measuring all of them costs a
+    /// round trip each and most documents have one shape throughout. The ones that do not — a
+    /// scan with a landscape page in the middle — put themselves right here, as they are read.
+    /// </summary>
+    public void Reshape(double aspectRatio)
+    {
+        if (aspectRatio <= 0 || Math.Abs(aspectRatio - AspectRatio) < 0.01) return;
+
+        AspectRatio = aspectRatio;
+        Resize(_sheet.Width);
+    }
 
     /// <summary>True once the image has been asked for, so it is not asked for twice.</summary>
     public bool IsRendered { get; private set; }
