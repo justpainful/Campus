@@ -42,6 +42,18 @@ public sealed class PhoneReceiver(
     public event EventHandler<string>? Progress;
 
     /// <summary>
+    /// Whether an unpaired phone asking for a secret should be given one.
+    ///
+    /// Off unless the person at this machine has just pressed the button for it, and only ever
+    /// set for a conversation over the cable. A phone on the network asking to be paired is a
+    /// phone on the network claiming to be yours.
+    /// </summary>
+    public bool OfferPairing { get; set; }
+
+    /// <summary>Raised when a phone has just been paired, so the caller can say whose it is.</summary>
+    public event EventHandler<string>? Paired;
+
+    /// <summary>
     /// Waits for one phone to connect and takes what it has. Returns null if nothing connected
     /// before the wait was cancelled.
     /// </summary>
@@ -116,20 +128,42 @@ public sealed class PhoneReceiver(
 
         var device = await _devices.GetAsync(hello.DeviceId, ct).ConfigureAwait(false);
 
-        if (device?.SharedKey is not { Length: > 0 } secret)
-        {
-            throw await Refuse(stream,
-                "That phone is not paired with this workspace. Pair it again — the code is on "
-                + "the Sync page.", ct).ConfigureAwait(false);
-        }
+        // Pairing by QR mints the secret before the phone has said who it is, so the record it
+        // leaves behind is keyed by an id invented here. The phone then greets with its own, and
+        // this is where the two are reconciled — by the signature, which only the phone holding
+        // that secret can produce. Without this the first connection after a QR pairing is
+        // refused as "not paired", for ever, which is exactly what it did.
+        device ??= await AdoptAsync(hello, ct).ConfigureAwait(false);
 
-        if (!device.Trusted)
+        var secret = device?.SharedKey is { Length: > 0 } stored ? stored : null;
+
+        // A phone with no secret that is asking for one. Four things have to be true before it
+        // gets one, and three of them are outside this program: it is on a cable, iOS let us
+        // reach it because it has been told to trust this machine, the person here pressed the
+        // button, and the phone says it has nothing already.
+        var pairing = secret is null && hello.WantsPairing && OfferPairing;
+
+        if (pairing)
+        {
+            secret = await PairOverCableAsync(hello, ct).ConfigureAwait(false);
+        }
+        else if (secret is null)
+        {
+            throw await Refuse(stream, hello.WantsPairing
+                ? "This phone is asking to be paired. Press \u201CPair over the cable\u201D on "
+                  + "this page to allow it."
+                : "That phone is not paired with this workspace. Plug it in and press "
+                  + "\u201CPair over the cable\u201D on this page.", ct).ConfigureAwait(false);
+        }
+        else if (device is { Trusted: false })
         {
             throw await Refuse(stream, "That phone is no longer trusted by this workspace.", ct)
                 .ConfigureAwait(false);
         }
 
-        if (!PhoneSync.Verify(hello, secret))
+        // Skipped for a phone being paired right now: it could not have signed anything, because
+        // not holding the secret is the whole of what it came to fix.
+        if (!pairing && !PhoneSync.Verify(hello, secret))
         {
             // Being on the same network is not proof of anything, and this is where that is
             // enforced rather than assumed.
@@ -138,13 +172,21 @@ public sealed class PhoneReceiver(
                 .ConfigureAwait(false);
         }
 
-        Progress?.Invoke(this, $"{hello.DeviceName} is paired. Reading what it has…");
+        Progress?.Invoke(this, pairing
+            ? $"Paired with {hello.DeviceName}. Reading what it has…"
+            : $"{hello.DeviceName} is paired. Reading what it has…");
 
         await PhoneSync.WriteJsonAsync(stream, new PhoneSync.HelloAck
         {
             Accepted = true,
             WorkspaceName = workspaceName,
+            PairingCode = pairing
+                ? PhoneSync.BuildPairingCode(hello.DeviceId, workspaceName,
+                    Convert.FromBase64String(secret!))
+                : null,
         }, ct).ConfigureAwait(false);
+
+        if (pairing) Paired?.Invoke(this, hello.DeviceName);
 
         using var key = PhoneSync.TransferKey(secret);
 
@@ -209,6 +251,69 @@ public sealed class PhoneReceiver(
         await _devices.SaveAsync(device, ct).ConfigureAwait(false);
 
         return new PhoneSyncResult(hello.DeviceName, accepted.Count, rejected.Count, attachments);
+    }
+
+    /// <summary>
+    /// Finds the record a QR pairing left behind and re-keys it to the id the phone announced.
+    ///
+    /// The signature is the proof and the only one available: a device that can sign this nonce
+    /// with that secret is the device the secret was minted for. Every paired phone is tried,
+    /// which is a handful of HMACs — and a phone that matches none of them is simply not paired.
+    /// </summary>
+    private async Task<PairedDevice?> AdoptAsync(PhoneSync.Hello hello, CancellationToken ct)
+    {
+        if (hello.Signature is not { Length: > 0 }) return null;
+
+        var known = await _devices.AllAsync(ct).ConfigureAwait(false);
+
+        foreach (var candidate in known)
+        {
+            if (candidate.SharedKey is not { Length: > 0 } secret) continue;
+            if (!PhoneSync.Verify(hello, secret)) continue;
+
+            await _devices.ForgetAsync(candidate.DeviceId, ct).ConfigureAwait(false);
+
+            var adopted = new PairedDevice
+            {
+                DeviceId = hello.DeviceId,
+                DisplayName = hello.DeviceName is { Length: > 0 } name ? name : candidate.DisplayName,
+                Platform = candidate.Platform,
+                PairedAt = candidate.PairedAt,
+                SharedKey = secret,
+                Trusted = candidate.Trusted,
+            };
+
+            await _devices.SaveAsync(adopted, ct).ConfigureAwait(false);
+
+            Progress?.Invoke(this, $"Recognised {adopted.DisplayName}.");
+            return adopted;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Mints a secret for a phone on the cable and records the pairing.
+    ///
+    /// The record is keyed by the id the phone announced, rather than by one invented here, which
+    /// is the difference between this and pairing by QR: over the cable the phone speaks first,
+    /// so its identity is known before the secret exists rather than after.
+    /// </summary>
+    private async Task<string> PairOverCableAsync(PhoneSync.Hello hello, CancellationToken ct)
+    {
+        var key = PhoneSync.NewSharedKey();
+        var secret = Convert.ToBase64String(key);
+
+        await _devices.SaveAsync(new PairedDevice
+        {
+            DeviceId = hello.DeviceId,
+            DisplayName = hello.DeviceName is { Length: > 0 } name ? name : "iPhone",
+            Platform = DevicePlatform.IOS,
+            PairedAt = DateTimeOffset.UtcNow,
+            SharedKey = secret,
+        }, ct).ConfigureAwait(false);
+
+        return secret;
     }
 
     /// <summary>

@@ -63,10 +63,13 @@ final class SyncClient {
     ) async {
         defer { if closing { channel.close() } }
 
-        guard let computer = Pairing.load() else {
-            status = .failed("This phone is not paired with a computer yet.")
-            return
-        }
+        // An unpaired phone still greets, and asks.
+        //
+        // Over Wi-Fi this gets a refusal, which is correct: a computer on the same network has
+        // shown nothing except that it is on the same network. Over the cable the PC can offer a
+        // secret, because plugging this phone in and tapping Trust on it is a good deal more
+        // than a stranger can do.
+        let computer = Pairing.load()
 
         // An empty outbox still greets.
         //
@@ -76,33 +79,58 @@ final class SyncClient {
         // is nothing waiting" is an answer, and it costs one round trip to give it.
         let pending = outbox.pending
 
-        guard let keyData = Data(base64Encoded: computer.key), keyData.count == 32 else {
-            status = .failed("The pairing key on this phone is not usable. Pair again.")
-            return
-        }
-
-        let key = SymmetricKey(data: keyData)
         let deviceId = Device.identifier
 
         do {
             // ---- the greeting, in the clear: it carries no content, only proof of pairing
             let nonce = Pairing.makeNonce()
-            guard let signature = Pairing.sign(nonce: nonce, key: computer.key) else {
-                status = .failed("This phone could not sign the greeting.")
-                return
+            var signature = ""
+
+            if let computer {
+                guard let signed = Pairing.sign(nonce: nonce, key: computer.key) else {
+                    status = .failed("This phone could not sign the greeting.")
+                    return
+                }
+                signature = signed
             }
 
             try await channel.writeJSON(SyncProtocol.Hello(
                 deviceId: deviceId,
                 deviceName: Device.name,
                 nonce: nonce,
-                signature: signature))
+                signature: signature,
+                wantsPairing: computer == nil))
 
             let ack: SyncProtocol.HelloAck = try await channel.readJSON()
             guard ack.accepted else {
                 status = .failed(ack.reason ?? "That computer refused the connection.")
                 return
             }
+
+            // ---- a secret, if this was a pairing
+            var settled = computer
+
+            if let code = ack.pairingCode {
+                guard let offered = Pairing.parse(code) else {
+                    status = .failed("That computer sent a pairing code this phone cannot read.")
+                    return
+                }
+
+                try Pairing.save(offered)
+                settled = offered
+            }
+
+            guard let settled else {
+                status = .failed("This phone is not paired with a computer yet.")
+                return
+            }
+
+            guard let keyData = Data(base64Encoded: settled.key), keyData.count == 32 else {
+                status = .failed("The pairing key on this phone is not usable. Pair again.")
+                return
+            }
+
+            let key = SymmetricKey(data: keyData)
 
             // ---- the captures, encrypted
             status = .sending(0, pending.count)
@@ -134,6 +162,10 @@ final class SyncClient {
             var message = pending.isEmpty
                 ? "Nothing was waiting to send."
                 : "Sent \(result.acceptedIds.count) to \(ack.workspaceName ?? "Campus")."
+
+            if ack.pairingCode != nil {
+                message = "Paired with \(settled.name). " + message
+            }
 
             if !result.rejected.isEmpty {
                 message += " \(result.rejected.count) could not be stored and are still here."

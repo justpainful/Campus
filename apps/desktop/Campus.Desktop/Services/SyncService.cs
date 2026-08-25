@@ -266,20 +266,31 @@ public sealed class SyncService(WorkspaceService workspace)
     /// same pairing secret. Campus Pocket has to be open on the phone — iOS gives a foreground
     /// app a socket and takes it away again when the app is put down.
     /// </summary>
+    /// <param name="offerPairing">
+    /// Whether a phone that has no secret should be given one. Only ever true because somebody
+    /// pressed the button for it: the cable proves possession, not intent.
+    /// </param>
     public async Task<PhoneSyncResult?> ReceiveOverCableAsync(
-        UsbDevice device, CancellationToken ct = default)
+        UsbDevice device, bool offerPairing = false, CancellationToken ct = default)
     {
-        Progress?.Invoke(this, $"Reaching the phone over the cable…");
+        Progress?.Invoke(this, "Reaching the phone over the cable…");
 
         await using var tunnel = await UsbMux.ConnectAsync(device.DeviceId, PhoneSync.Port, ct);
 
         var receiver = new PhoneReceiver(
-            _workspace.Database, _workspace.Vault, _workspace.DeviceId, "Campus");
+            _workspace.Database, _workspace.Vault, _workspace.DeviceId, Environment.MachineName)
+        {
+            OfferPairing = offerPairing,
+        };
 
         receiver.Progress += (_, message) => Progress?.Invoke(this, message);
+        receiver.Paired += (_, name) => Paired?.Invoke(this, name);
 
         return await receiver.ReceiveOverAsync(tunnel, ct);
     }
+
+    /// <summary>Raised when a phone has just been paired over the cable.</summary>
+    public event EventHandler<string>? Paired;
 
     // ------------------------------------------------------------------------ pairing
 

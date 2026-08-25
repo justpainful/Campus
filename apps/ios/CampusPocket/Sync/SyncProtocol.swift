@@ -18,6 +18,11 @@ enum SyncProtocol {
         var deviceName: String
         var nonce: String
         var signature: String
+
+        /// Set when this phone has no pairing secret and is asking the PC for one. It cannot
+        /// sign anything in that state, so the greeting carries no proof and the PC decides on
+        /// other grounds — which over a cable it has, and over the network it does not.
+        var wantsPairing: Bool = false
     }
 
     struct HelloAck: Codable, Sendable {
@@ -25,6 +30,9 @@ enum SyncProtocol {
         var accepted: Bool
         var workspaceName: String?
         var reason: String?
+
+        /// The same string the QR would have carried, when the PC agreed to pair over the cable.
+        var pairingCode: String?
     }
 
     /// A batch of captures. Attachments follow as length-prefixed blobs, in the order the items

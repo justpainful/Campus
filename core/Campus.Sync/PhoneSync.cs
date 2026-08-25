@@ -50,6 +50,17 @@ public static class PhoneSync
         public string DeviceName { get; init; } = string.Empty;
         public string Nonce { get; init; } = string.Empty;
         public string Signature { get; init; } = string.Empty;
+
+        /// <summary>
+        /// Set by a phone that has no pairing secret yet and is asking for one.
+        ///
+        /// It cannot sign anything — that is the whole of what "not paired" means — so the
+        /// greeting carries no proof and the PC must decide on other grounds whether to answer.
+        /// Over the cable there are such grounds: somebody plugged this phone into this machine
+        /// and tapped Trust on it, and then pressed a button here. Over the network there are
+        /// none, which is why this is only ever honoured on a cable.
+        /// </summary>
+        public bool WantsPairing { get; init; }
     }
 
     public sealed record HelloAck
@@ -58,6 +69,14 @@ public static class PhoneSync
         public bool Accepted { get; init; }
         public string? WorkspaceName { get; init; }
         public string? Reason { get; init; }
+
+        /// <summary>
+        /// A freshly minted pairing code, when the phone asked for one and this machine agreed.
+        ///
+        /// The same string the QR would have carried. It goes down the cable instead of across a
+        /// room, which is a shorter journey with fewer people able to watch it.
+        /// </summary>
+        public string? PairingCode { get; init; }
     }
 
     /// <summary>One thing caught on the phone.</summary>

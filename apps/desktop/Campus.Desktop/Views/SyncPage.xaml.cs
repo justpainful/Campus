@@ -119,17 +119,33 @@ public sealed partial class SyncPage : Page
         CableTitle.Text = title;
         CableDetail.Text = detail;
         CableButton.IsEnabled = canSync && !_cableBusy;
+        CablePairButton.IsEnabled = canSync && !_cableBusy;
         CableIcon.Symbol = canSync ? CampusSymbols.Phone : CampusSymbols.Usb;
     }
 
-    private async Task SyncOverCableAsync(UsbDevice phone)
+    /// <summary>
+    /// Pairs the phone that is already plugged in.
+    ///
+    /// No code to read off a screen and no camera: the phone is on the end of a cable, iOS only
+    /// let us reach it because it has been told to trust this machine, and this button is the
+    /// person at this machine saying yes. That is the same evidence scanning a QR provides —
+    /// you must be holding both — arrived at with one press instead of four steps.
+    /// </summary>
+    private async void OnCablePairClick(object sender, RoutedEventArgs e)
+    {
+        if (_attached is not { } phone) return;
+        await SyncOverCableAsync(phone, offerPairing: true);
+    }
+
+    private async Task SyncOverCableAsync(UsbDevice phone, bool offerPairing = false)
     {
         _cableBusy = true;
         CableButton.IsEnabled = false;
+        CablePairButton.IsEnabled = false;
 
         try
         {
-            var result = await _sync.ReceiveOverCableAsync(phone);
+            var result = await _sync.ReceiveOverCableAsync(phone, offerPairing);
 
             if (result is null)
             {
@@ -171,6 +187,7 @@ public sealed partial class SyncPage : Page
         {
             _cableBusy = false;
             CableButton.IsEnabled = _attached is not null;
+            CablePairButton.IsEnabled = _attached is not null;
         }
     }
 
