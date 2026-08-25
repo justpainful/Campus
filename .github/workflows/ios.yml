@@ -203,6 +203,14 @@ jobs:
             --cellularMode active --cellularBars 4 \
             --dataNetwork wifi --wifiMode active --wifiBars 3
 
+          # The simulator offers its swipe-typing tutorial the first time a keyboard appears, and
+          # it covers the bottom half of whatever is being photographed. Marking it as already
+          # seen is the only way to decline it without tapping Continue by hand.
+          xcrun simctl spawn "$DEVICE" defaults write com.apple.Preferences \
+            DidShowContinuousPathIntroduction -bool true
+          xcrun simctl spawn "$DEVICE" defaults write com.apple.keyboard.preferences \
+            DidShowContinuousPathIntroduction -bool true
+
           app=$(find build/simulator/Build/Products -name 'CampusPocket.app' -maxdepth 3 | head -1)
           echo "Installing $app"
           xcrun simctl install "$DEVICE" "$app"

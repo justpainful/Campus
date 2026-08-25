@@ -78,10 +78,22 @@ struct OutboxView: View {
 
             Spacer()
 
-            Text(item.capturedAt, format: .relative(presentation: .numeric))
+            Text(Self.ago(item.capturedAt))
                 .font(.caption)
                 .foregroundStyle(CampusTheme.labelTertiary)
         }
+    }
+
+    /// How long ago something was captured, in words a person would use.
+    ///
+    /// Foundation's relative formatter is happy to say "in 0 seconds" about something that just
+    /// happened, and about anything a fraction of a second in the future — which, with a clock
+    /// that ticks between saving a capture and drawing the row, is most of them.
+    static func ago(_ date: Date) -> String {
+        let elapsed = Date().timeIntervalSince(date)
+        if elapsed < 60 { return "Just now" }
+
+        return date.formatted(.relative(presentation: .numeric))
     }
 
     private func subtitle(_ item: CaptureItem) -> String? {
